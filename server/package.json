@@ -1,0 +1,33 @@
+{
+  "name": "jc-waterfun-resort-api",
+  "version": "1.0.0",
+  "description": "An Express.js web application for JC Waterfun Resort, designed to handle online reservations, room management, customer inquiries, and other essential resort services.",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dsjc-devs/jc-waterfun-resort.git"
+  },
+  "keywords": [
+    "API",
+    "server"
+  ],
+  "author": "Darryle Miles Bacay",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dsjc-devs/jc-waterfun-resort/issues"
+  },
+  "homepage": "https://github.com/dsjc-devs/jc-waterfun-resort#readme",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.0",
+    "nodemon": "^3.1.10"
+  }
+}
