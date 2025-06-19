@@ -13,6 +13,9 @@ import express from 'express';
 /*  ========== Importing Configuration ========== */
 import connectDB from './config/db.js';
 
+/*  ========== Importing Routes ========== */
+import usersRoutes from './routes/userRoutes.js';
+
 const app = express();
 const __dirname = path.resolve();
 dotenv.config();
@@ -34,7 +37,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
 
 /*  ========== API - Routes ========== */
-// app.use(`/api/${API_VERSION}/users`, usersRoutes);
+app.use(`/api/${API_VERSION}/users`, usersRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'client', 'build')));
