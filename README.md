@@ -87,9 +87,6 @@ $ cd ../client && npm install
 # 3. Configure environment variables (see above)
 
 # 4. Run apps
-$ npm run dev        # Runs both client and server concurrently
-
-# Or run separately
 $ cd server && npm run server     # Runs server only
 $ cd client && npm run start      # Runs client only
 ```
