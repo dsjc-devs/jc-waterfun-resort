@@ -89,6 +89,7 @@ $ cd ../client && npm install
 # 4. Run apps
 $ cd server && npm run server     # Runs server only
 $ cd client && npm run start      # Runs client only
+$ npm run dev                     # Runs both app
 ```
 
 The API runs at **`http://localhost:5000/api/v1`** (configurable), and the React app at **`http://localhost:3000`**.
