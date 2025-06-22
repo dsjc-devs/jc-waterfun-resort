@@ -1,6 +1,6 @@
 # Website Reservation System for John Cezar Waterfun Resort
 
-*A full-stack MERN application that modernises bookings and internal operations for John Cezar Waterfun Resort.*
+_A full-stack MERN application that modernises bookings and internal operations for John Cezar Waterfun Resort._
 
 ---
 
@@ -8,7 +8,7 @@
 
 John Cezar Waterfun Resort currently relies on traditional, paper-based booking workflows. This project delivers a responsive web application that enables guests to reserve rooms online, while providing staff with an intuitive admin portal for managing reservations, rooms, and user accounts.
 
-> **Goal**   Create a seamless digital experience that benefits customers, staff, and the business by automating reservations, payments, and room availability in real time.
+> **Goal** Create a seamless digital experience that benefits customers, staff, and the business by automating reservations, payments, and room availability in real time.
 
 ---
 
@@ -85,6 +85,13 @@ $ cd server && npm install
 $ cd ../client && npm install
 
 # 3. Configure environment variables (see above)
+
+# 4. Run apps
+$ npm run dev        # Runs both client and server concurrently
+
+# Or run separately
+$ cd server && npm run server     # Runs server only
+$ cd client && npm run start      # Runs client only
 ```
 
 The API runs at **`http://localhost:5000/api/v1`** (configurable), and the React app at **`http://localhost:3000`**.
@@ -123,13 +130,13 @@ This project is licensed under the **MIT License** — see the `LICENSE` file fo
 
 ## 📬 Contact
 
-* **Project Lead:** Darryle Miles Bacay
-* **Email:** [dmilesbacay@gmail.com](mailto:dmilesbacay@gmail.com)
-* **Dev Team:**
+- **Project Lead:** Darryle Miles Bacay
+- **Email:** [dmilesbacay@gmail.com](mailto:dmilesbacay@gmail.com)
+- **Dev Team:**
 
-  * Darryle Miles Bacay
-  * Shannon Paul Giron
-  * Christian Len Sarabia
-  * Jhon Ace Sasutona
+  - Darryle Miles Bacay
+  - Shannon Paul Giron
+  - Christian Len Sarabia
+  - Jhon Ace Sasutona
 
 > Built with ❤️ using the Agile Systems Development Life Cycle (ASDLC).
