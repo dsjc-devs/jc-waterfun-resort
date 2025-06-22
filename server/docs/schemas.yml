@@ -1,0 +1,160 @@
+openapi: 3.0.0
+info:
+  title: JC Waterfun Resort API
+  version: 1.0.0
+  description: REST API documentation for managing users
+
+servers:
+  - url: http://localhost:5000/api/v1
+    description: Local dev
+
+tags:
+  - name: Users
+    description: Endpoints for managing users
+
+paths:
+  /users/create:
+    post:
+      summary: Create a new user
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInput"
+      responses:
+        200:
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users:
+    get:
+      summary: Get all users
+      tags: [Users]
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+      responses:
+        200:
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /users/{userId}:
+    get:
+      summary: Get a user by ID
+      tags: [Users]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: User fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+    patch:
+      summary: Update a user by ID
+      tags: [Users]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInput"
+      responses:
+        200:
+          description: User updated successfully
+
+    delete:
+      summary: Delete a user by ID
+      tags: [Users]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: User deleted successfully
+
+components:
+  schemas:
+    Position:
+      type: object
+      properties:
+        label:
+          type: string
+          example: Staff
+        value:
+          type: string
+          example: STAFF
+
+    User:
+      type: object
+      properties:
+        userId:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        emailAddress:
+          type: string
+        avatar:
+          type: string
+        status:
+          type: string
+        position:
+          type: array
+          items:
+            $ref: "#/components/schemas/Position"
+
+    UserInput:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - emailAddress
+        - password
+        - position
+        - status
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        emailAddress:
+          type: string
+        password:
+          type: string
+        avatar:
+          type: string
+        status:
+          type: string
+        position:
+          type: array
+          items:
+            $ref: "#/components/schemas/Position"

@@ -9,6 +9,8 @@ import path from 'path';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
+import YAML from 'yamljs';
+import swaggerUi from 'swagger-ui-express';
 
 /*  ========== Importing Configuration ========== */
 import connectDB from './config/db.js';
@@ -32,9 +34,14 @@ const corsOptions = {
   optionSuccessStatus: 200,
 };
 
+/*  ========== CORS - Setup ========== */
 app.use(cors(corsOptions)); // Use this after the variable declaration
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
+
+/*  ========== Swagger - Setup ========== */
+const swaggerDocument = YAML.load(path.join(__dirname, 'docs', 'schemas.yml'));
+app.use(`/api/${API_VERSION}/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 /*  ========== API - Routes ========== */
 app.use(`/api/${API_VERSION}/users`, usersRoutes);
