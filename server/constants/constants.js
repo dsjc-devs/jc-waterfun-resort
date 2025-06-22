@@ -1,4 +1,4 @@
-export const colours = {
+const colours = {
   reset: '\x1b[0m',
   bright: '\x1b[1m',
   dim: '\x1b[2m',
@@ -32,3 +32,26 @@ export const colours = {
     crimson: '\x1b[48m'
   }
 };
+
+const USER_TYPES = [
+  {
+    label: "Master Admin",
+    value: "MASTER_ADMIN"
+  },
+  {
+    label: "Receptionist",
+    value: "RECEPTIONIST"
+  },
+  {
+    label: "Staff",
+    value: "STAFF"
+  },
+]
+
+const USER_STATUSSES = ["ACTIVE", "INACTIVE", "ARCHIVED"]
+
+export {
+  colours,
+  USER_TYPES,
+  USER_STATUSSES
+}
