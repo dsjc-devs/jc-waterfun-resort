@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 // project import
-import { APP_DEFAULT_PATH } from 'config/cofig';
+import { APP_DEFAULT_PATH } from 'config/config';
 
 // material-ui
 import { Box, Button, Grid, Stack, Typography } from '@mui/material';

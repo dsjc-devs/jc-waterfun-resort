@@ -7,7 +7,7 @@ import PageWrapper from '../layout/Wrapper/Wrapper'
 // render - absolute pages
 const Home = Loadable(lazy(() => import('pages/home/index')));
 
-const NotFoundPage = Loadable(lazy(() => import('pages/portal/maintenance/404')));
+const NotFoundPage = Loadable(lazy(() => import('pages/maintenance/404')));
 
 // ==============================|| AUTH ROUTING ||============================== //
 

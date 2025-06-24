@@ -1,40 +1,29 @@
 // material-ui
 import useMediaQuery from '@mui/material/useMediaQuery';
-import IconButton from '@mui/material/IconButton';
-import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 
 // project import
-import Search from './Search';
 import Profile from './Profile';
-import Notification from './Notification';
 import MobileSection from './MobileSection';
-
-// project import
-import { GithubOutlined } from '@ant-design/icons';
+import { Button, Stack } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 // ==============================|| HEADER - CONTENT ||============================== //
 
 export default function HeaderContent() {
   const downLG = useMediaQuery((theme) => theme.breakpoints.down('lg'));
+  const navigate = useNavigate()
 
   return (
     <>
-      {!downLG && <Search />}
+      {!downLG && <Box sx={{ width: '100%' }} />}
       {downLG && <Box sx={{ width: '100%', ml: 1 }} />}
-      <IconButton
-        component={Link}
-        href="https://github.com/codedthemes/mantis-free-react-admin-template"
-        target="_blank"
-        disableRipple
-        color="secondary"
-        title="Download Free Version"
-        sx={{ color: 'text.primary', bgcolor: 'grey.100' }}
-      >
-        <GithubOutlined />
-      </IconButton>
 
-      <Notification />
+      <Stack gap={3} marginInline={3} flexDirection='row' alignItems='center'>
+        <Box sx={{ flexShrink: 0, mx: 1, display: 'flex', alignItems: 'center' }}>
+          <Button sx={{ color: 'text.primary' }} onClick={() => navigate('/', '_blank')}> Home Website </Button>
+        </Box>
+      </Stack>
       {!downLG && <Profile />}
       {downLG && <MobileSection />}
     </>
