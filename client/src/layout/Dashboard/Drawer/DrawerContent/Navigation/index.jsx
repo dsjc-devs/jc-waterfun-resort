@@ -1,5 +1,4 @@
 // material-ui
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 // project import
@@ -9,18 +8,27 @@ import menuItem from 'menu-items';
 // ==============================|| DRAWER CONTENT - NAVIGATION ||============================== //
 
 export default function Navigation() {
-  const navGroups = menuItem.items.map((item) => {
-    switch (item.type) {
-      case 'group':
-        return <NavGroup key={item.id} item={item} />;
-      default:
-        return (
-          <Typography key={item.id} variant="h6" color="error" align="center">
-            Fix - Navigation Group
-          </Typography>
+  const userRole = "POSITIONS.POSITIONS_MASTER_ADMIN";
+
+  const navGroups = menuItem.items
+    .filter((item) => {
+      if (item?.access?.includes(userRole)) {
+        const filteredChildren = item.children?.filter((child) =>
+          child.access?.includes(userRole)
         );
-    }
-  });
+
+        if (!filteredChildren?.length) {
+          return false;
+        }
+
+        item.children = filteredChildren;
+        return true;
+      }
+      return false;
+    })
+    .map((item) => <NavGroup key={item.id} item={item} />);
 
   return <Box sx={{ pt: 2 }}>{navGroups}</Box>;
 }
+
+
