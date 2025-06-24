@@ -27,7 +27,7 @@ export default function NavCard() {
         </Stack>
         <AnimateButton>
           <Button component={Link} target="_blank" href="/portal/tickets/submit" variant="contained" color="primary" size="small">
-            Support
+            Submit a ticket
           </Button>
         </AnimateButton>
       </Stack>
