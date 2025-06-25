@@ -1,4 +1,4 @@
-import logo from 'src/assets/images/logo/logo-circular.png';
+import logo from 'src/assets/images/logo/logo.png';
 
 // ==============================|| LOGO SVG ||============================== //
 
