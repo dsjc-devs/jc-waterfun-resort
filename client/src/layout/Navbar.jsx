@@ -4,7 +4,7 @@ import { Button, Stack, Typography } from '@mui/material'
 
 
 import navItems from './Wrapper/nav-items/navItems'
-import Logo from 'assets/images/logo/logo.png'
+import Logo from 'assets/images/logo/logo-circular.png'
 
 const Navbar = () => {
   const navigate = useNavigate()
