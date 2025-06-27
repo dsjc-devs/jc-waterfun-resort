@@ -6,7 +6,7 @@ import { Grid, Typography, Stack, } from '@mui/material'
 
 import address from 'layout/footer-items/address'
 import quickLinks from 'layout/footer-items/quickLinks'
-
+import { COMPANY_NAME } from 'constants/constants.js';
 
 const Footer = () => {
 
@@ -15,11 +15,11 @@ const Footer = () => {
   const currentYear = date.getFullYear();
   const navigate = useNavigate();
 
-  
+
 
   return (
-    
-<React.Fragment>
+
+    <React.Fragment>
       <Grid
         container
         sx={{
@@ -33,7 +33,7 @@ const Footer = () => {
           </Typography>
           {address.map((ad) => (
             <Stack key={ad.name} direction="row" alignItems="center" spacing={2} mb={1.5} >
-              {React.createElement(ad.icon, { style: { color: ad.color , fontSize: 18 } })}
+              {React.createElement(ad.icon, { style: { color: ad.color, fontSize: 18 } })}
               <Typography variant="subtitle2" color="#ffffff">
                 {ad.name}
               </Typography>
@@ -46,7 +46,7 @@ const Footer = () => {
           </Typography>
           {quickLinks.map((ql) => (
             <Stack key={ql.name} onClick={() => navigate(ql.link)} sx={{ cursor: 'pointer', ":hover": { textDecoration: 'underline #fff' } }} direction="row" alignItems="center" spacing={2} mb={1.5} >
-               {React.createElement(ql.icon, { style: { color: ql.color , fontSize: 18 } })}
+              {React.createElement(ql.icon, { style: { color: ql.color, fontSize: 18 } })}
               <Typography variant="subtitle2" color="#ffffff">
                 {ql.name}
               </Typography>
@@ -59,10 +59,10 @@ const Footer = () => {
             Book Your Reservation Today!
           </Typography>
           <Typography mb={1} variant="subtitle2" color="#ffffff">
-            Come and enjoy a relaxing stay at Pacific Sky Beach Resort, where the ocean views are stunning, and the atmosphere is peaceful. Whether you want to unwind or have fun by the beach, we have everything you need for a perfect getaway. Book your reservation today and make memories that will last a lifetime!
-          </Typography>
-        </Grid>
-      </Grid>
+            Come and enjoy a relaxing stay at {COMPANY_NAME}, where the ocean views are stunning, and the atmosphere is peaceful.Whether you want to unwind or have fun by the beach, we have everything you need for a perfect getaway.Book your reservation today and make memories that will last a lifetime!
+          </Typography >
+        </Grid >
+      </Grid >
 
       <Stack gap={1}
         sx={{
@@ -74,12 +74,12 @@ const Footer = () => {
           padding: 1.5,
         }}>
 
-        <Typography variant= 'h6' color="#ffff">©</Typography>
+        <Typography variant='h6' color="#ffff">©</Typography>
         <Typography variant='h6' color="#ffff" sx={{ cursor: 'pointer', ":hover": { textDecoration: 'underline' } }}>Investpro Realty, All Rights Reserved {currentYear} </Typography>
-     
+
       </Stack>
 
-       </React.Fragment>
+    </React.Fragment >
 
   )
 }
