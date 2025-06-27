@@ -17,6 +17,7 @@ import connectDB from './config/db.js';
 
 /*  ========== Importing Routes ========== */
 import usersRoutes from './routes/userRoutes.js';
+import testimonialsRoutes from './routes/testimonialsRoutes.js';
 
 const app = express();
 const __dirname = path.resolve();
@@ -45,6 +46,7 @@ app.use(`/api/${API_VERSION}/api-docs`, swaggerUi.serve, swaggerUi.setup(swagger
 
 /*  ========== API - Routes ========== */
 app.use(`/api/${API_VERSION}/users`, usersRoutes);
+app.use(`/api/${API_VERSION}/testimonials`, testimonialsRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'client', 'build')));
