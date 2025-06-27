@@ -17,7 +17,7 @@ const createTestimonial = async (testimonialData) => {
       rating,
     });
 
-    return testimonial;
+    return `Testimonial with ID ${testimonial.testimonialId} successfully created.`;
   } catch (error) {
     console.error("Error creating testimonial:", error.message);
     throw new Error(error);
