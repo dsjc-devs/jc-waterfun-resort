@@ -3,7 +3,10 @@ import userServices from '../services/userServices.js';
 
 const createUser = expressAsync(async (req, res) => {
   try {
-    const response = await userServices.createUser(req.body);
+    const avatar = req.files && req.files['avatar'] ? req.files['avatar'][0].path : "";
+    const payload = { ...req.body, avatar }
+
+    const response = await userServices.createUser(payload);
     res.json(response)
   } catch (error) {
     console.error(error);
