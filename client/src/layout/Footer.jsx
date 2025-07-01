@@ -63,7 +63,6 @@ const Footer = () => {
           </Typography >
         </Grid >
       </Grid >
-
       <Stack gap={1}
         sx={{
           backgroundColor: 'rgba(0, 0, 0, .4)',
@@ -74,12 +73,13 @@ const Footer = () => {
           padding: 1.5,
         }}>
 
-        <Typography variant='h6' color="#ffff">©</Typography>
-        <Typography variant='h6' color="#ffff" sx={{ cursor: 'pointer', ":hover": { textDecoration: 'underline' } }}>Investpro Realty, All Rights Reserved {currentYear} </Typography>
 
+        <Typography variant= 'h6' color="#ffff">©</Typography>
+        <Typography variant='h6' color="#ffff" sx={{ cursor: 'pointer', ":hover": { textDecoration: 'underline' } }}>{COMPANY_NAME}, All Rights Reserved {currentYear} </Typography>
+     
       </Stack>
 
-    </React.Fragment >
+       </React.Fragment>
 
   )
 }
