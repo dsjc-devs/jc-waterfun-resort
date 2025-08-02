@@ -6,7 +6,8 @@ import { Grid, Typography, Stack, } from '@mui/material'
 
 import address from 'layout/footer-items/address'
 import quickLinks from 'layout/footer-items/quickLinks'
-import { COMPANY_NAME } from 'constants/constants.js';
+import  {COMPANY_NAME}  from 'constants/constants.js';
+
 
 const Footer = () => {
 
@@ -72,7 +73,6 @@ const Footer = () => {
           flexDirection: 'row',
           padding: 1.5,
         }}>
-
 
         <Typography variant= 'h6' color="#ffff">©</Typography>
         <Typography variant='h6' color="#ffff" sx={{ cursor: 'pointer', ":hover": { textDecoration: 'underline' } }}>{COMPANY_NAME}, All Rights Reserved {currentYear} </Typography>
