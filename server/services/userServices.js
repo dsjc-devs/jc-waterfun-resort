@@ -1,6 +1,44 @@
 import Users from '../models/usersModels.js';
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken'
+
+const authUser = async (data) => {
+  const { emailAddress, password } = data || {};
+
+  if (!emailAddress || !password) {
+    throw new Error("Email and password are required");
+  }
+
+  const user = await Users.findOne({ emailAddress });
+
+  if (!user) {
+    throw new Error("Invalid email or password");
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new Error("Invalid email or password");
+  }
+
+  const userObj = user.toObject();
+  delete userObj.password;
+
+  const token = jwt.sign(
+    { userId: user.userId, emailAddress: user.emailAddress },
+    process.env.JWT_SECRET,
+    { expiresIn: "30d" }
+  );
+
+  console.log('JWT_SECRET used to verify:', process.env.JWT_SECRET);
+  console.log('Token:', token);
+
+  return {
+    message: "Authentication successful",
+    user: userObj,
+    token,
+  };
+};
 
 const createUser = async (userData) => {
   const {
@@ -121,6 +159,7 @@ const deleteUserById = async (userId) => {
 };
 
 export default {
+  authUser,
   createUser,
   getUsers,
   getSingleUserById,

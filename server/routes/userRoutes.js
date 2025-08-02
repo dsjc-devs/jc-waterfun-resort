@@ -1,7 +1,9 @@
 import express from 'express';
 import { createValidator } from '../middleware/validations/userValidator.js'
+import { protect } from '../middleware/authMiddleware.js'
 
 import {
+  authUser,
   createUser,
   getUsers,
   getSingleUserById,
@@ -11,6 +13,8 @@ import {
 import createUploadMiddleware from '../middleware/multer/uploadMiddleware.js'
 
 const router = express.Router();
+
+router.post('/login', authUser)
 
 router.post(
   '/create',
@@ -26,10 +30,10 @@ router.post(
   createUser
 );
 
-router.get('/', getUsers)
+router.get('/', protect, getUsers)
 
 router.get('/:userId', getSingleUserById)
-router.patch('/:userId', updateUserById)
-router.delete('/:userId', deleteUserById)
+router.patch('/:userId', protect, updateUserById)
+router.delete('/:userId', protect, deleteUserById)
 
 export default router

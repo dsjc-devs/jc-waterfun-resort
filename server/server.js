@@ -48,7 +48,7 @@ app.use(`/api/${API_VERSION}/api-docs`, swaggerUi.serve, swaggerUi.setup(swagger
 /*  ========== API - Routes ========== */
 app.use(`/api/${API_VERSION}/users`, usersRoutes);
 app.use(`/api/${API_VERSION}/testimonials`, testimonialsRoutes);
-app.use(`/api/${API_VERSION}/marketing-material`, marketingMaterialsRoutes);1
+app.use(`/api/${API_VERSION}/marketing-material`, marketingMaterialsRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'client', 'build')));

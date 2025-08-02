@@ -1,6 +1,16 @@
 import expressAsync from "express-async-handler";
 import userServices from '../services/userServices.js';
 
+const authUser = expressAsync(async (req, res) => {
+  try {
+    const response = await userServices.authUser(req.body)
+    res.json(response)
+  } catch (error) {
+    console.log(error);
+    throw new Error(error)
+  }
+})
+
 const createUser = expressAsync(async (req, res) => {
   try {
     const avatar = req.files && req.files['avatar'] ? req.files['avatar'][0].path : "";
@@ -55,6 +65,7 @@ const deleteUserById = expressAsync(async (req, res) => {
 });
 
 export {
+  authUser,
   createUser,
   getUsers,
   getSingleUserById,
