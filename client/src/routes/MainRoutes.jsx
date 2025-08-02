@@ -4,8 +4,10 @@ import DashboardLayout from 'layout/Dashboard';
 
 // Lazy-loaded components
 const DashboardDefault = Loadable(lazy(() => import('pages/portal/dashboard')));
-
 const UnderConstruction = Loadable(lazy(() => import('pages/maintenance/under-construction')));
+
+// pages
+const Staffs = Loadable(lazy(() => import('pages/portal/staffs')));
 
 const MainRoutes = {
   path: '/',
@@ -22,66 +24,37 @@ const MainRoutes = {
           element: <DashboardDefault />
         },
         {
-          path: 'human-resource',
-          children: [
-            {
-              path: 'staffs',
-              element: <UnderConstruction />
-            },
-            {
-              path: 'customers',
-              element: <UnderConstruction />
-            }
-          ]
+          path: 'staffs',
+          element: <Staffs />
+        },
+        {
+          path: 'customers',
+          element: <UnderConstruction />
         },
         {
           path: 'rooms',
-          children: [
-            {
-              path: '',
-              element: <UnderConstruction />
-            }
-          ]
+          element: <UnderConstruction />
         },
         {
           path: 'reservations',
-          children: [
-            {
-              path: '',
-              element: <UnderConstruction />
-            },
-            {
-              path: 'calendar',
-              element: <UnderConstruction />
-            },
-          ]
+          element: <UnderConstruction />
         },
         {
-          path: 'marketing',
-          children: [
-            {
-              path: 'banners',
-              element: <UnderConstruction />
-            },
-            {
-              path: 'promotions',
-              element: <UnderConstruction />
-            },
-          ]
+          path: 'calendar',
+          element: <UnderConstruction />
         },
         {
-          path: 'tickets',
-          children: [
-            {
-              path: '',
-              element: <UnderConstruction />
-            },
-            {
-              path: 'submit',
-              element: <UnderConstruction />
-            },
-          ]
+          path: 'banners',
+          element: <UnderConstruction />
         },
+        {
+          path: 'promotions',
+          element: <UnderConstruction />
+        },
+        {
+          path: 'my-reservations',
+          element: <UnderConstruction />
+        }
       ]
     }
   ]
