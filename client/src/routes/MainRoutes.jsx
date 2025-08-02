@@ -12,7 +12,6 @@ const MainRoutes = {
   element: <DashboardLayout />,
   children: [
     {
-      index: true,
       element: <DashboardDefault />
     },
     {
