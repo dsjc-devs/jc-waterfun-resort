@@ -12,7 +12,7 @@ const TitleTag = ({ title, subtitle, icon }) => {
         <Typography variant="h4" color="secondary">
           {subtitle || COMPANY_NAME}
         </Typography>
-        <Typography variant="h1" fontWeight={900}>
+        <Typography variant="h2">
           {title}
         </Typography>
       </Box>

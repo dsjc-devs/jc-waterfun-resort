@@ -1350,10 +1350,20 @@
   resolved "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.2.2.tgz"
   integrity sha512-J4yDIIthosAsRZ5CPYP/jQvUAQtlZTTD/4suA08/FEnlxqW3sKS9iAhgsa9VYLZ6vDHn/ixJgIqRQPotoBjxIw==
 
+"@fontsource/cinzel@^5.2.6":
+  version "5.2.6"
+  resolved "https://registry.npmjs.org/@fontsource/cinzel/-/cinzel-5.2.6.tgz"
+  integrity sha512-ec+bdUJiEugRaDxoXAt7GWb0dYiAW6256a4OsZ8UXgAdsxF798xa9l/B/WrgHTExFhWYWNB0Y9xqcfbqWajTAw==
+
 "@fontsource/inter@^5.0.17":
   version "5.0.18"
   resolved "https://registry.npmjs.org/@fontsource/inter/-/inter-5.0.18.tgz"
   integrity sha512-YCsoYPTcs713sI7tLtxaPrIhXAXvEetGg5Ry02ivA8qUOb3fQHojbK/X9HLD5OOKvFUNR2Ynkwb1kR1hVKQHpw==
+
+"@fontsource/istok-web@^5.2.6":
+  version "5.2.6"
+  resolved "https://registry.npmjs.org/@fontsource/istok-web/-/istok-web-5.2.6.tgz"
+  integrity sha512-+dCGBSsEl3qL9YARU1lB/gRBcmsV7q7+5DFRzEz0lgpM8Q/sQ6Bx7sqmEKFxUeUR8ozroSYPwCVOobmsZ8ZKjQ==
 
 "@fontsource/poppins@^5.0.12":
   version "5.0.14"

@@ -8,7 +8,7 @@ import menuItem from 'menu-items';
 // ==============================|| DRAWER CONTENT - NAVIGATION ||============================== //
 
 export default function Navigation() {
-  const userRole = "POSITIONS.POSITIONS_MASTER_ADMIN";
+  const userRole = "MASTER_ADMIN";
 
   const navGroups = menuItem.items
     .filter((item) => {

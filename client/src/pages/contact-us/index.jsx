@@ -100,20 +100,9 @@ const ContactUs = () => {
       <PageTitle title="Contact Us" isOnportal={false} />
       <Box sx={{ px: 4, py: 6 }}>
         <TitleTag title="Contact Us" />
-
         <Grid container spacing={4} justifyContent="center" alignItems="flex-start" mt={6} paddingInline={10}>
           <Grid item xs={12} md={6}>
-            <Box
-              sx={{
-                border: '1px solid #839CAA',
-                padding: '3px',
-                borderRadius: '4px',
-                display: 'inline-block',
-              }}
-            >
-              <Typography variant="h6" color="#00B2FF">Contact Us</Typography>
-            </Box>
-            <Typography variant="h1" sx={{ mt: 3 }}>
+            <Typography variant="h2" sx={{ mt: 3 }}>
               If you have any questions, feel free to reach out to us!
             </Typography>
             <Typography variant="body1" color="#839CAA" sx={{ mt: 2 }}>
@@ -251,7 +240,6 @@ const ContactUs = () => {
           </Alert>
         </Snackbar>
 
-        {/* Confirmation Dialog */}
         <Dialog open={showModal} onClose={() => setShowModal(false)} fullWidth maxWidth="sm">
           <DialogTitle sx={{ fontWeight: 'bold', fontSize: '30px' }}>
             Thank You for Contacting Us!

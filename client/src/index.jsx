@@ -27,6 +27,18 @@ import '@fontsource/public-sans/500.css';
 import '@fontsource/public-sans/600.css';
 import '@fontsource/public-sans/700.css';
 
+import '@fontsource/cinzel/400.css';
+import '@fontsource/cinzel/500.css';
+import '@fontsource/cinzel/600.css';
+import '@fontsource/cinzel/700.css';
+import '@fontsource/cinzel/800.css';
+import '@fontsource/cinzel/900.css';
+
+import '@fontsource/istok-web/400.css';
+import '@fontsource/istok-web/700.css';
+import '@fontsource/istok-web/400-italic.css';
+import '@fontsource/istok-web/700-italic.css';
+
 // project import
 import App from './App';
 import reportWebVitals from './reportWebVitals';

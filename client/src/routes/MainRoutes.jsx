@@ -1,19 +1,18 @@
 import { lazy } from 'react';
-
-// project import
 import Loadable from 'components/Loadable';
-import Dashboard from 'layout/Dashboard';
+import DashboardLayout from 'layout/Dashboard';
 
-const DashboardDefault = Loadable(lazy(() => import('pages/portal/dashboard/index')));
+// Lazy-loaded components
+const DashboardDefault = Loadable(lazy(() => import('pages/portal/dashboard')));
 
-// ==============================|| MAIN ROUTING ||============================== //
+const UnderConstruction = Loadable(lazy(() => import('pages/maintenance/under-construction')));
 
 const MainRoutes = {
   path: '/',
-  element: <Dashboard />,
+  element: <DashboardLayout />,
   children: [
     {
-      path: '/',
+      index: true,
       element: <DashboardDefault />
     },
     {
@@ -23,8 +22,69 @@ const MainRoutes = {
           path: 'dashboard',
           element: <DashboardDefault />
         },
+        {
+          path: 'human-resource',
+          children: [
+            {
+              path: 'staffs',
+              element: <UnderConstruction />
+            },
+            {
+              path: 'customers',
+              element: <UnderConstruction />
+            }
+          ]
+        },
+        {
+          path: 'rooms',
+          children: [
+            {
+              path: '',
+              element: <UnderConstruction />
+            }
+          ]
+        },
+        {
+          path: 'reservations',
+          children: [
+            {
+              path: '',
+              element: <UnderConstruction />
+            },
+            {
+              path: 'calendar',
+              element: <UnderConstruction />
+            },
+          ]
+        },
+        {
+          path: 'marketing',
+          children: [
+            {
+              path: 'banners',
+              element: <UnderConstruction />
+            },
+            {
+              path: 'promotions',
+              element: <UnderConstruction />
+            },
+          ]
+        },
+        {
+          path: 'tickets',
+          children: [
+            {
+              path: '',
+              element: <UnderConstruction />
+            },
+            {
+              path: 'submit',
+              element: <UnderConstruction />
+            },
+          ]
+        },
       ]
-    },
+    }
   ]
 };
 

@@ -39,8 +39,8 @@ const USER_TYPES = [
     value: "MASTER_ADMIN"
   },
   {
-    label: "Receptionist",
-    value: "RECEPTIONIST"
+    label: "Customer",
+    value: "CUSTOMER"
   },
   {
     label: "Staff",
