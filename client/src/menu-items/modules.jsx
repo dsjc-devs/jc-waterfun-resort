@@ -62,7 +62,7 @@ const modules = [
         url: '/portal/staffs',
         icon: icons.AccountGroupIcon,
         breadcrumbs: false,
-        access: [USER_TYPES[0].value],
+        access: [USER_TYPES[0].value, USER_TYPES[1].value],
       },
       {
         id: 'customer-list',

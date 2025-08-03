@@ -4,11 +4,14 @@ import Box from '@mui/material/Box';
 // project import
 import NavGroup from './NavGroup';
 import menuItem from 'menu-items';
+import useAuth from 'hooks/useAuth';
 
 // ==============================|| DRAWER CONTENT - NAVIGATION ||============================== //
 
 export default function Navigation() {
-  const userRole = "MASTER_ADMIN";
+  const { user } = useAuth()
+
+  const userRole = user?.position[0]?.value
 
   const navGroups = menuItem.items
     .filter((item) => {

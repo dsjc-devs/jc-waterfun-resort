@@ -1,11 +1,9 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
-// material-ui
+// Material-UI
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
-import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
@@ -17,24 +15,27 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-// third party
+// Third Party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 
-// project import
+// Project Import
 import AnimateButton from 'components/@extended/AnimateButton';
+import useAuth from 'hooks/useAuth';
 
-// assets
+// Assets
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
-import FirebaseSocial from './FirebaseSocial';
+import { useSnackbar } from 'contexts/SnackbarContext';
 
 // ============================|| JWT - LOGIN ||============================ //
 
-export default function AuthLogin({ isDemo = false }) {
+export default function AuthLogin() {
+  const { login, isLoggedIn } = useAuth();
+  const navigate = useNavigate();
   const [checked, setChecked] = React.useState(false);
-
   const [showPassword, setShowPassword] = React.useState(false);
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -43,18 +44,41 @@ export default function AuthLogin({ isDemo = false }) {
     event.preventDefault();
   };
 
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/portal/dashboard')
+    }
+  }, [isLoggedIn])
+
+  const { openSnackbar } = useSnackbar();
+
   return (
-    <>
+    <React.Fragment>
       <Formik
         initialValues={{
-          email: '',
+          emailAddress: '',
           password: '',
-          submit: null
         }}
         validationSchema={Yup.object().shape({
-          email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+          emailAddress: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
           password: Yup.string().max(255).required('Password is required')
         })}
+        onSubmit={async (values, { setStatus, setSubmitting }) => {
+          try {
+            await login(values.emailAddress, values.password);
+            setStatus({ success: true });
+            setSubmitting(false);
+            navigate('/portal/dashboard')
+          } catch (error) {
+            setStatus({ success: false });
+            setSubmitting(false);
+            openSnackbar({
+              message: error?.message,
+              anchorOrigin: { vertical: 'top', horizontal: 'right' },
+              alert: { color: 'error' },
+            });
+          }
+        }}
       >
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit}>
@@ -65,18 +89,18 @@ export default function AuthLogin({ isDemo = false }) {
                   <OutlinedInput
                     id="email-login"
                     type="email"
-                    value={values.email}
-                    name="email"
+                    value={values.emailAddress}
+                    name="emailAddress"
                     onBlur={handleBlur}
                     onChange={handleChange}
                     placeholder="Enter email address"
                     fullWidth
-                    error={Boolean(touched.email && errors.email)}
+                    error={Boolean(touched.emailAddress && errors.emailAddress)}
                   />
                 </Stack>
-                {touched.email && errors.email && (
+                {touched.emailAddress && errors.emailAddress && (
                   <FormHelperText error id="standard-weight-helper-text-email-login">
-                    {errors.email}
+                    {errors.emailAddress}
                   </FormHelperText>
                 )}
               </Grid>
@@ -86,7 +110,7 @@ export default function AuthLogin({ isDemo = false }) {
                   <OutlinedInput
                     fullWidth
                     error={Boolean(touched.password && errors.password)}
-                    id="-password-login"
+                    id="password-login"
                     type={showPassword ? 'text' : 'password'}
                     value={values.password}
                     name="password"
@@ -116,20 +140,8 @@ export default function AuthLogin({ isDemo = false }) {
               </Grid>
 
               <Grid item xs={12} sx={{ mt: -1 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={checked}
-                        onChange={(event) => setChecked(event.target.checked)}
-                        name="checked"
-                        color="primary"
-                        size="small"
-                      />
-                    }
-                    label={<Typography variant="h6">Keep me sign in</Typography>}
-                  />
-                  <Link variant="h6" component={RouterLink} color="text.primary">
+                <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
+                  <Link variant="h6" component={RouterLink} color="text.primary" to="/forgot-password">
                     Forgot Password?
                   </Link>
                 </Stack>
@@ -146,20 +158,10 @@ export default function AuthLogin({ isDemo = false }) {
                   </Button>
                 </AnimateButton>
               </Grid>
-              <Grid item xs={12}>
-                <Divider>
-                  <Typography variant="caption"> Login with</Typography>
-                </Divider>
-              </Grid>
-              <Grid item xs={12}>
-                <FirebaseSocial />
-              </Grid>
             </Grid>
           </form>
         )}
       </Formik>
-    </>
+    </React.Fragment>
   );
 }
-
-AuthLogin.propTypes = { isDemo: PropTypes.bool };

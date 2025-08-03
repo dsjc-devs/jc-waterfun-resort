@@ -9,6 +9,9 @@ const UnderConstruction = Loadable(lazy(() => import('pages/maintenance/under-co
 // pages
 const Staffs = Loadable(lazy(() => import('pages/portal/staffs')));
 
+const Customers = Loadable(lazy(() => import('pages/portal/customers')));
+const CustomersDetails = Loadable(lazy(() => import('pages/portal/customers/details')));
+
 const MainRoutes = {
   path: '/',
   element: <DashboardLayout />,
@@ -29,7 +32,16 @@ const MainRoutes = {
         },
         {
           path: 'customers',
-          element: <UnderConstruction />
+          children: [
+            {
+              index: true,
+              element: <Customers />
+            },
+            {
+              path: 'details/:id',
+              element: <CustomersDetails />
+            }
+          ]
         },
         {
           path: 'rooms',
