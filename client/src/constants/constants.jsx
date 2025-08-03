@@ -15,7 +15,10 @@ const USER_TYPES = [
   }
 ]
 
+const BLANK_VALUE = "-"
+
 export {
   COMPANY_NAME,
-  USER_TYPES
+  USER_TYPES,
+  BLANK_VALUE
 }

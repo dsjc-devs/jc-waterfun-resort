@@ -14,6 +14,7 @@ import Loader from 'components/Loader';
 import Breadcrumbs from 'components/@extended/Breadcrumbs';
 
 import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
+import AuthGuard from 'route-guard/AuthGuard';
 
 // ==============================|| MAIN LAYOUT ||============================== //
 
@@ -29,14 +30,16 @@ export default function DashboardLayout() {
   if (menuMasterLoading) return <Loader />;
 
   return (
-    <Box sx={{ display: 'flex', width: '100%' }}>
-      <Header />
-      <Drawer />
-      <Box component="main" sx={{ width: 'calc(100% - 260px)', flexGrow: 1, p: { xs: 2, sm: 3 } }}>
-        <Toolbar />
-        <Breadcrumbs navigation={navigation} title />
-        <Outlet />
+    <AuthGuard>
+      <Box sx={{ display: 'flex', width: '100%' }}>
+        <Header />
+        <Drawer />
+        <Box component="main" sx={{ width: 'calc(100% - 260px)', flexGrow: 1, p: { xs: 2, sm: 3 } }}>
+          <Toolbar />
+          <Breadcrumbs navigation={navigation} title />
+          <Outlet />
+        </Box>
       </Box>
-    </Box>
+    </AuthGuard>
   );
 }

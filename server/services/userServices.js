@@ -25,13 +25,10 @@ const authUser = async (data) => {
   delete userObj.password;
 
   const token = jwt.sign(
-    { userId: user.userId, emailAddress: user.emailAddress },
+    { userId: user.userId, emailAddress: user.emailAddress, ...userObj },
     process.env.JWT_SECRET,
     { expiresIn: "30d" }
   );
-
-  console.log('JWT_SECRET used to verify:', process.env.JWT_SECRET);
-  console.log('Token:', token);
 
   return {
     message: "Authentication successful",
@@ -82,6 +79,11 @@ const getUsers = async (queryObject) => {
     const skip = (page - 1) * limit;
 
     const { page: _page, limit: _limit, ...filters } = queryObject;
+
+    if (filters["position.value"]) {
+      const values = filters["position.value"].split(",");
+      filters["position.value"] = values.length > 1 ? { $in: values } : values[0];
+    }
 
     const users = await Users.find(filters)
       .sort({ createdAt: -1 })

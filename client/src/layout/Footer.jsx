@@ -6,20 +6,16 @@ import { Grid, Typography, Stack, } from '@mui/material'
 
 import address from 'layout/footer-items/address'
 import quickLinks from 'layout/footer-items/quickLinks'
-import  {COMPANY_NAME}  from 'constants/constants.js';
+import { COMPANY_NAME } from 'constants/constants';
 
 
 const Footer = () => {
-
   const theme = useTheme();
   const date = new Date();
   const currentYear = date.getFullYear();
   const navigate = useNavigate();
 
-
-
   return (
-
     <React.Fragment>
       <Grid
         container
@@ -74,12 +70,12 @@ const Footer = () => {
           padding: 1.5,
         }}>
 
-        <Typography variant= 'h6' color="#ffff">©</Typography>
+        <Typography variant='h6' color="#ffff">©</Typography>
         <Typography variant='h6' color="#ffff" sx={{ cursor: 'pointer', ":hover": { textDecoration: 'underline' } }}>{COMPANY_NAME}, All Rights Reserved {currentYear} </Typography>
-     
+
       </Stack>
 
-       </React.Fragment>
+    </React.Fragment>
 
   )
 }

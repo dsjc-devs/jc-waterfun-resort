@@ -1,0 +1,66 @@
+.label-value {
+  h5 {
+    font-weight: 800;
+    font-size: 13px;
+    text-transform: capitalize;
+    margin-bottom: 0rem;
+  }
+  .subtitle {
+    font-size: 16px;
+    margin-top: 0;
+    line-height: 1;
+  }
+}
+
+.label-value-bold {
+  h5 {
+    font-weight: 800;
+  }
+}
+.label-value-light {
+  h5 {
+    font-weight: 400;
+  }
+}
+
+.label-value-icon {
+  display: flex;
+  align-items: center;
+
+  .icon {
+    margin-right: 1rem;
+    svg {
+      font-size: 1.2rem;
+    }
+  }
+  .caption {
+    h5 {
+      font-weight: 300;
+      margin-bottom: 0;
+      text-transform: capitalize;
+      cursor: auto;
+    }
+    .subtitle {
+      cursor: auto;
+    }
+  }
+}
+
+.label-value-ellipsis {
+  position: relative;
+
+  .caption {
+    width: 80%;
+  }
+  .subtitle {
+    max-width: 100%;
+    /* width: 100%; */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+  h5 {
+    cursor: pointer;
+  }
+}
