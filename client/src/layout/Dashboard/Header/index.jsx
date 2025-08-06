@@ -64,7 +64,7 @@ export default function Header() {
   return (
     <>
       {!downLG ? (
-        <AppBarStyled open={!!drawerOpen} {...appBar}>
+        <AppBarStyled open={!!drawerOpen} {...appBar} sx={{ zIndex: 1 }}>
           {mainHeader}
         </AppBarStyled>
       ) : (

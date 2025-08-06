@@ -18,6 +18,7 @@ import Typography from '@mui/material/Typography';
 // Third Party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
+import { toast } from 'react-toastify';
 
 // Project Import
 import AnimateButton from 'components/@extended/AnimateButton';
@@ -26,31 +27,22 @@ import useAuth from 'hooks/useAuth';
 // Assets
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
-import { useSnackbar } from 'contexts/SnackbarContext';
 
 // ============================|| JWT - LOGIN ||============================ //
 
 export default function AuthLogin() {
   const { login, isLoggedIn } = useAuth();
   const navigate = useNavigate();
-  const [checked, setChecked] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
 
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleMouseDownPassword = (event) => event.preventDefault();
 
   useEffect(() => {
     if (isLoggedIn) {
-      navigate('/portal/dashboard')
+      navigate('/portal/dashboard');
     }
-  }, [isLoggedIn])
-
-  const { openSnackbar } = useSnackbar();
+  }, [isLoggedIn]);
 
   return (
     <React.Fragment>
@@ -68,15 +60,12 @@ export default function AuthLogin() {
             await login(values.emailAddress, values.password);
             setStatus({ success: true });
             setSubmitting(false);
-            navigate('/portal/dashboard')
+            toast.success('Login successful!');
+            navigate('/portal/dashboard');
           } catch (error) {
             setStatus({ success: false });
             setSubmitting(false);
-            openSnackbar({
-              message: error?.message,
-              anchorOrigin: { vertical: 'top', horizontal: 'right' },
-              alert: { color: 'error' },
-            });
+            toast.error(error?.message || 'Login failed.');
           }
         }}
       >
@@ -146,14 +135,18 @@ export default function AuthLogin() {
                   </Link>
                 </Stack>
               </Grid>
-              {errors.submit && (
-                <Grid item xs={12}>
-                  <FormHelperText error>{errors.submit}</FormHelperText>
-                </Grid>
-              )}
+
               <Grid item xs={12}>
                 <AnimateButton>
-                  <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
+                  <Button
+                    disableElevation
+                    disabled={isSubmitting}
+                    fullWidth
+                    size="large"
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                  >
                     Login
                   </Button>
                 </AnimateButton>

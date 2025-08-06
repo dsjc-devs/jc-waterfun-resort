@@ -1,6 +1,6 @@
 import express from 'express';
 import { createValidator } from '../middleware/validations/userValidator.js'
-import { protect } from '../middleware/authMiddleware.js'
+import { checkIfUserExists, protect } from '../middleware/authMiddleware.js'
 
 import {
   authUser,
@@ -26,6 +26,7 @@ router.post(
       avatar: 'user_avatars',
     },
   }),
+  checkIfUserExists,
   createValidator,
   createUser
 );

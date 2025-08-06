@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { Grid, Typography, Stack, } from '@mui/material'
 
 
-import address from 'layout/footer-items/address'
-import quickLinks from 'layout/footer-items/quickLinks'
+import address from 'layout/Wrapper/footer-items/address'
+import quickLinks from 'layout/Wrapper/footer-items/quickLinks'
 import { COMPANY_NAME } from 'constants/constants';
 
 

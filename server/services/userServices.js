@@ -1,5 +1,6 @@
-import Users from '../models/usersModels.js';
 import { v4 as uuidv4 } from 'uuid';
+import { USER_ROLES } from '../constants/constants.js';
+import Users from '../models/usersModels.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 
@@ -42,11 +43,32 @@ const createUser = async (userData) => {
     firstName,
     lastName,
     emailAddress,
+    phoneNumber,
     avatar,
     status,
     password,
     position,
   } = userData || {};
+
+  const positionArr = []
+
+  switch (position) {
+    case "MASTER_ADMIN":
+      positionArr.push({ label: USER_ROLES.MASTER_ADMIN.label, value: USER_ROLES.MASTER_ADMIN.value })
+      break;
+
+    case "RECEPTIONIST":
+      positionArr.push({ label: USER_ROLES.RECEPTIONIST.label, value: USER_ROLES.RECEPTIONIST.value })
+      break;
+
+    case "ADMIN":
+      positionArr.push({ label: USER_ROLES.ADMIN.label, value: USER_ROLES.ADMIN.value })
+      break;
+
+    default:
+      positionArr.push({ label: USER_ROLES.CUSTOMER.label, value: USER_ROLES.CUSTOMER.value })
+      break;
+  }
 
   const userId = uuidv4();
 
@@ -59,10 +81,11 @@ const createUser = async (userData) => {
       firstName,
       lastName,
       emailAddress,
+      phoneNumber,
       avatar,
       status,
       password: hashedPassword,
-      position,
+      position: positionArr,
     });
 
     return user;
@@ -82,14 +105,55 @@ const getUsers = async (queryObject) => {
 
     if (filters["position.value"]) {
       const values = filters["position.value"].split(",");
-      filters["position.value"] = values.length > 1 ? { $in: values } : values[0];
+      filters["position.value"] =
+        values.length > 1 ? { $in: values } : { $eq: values[0] };
     }
 
-    const users = await Users.find(filters)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .select("-password");
+    const users = await Users.aggregate([
+      { $match: filters },
+
+      {
+        $addFields: {
+          positionRank: {
+            $switch: {
+              branches: [
+                {
+                  case: {
+                    $in: ["MASTER_ADMIN", "$position.value"]
+                  },
+                  then: 0
+                },
+                {
+                  case: {
+                    $in: ["ADMIN", "$position.value"]
+                  },
+                  then: 1
+                },
+                {
+                  case: {
+                    $in: ["RECEPTIONIST", "$position.value"]
+                  },
+                  then: 2
+                }
+              ],
+              default: 99
+            }
+          }
+        }
+      },
+
+      { $sort: { positionRank: 1, createdAt: -1 } },
+
+      { $skip: skip },
+      { $limit: limit },
+
+      {
+        $project: {
+          password: 0,
+          positionRank: 0
+        }
+      }
+    ]);
 
     const totalCount = await Users.countDocuments(filters);
 
@@ -121,13 +185,40 @@ const getSingleUserById = async (userId) => {
 }
 
 const updateUserById = async (userId, userData) => {
+  const mapPositionToRole = (position) => {
+    switch (position) {
+      case "MASTER_ADMIN":
+        return { label: USER_ROLES.MASTER_ADMIN.label, value: USER_ROLES.MASTER_ADMIN.value };
+
+      case "RECEPTIONIST":
+        return { label: USER_ROLES.RECEPTIONIST.label, value: USER_ROLES.RECEPTIONIST.value };
+
+      case "ADMIN":
+        return { label: USER_ROLES.ADMIN.label, value: USER_ROLES.ADMIN.value };
+
+      default:
+        return { label: USER_ROLES.CUSTOMER.label, value: USER_ROLES.CUSTOMER.value };
+    }
+  };
+
   try {
-    const allowedFields = ["firstName", "lastName", "emailAddress", "avatar", "position", "status"];
+    const allowedFields = ["firstName", "lastName", "emailAddress", "phoneNumber", "avatar", "position", "status"];
     const updates = {};
 
     for (const key of allowedFields) {
       if (userData[key] !== undefined) {
-        updates[key] = userData[key];
+        if (key === "position") {
+          const roleObj = mapPositionToRole(userData.position);
+
+          const user = await Users.findOne({ userId });
+          const currentPositions = user.position || [];
+
+          const filteredPositions = currentPositions.filter(pos => pos.value !== roleObj.value);
+
+          updates.position = [roleObj, ...filteredPositions];
+        } else {
+          updates[key] = userData[key];
+        }
       }
     }
 
@@ -141,7 +232,10 @@ const updateUserById = async (userId, userData) => {
       throw new Error("User not found");
     }
 
-    return `User with an ID of ${userId} successfully updated.`
+    return {
+      message: `User with an ID of ${userId} successfully updated.`,
+      updatedUser
+    };
   } catch (error) {
     console.error("Error updating user:", error.message);
     throw new Error(error);

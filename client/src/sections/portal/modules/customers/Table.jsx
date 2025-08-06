@@ -1,53 +1,56 @@
 import React, { useMemo, useState } from 'react'
 import { useGetUsers } from 'api/users'
 import { useNavigate } from 'react-router'
-import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons'
-import { useSnackbar } from 'contexts/SnackbarContext'
-import { USER_TYPES } from 'constants/constants'
-import { Box, Button, Chip, Stack, Tooltip, Typography } from '@mui/material'
+import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons'
+import { Box, Button, Chip, Fade, Menu, MenuItem, Stack, Typography } from '@mui/material'
 
+import agent from 'api'
 import Avatar from 'components/@extended/Avatar'
 import IconButton from 'components/@extended/IconButton'
 import ConvertDate from 'components/ConvertDate'
 import useAuth from 'hooks/useAuth'
 import ConfirmationDialog from 'components/ConfirmationDialog'
-import agent from 'api'
 import Table from 'components/Table'
+import RegistrationModal from 'components/RegistrationModal'
+import { toast } from 'react-toastify'
 
 const CustomersTable = ({ queryObj = {} }) => {
   const { data, isLoading, mutate } = useGetUsers({ queryObj });
   const { users } = data || {}
 
   const { user } = useAuth()
-  const { openSnackbar } = useSnackbar()
   const navigate = useNavigate()
 
   const [loading, setLoading] = useState(false)
+
   const [deleteConfigs, setDeleteConfigs] = useState({
     open: false,
     userId: ''
   })
 
-  const handleOpen = (userId) => {
-    setDeleteConfigs({ open, userId })
-  }
+  const [openMenu, setOpenMenu] = useState({ anchorEl: null, userId: null });
+  const [isOpenAddCustomer, setIsOpenAddCustomer] = useState(false)
+
+  const handleMenuClick = (event, userId) => {
+    setOpenMenu({ anchorEl: event.currentTarget, userId });
+  };
+
+  const handleMenuClose = () => {
+    setOpenMenu({ anchorEl: null, userId: null });
+  };
 
   const handleDelete = async () => {
     setLoading(true)
     try {
       await agent.Users.deleteUser(deleteConfigs.userId)
-      openSnackbar({
-        message: `Deleted successfully.`,
-        anchorOrigin: { vertical: 'top', horizontal: 'right' },
-        alert: { color: 'success' },
-        duration: 3000
+      toast.success("Deleted successfully.", {
+        position: "top-right",
+        autoClose: 3000,
       });
     } catch (error) {
-      openSnackbar({
-        message: error,
-        anchorOrigin: { vertical: 'top', horizontal: 'right' },
-        alert: { color: 'error' },
-        duration: 3000
+      toast.error(error, {
+        position: "top-right",
+        autoClose: 3000,
       });
     } finally {
       setLoading(false)
@@ -71,7 +74,12 @@ const CustomersTable = ({ queryObj = {} }) => {
             />
           </Box>
           <Box>
-            <Typography variant='subtitle2' color="secondary.600"> #{row.userId} </Typography>
+            <Typography
+              variant='subtitle2'
+              color="secondary.600"
+            >
+              #{row.userId}
+            </Typography>
             <Typography variant='subtitle1'> {row.firstName} {row.lastName} </Typography>
             <Typography variant='subtitle2' color="primary"> {row.emailAddress} </Typography>
           </Box>
@@ -120,32 +128,19 @@ const CustomersTable = ({ queryObj = {} }) => {
       disablePadding: false,
       label: 'Actions',
       renderCell: (row) => {
-        const { userId } = row || {}
-        const _position = user?.position[0]?.value
-        const hasAccess = _position === USER_TYPES[0].value
+        const { position, userId } = row || {}
+        const _position = position[0]?.value
+        const isSameRole = user?.position[0]?.value === _position
 
         return (
-          <Stack direction='row' spacing={2} alignItems='center' justifyContent='center'>
-            <Tooltip title='View'>
-              <IconButton color='primary' onClick={() => navigate(`/portal/customers/details/${userId}`)}>
-                <EyeOutlined />
-              </IconButton>
-            </Tooltip>
-            {hasAccess && (
-              <React.Fragment>
-                <Box>
-                  <IconButton color='info'>
-                    <EditOutlined />
-                  </IconButton>
-                </Box>
-                <Box>
-                  <IconButton onClick={() => handleOpen(userId)} color='error' disabled={!hasAccess}>
-                    <DeleteOutlined />
-                  </IconButton>
-                </Box>
-              </React.Fragment>
-            )}
-          </Stack>
+          <IconButton
+            aria-label="more"
+            aria-controls={openMenu.userId === userId ? 'row-menu' : undefined}
+            aria-haspopup="true"
+            onClick={(e) => handleMenuClick(e, userId)}
+          >
+            <EllipsisOutlined />
+          </IconButton>
         )
       }
     },
@@ -160,13 +155,11 @@ const CustomersTable = ({ queryObj = {} }) => {
         rows={users || []}
         isLoading={isLoading || loading}
         settings={{
-          order: 'asc',
-          orderBy: 'createdAt',
           otherActionButton: (
             <Button
               variant='contained'
               startIcon={<PlusOutlined />}
-              onClick={() => alert(`test`)}
+              onClick={() => setIsOpenAddCustomer(prevState => !prevState)}
               sx={{ width: '150px' }}
             >
               Add Customer
@@ -181,6 +174,40 @@ const CustomersTable = ({ queryObj = {} }) => {
         handleConfirm={handleDelete}
         open={deleteConfigs.open}
         handleClose={() => setDeleteConfigs({ ...deleteConfigs, open: false })}
+      />
+
+      <Menu
+        id={`row-menu-${openMenu.userId}`}
+        anchorEl={openMenu.anchorEl}
+        open={Boolean(openMenu.anchorEl)}
+        onClose={handleMenuClose}
+        TransitionComponent={Fade}
+      >
+        <MenuItem
+          onClick={() => {
+            navigate(`/portal/customers/details/${openMenu.userId}`)
+            handleMenuClose()
+          }}
+        >
+          <EyeOutlined style={{ marginRight: 8 }} />
+          View
+        </MenuItem>
+
+        <MenuItem
+          onClick={() => {
+            setDeleteConfigs({ open: true, userId: openMenu.userId })
+            handleMenuClose()
+          }}
+        >
+          <DeleteOutlined style={{ marginRight: 8 }} />
+          Delete
+        </MenuItem>
+      </Menu>
+
+      <RegistrationModal
+        handleClose={() => setIsOpenAddCustomer(prevState => !prevState)}
+        open={isOpenAddCustomer}
+        title='Create Customer'
       />
     </React.Fragment>
   )

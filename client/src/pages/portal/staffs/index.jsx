@@ -21,7 +21,7 @@ const Staffs = () => {
         subheading="Manage staff information, roles, and access within the resort system."
       />
 
-      <StaffsTable queryObj={{ "position.value": "STAFF,MASTER_ADMIN" }} />
+      <StaffsTable queryObj={{ "position.value": "RECEPTIONIST,ADMIN,MASTER_ADMIN" }} />
     </React.Fragment>
   )
 }

@@ -121,7 +121,7 @@ export default function Profile() {
                           <Stack>
                             <Typography variant="h6">{firstName} {lastName}</Typography>
                             <Typography variant="body2" color="text.secondary">
-                              {position[0]?.label ?? ""}
+                              {position && position[0]?.label}
                             </Typography>
                           </Stack>
                         </Stack>

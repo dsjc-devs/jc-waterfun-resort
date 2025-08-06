@@ -1,58 +1,60 @@
 import React, { useMemo, useState } from 'react'
-import { Box, Button, Chip, Stack, Tooltip, Typography } from '@mui/material'
+import { Box, Button, Chip, Fade, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material'
 import { useGetUsers } from 'api/users'
-import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons'
-import { useSnackbar } from 'contexts/SnackbarContext'
-import { USER_TYPES } from 'constants/constants'
+import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons'
+import { USER_ROLES } from 'constants/constants'
+import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router'
 
+import agent from 'api'
 import Avatar from 'components/@extended/Avatar'
 import IconButton from 'components/@extended/IconButton'
 import ConvertDate from 'components/ConvertDate'
 import useAuth from 'hooks/useAuth'
 import StaffDetails from './Details'
 import ConfirmationDialog from 'components/ConfirmationDialog'
-import agent from 'api'
 import Table from 'components/Table'
+import RegistrationModal from 'components/RegistrationModal'
+
 
 const UsersTable = ({ queryObj = {} }) => {
   const { data, isLoading, mutate } = useGetUsers({ queryObj });
   const { users } = data || {}
 
   const { user } = useAuth()
-  const { openSnackbar } = useSnackbar()
+  const navigate = useNavigate()
 
   const [loading, setLoading] = useState(false)
-  const [viewConfigs, setViewConfigs] = useState({
-    open: false,
-    userId: ''
-  })
   const [deleteConfigs, setDeleteConfigs] = useState({
     open: false,
     userId: ''
   })
+  const [isOpenAddDialog, setIsOpenAddDialog] = useState(false)
+  const [openMenu, setOpenMenu] = useState({ anchorEl: null, userId: null });
 
-  const hasAccess = user?.position[0].value === USER_TYPES[0].value
+  const handleMenuClick = (event, userId) => {
+    setOpenMenu({ anchorEl: event.currentTarget, userId });
+  };
 
-  const handleOpen = (userId) => {
-    setDeleteConfigs({ open, userId })
-  }
+  const handleMenuClose = () => {
+    setOpenMenu({ anchorEl: null, userId: null });
+  };
+
+  const isMasterAdmin = user?.position[0].value === USER_ROLES.MASTER_ADMIN.value
+  const isAdmin = user?.position[0].value === USER_ROLES.ADMIN.value
 
   const handleDelete = async () => {
     setLoading(true)
     try {
       await agent.Users.deleteUser(deleteConfigs.userId)
-      openSnackbar({
-        message: `Deleted successfully.`,
-        anchorOrigin: { vertical: 'top', horizontal: 'right' },
-        alert: { color: 'success' },
-        duration: 3000
+      toast.success("Deleted successfully.", {
+        position: "top-right",
+        autoClose: 3000,
       });
     } catch (error) {
-      openSnackbar({
-        message: error,
-        anchorOrigin: { vertical: 'top', horizontal: 'right' },
-        alert: { color: 'error' },
-        duration: 3000
+      toast.error(error, {
+        position: "top-right",
+        autoClose: 3000,
       });
     } finally {
       setLoading(false)
@@ -76,7 +78,12 @@ const UsersTable = ({ queryObj = {} }) => {
             />
           </Box>
           <Box>
-            <Typography variant='subtitle2' color="secondary.600"> #{row.userId} </Typography>
+            <Typography
+              variant='subtitle2'
+              color="secondary.600"
+            >
+              #{row.userId}
+            </Typography>
             <Typography variant='subtitle1'> {row.firstName} {row.lastName} </Typography>
             <Typography variant='subtitle2' color="primary"> {row.emailAddress} </Typography>
           </Box>
@@ -98,13 +105,15 @@ const UsersTable = ({ queryObj = {} }) => {
             variant='light'
             label={<Typography variant='subtitle1'>
               {{
-                MASTER_ADMIN: 'Master Admin',
-                STAFF: 'Staff'
+                MASTER_ADMIN: USER_ROLES.MASTER_ADMIN.label,
+                ADMIN: USER_ROLES.ADMIN.label,
+                RECEPTIONIST: USER_ROLES.RECEPTIONIST.label
               }[_position]}
             </Typography>}
             color={{
               MASTER_ADMIN: 'primary',
-              STAFF: 'success'
+              RECEPTIONIST: 'success',
+              ADMIN: 'info',
             }[_position] || 'default'}
           />
         )
@@ -150,45 +159,19 @@ const UsersTable = ({ queryObj = {} }) => {
       id: 'actions',
       align: 'center',
       disablePadding: false,
-      label: 'Actions',
+      label: '',
       renderCell: (row) => {
-        const { position, userId } = row || {}
-        const _position = position[0]?.value
-        const isSameRole = user?.position[0]?.value === _position
+        const { userId } = row || {}
 
         return (
-          <Stack direction='row' spacing={2} alignItems='center' justifyContent='center'>
-            <Tooltip title='View'>
-              <IconButton color='primary' onClick={() => {
-                setViewConfigs((prevState) => ({
-                  userId,
-                  open: !prevState.open
-                }));
-              }}>
-                <EyeOutlined />
-              </IconButton>
-            </Tooltip>
-            {hasAccess && (
-              <React.Fragment>
-                <Tooltip title="Edit">
-                  <span>
-                    <IconButton color='info'>
-                      <EditOutlined />
-                    </IconButton>
-                  </span>
-                </Tooltip>
-                {!isSameRole && (
-                  <Tooltip title="Delete">
-                    <span>
-                      <IconButton onClick={() => handleOpen(row.userId)} color='error'>
-                        <DeleteOutlined />
-                      </IconButton>
-                    </span>
-                  </Tooltip>
-                )}
-              </React.Fragment>
-            )}
-          </Stack >
+          <IconButton
+            aria-label="more"
+            aria-controls={openMenu.userId === userId ? 'row-menu' : undefined}
+            aria-haspopup="true"
+            onClick={(e) => handleMenuClick(e, userId)}
+          >
+            <EllipsisOutlined />
+          </IconButton>
         )
       }
     },
@@ -203,13 +186,11 @@ const UsersTable = ({ queryObj = {} }) => {
         rows={users || []}
         isLoading={isLoading || loading}
         settings={{
-          order: 'asc',
-          orderBy: 'createdAt',
           otherActionButton: (
-            hasAccess && <Button
+            (isMasterAdmin || isAdmin) && <Button
               variant='contained'
               startIcon={<PlusOutlined />}
-              onClick={() => alert(`test`)}
+              onClick={() => setIsOpenAddDialog((prevState) => !prevState)}
               sx={{ width: '150px' }}
             >
               Add Staff
@@ -217,6 +198,77 @@ const UsersTable = ({ queryObj = {} }) => {
           )
         }}
       />
+
+      <Menu
+        id={`row-menu-${openMenu.userId}`}
+        anchorEl={openMenu.anchorEl}
+        open={Boolean(openMenu.anchorEl)}
+        onClose={handleMenuClose}
+        TransitionComponent={Fade}
+      >
+        <MenuItem
+          onClick={() => {
+            navigate(`/portal/staffs?userId=${openMenu.userId}`)
+            handleMenuClose()
+          }}
+        >
+          <EyeOutlined style={{ marginRight: 8 }} />
+          View
+        </MenuItem>
+
+        {(isMasterAdmin || isAdmin) && user && openMenu.userId && (() => {
+          const targetUser = users?.find((u) => u.userId === openMenu.userId);
+          const targetRole = targetUser?.position?.[0]?.value;
+          const currentRole = user?.position?.[0]?.value;
+
+          const isSameUser = user?.userId === targetUser?.userId;
+          const isSameRole = targetRole === currentRole;
+          const isTargetMasterAdmin = targetRole === "MASTER_ADMIN";
+
+          const canEdit = isSameUser || (!isSameRole && !isTargetMasterAdmin);
+          const canDelete = !isSameUser && !isSameRole && !isTargetMasterAdmin;
+
+          return (
+            <>
+              <Tooltip title={canEdit ? "" : "Not authorized to edit this user"} arrow>
+                <span>
+                  <MenuItem
+                    onClick={() => {
+                      if (canEdit) {
+                        navigate(`/portal/staffs?userId=${openMenu.userId}&isEditMode=true`)
+                        handleMenuClose()
+                      }
+                    }}
+                    disabled={!canEdit}
+                  >
+                    <EditOutlined style={{ marginRight: 8 }} />
+                    Edit
+                  </MenuItem>
+                </span>
+              </Tooltip>
+
+              <Tooltip title={canDelete ? "" : "Not authorized to delete this user"} arrow>
+                <span>
+                  <MenuItem
+                    onClick={() => {
+                      if (canDelete) {
+                        setDeleteConfigs({ open: true, userId: openMenu.userId });
+                      }
+                      handleMenuClose();
+                    }}
+                    disabled={!canDelete}
+                  >
+                    <DeleteOutlined style={{ marginRight: 8 }} />
+                    Delete
+                  </MenuItem>
+                </span>
+              </Tooltip>
+            </>
+          );
+        })()}
+      </Menu>
+
+      <StaffDetails mutate={mutate} />
 
       <ConfirmationDialog
         title='Delete User'
@@ -226,11 +278,11 @@ const UsersTable = ({ queryObj = {} }) => {
         handleClose={() => setDeleteConfigs({ ...deleteConfigs, open: false })}
       />
 
-      <StaffDetails
-        open={viewConfigs.open}
-        handleClose={() => setViewConfigs({ ...viewConfigs, open: false })}
-        userId={viewConfigs.userId}
-        mutate={mutate}
+      <RegistrationModal
+        open={isOpenAddDialog}
+        handleClose={() => setIsOpenAddDialog((prevState) => !prevState)}
+        type='RECEPTIONIST'
+        title='Create Staff'
       />
     </React.Fragment>
   )

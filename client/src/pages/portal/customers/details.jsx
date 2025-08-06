@@ -4,6 +4,7 @@ import PageTitle from 'components/PageTitle'
 import { APP_DEFAULT_PATH } from 'config/config';
 import { useGetSingleUser } from 'api/users';
 import { useParams } from 'react-router';
+import Details from 'sections/portal/modules/customers/Details';
 
 const CustomerDetails = () => {
   const { id } = useParams()
@@ -27,6 +28,8 @@ const CustomerDetails = () => {
         links={breadcrumbLinks}
         subheading={`Viewing details for customer ID: ${id}`}
       />
+
+      <Details isLoading={isLoading} user={user} />
     </React.Fragment>
   )
 }

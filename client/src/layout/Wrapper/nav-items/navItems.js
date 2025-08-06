@@ -1,12 +1,9 @@
-import { BookFilled, InfoCircleFilled, PhoneFilled, PictureFilled, SafetyCertificateFilled } from "@ant-design/icons";
-
 const navItems = [
-
-  { _id: 1, name: 'Book Now', link: '/book-now', icon: BookFilled  },
-  { _id: 2, name: 'About Us', link: '/about-us', icon: InfoCircleFilled },
-  { _id: 3, name: 'Admission', link: '/admission', icon: SafetyCertificateFilled  },
-  { _id: 4, name: 'Media', link: '/media', icon: PictureFilled  },
-  { _id: 5, name: 'Contact Us', link: '/contact-us', icon: PhoneFilled  }
+  { _id: "home", name: "Home", link: '/' },
+  { _id: "book-now", name: "Book Now", link: '/book-now' },
+  { _id: "about-us", name: "About Us", link: '/about-us' },
+  { _id: "gallery", name: "Gallery", link: '/gallery' },
+  { _id: "contact-us", name: "Contact Us", link: '/contact-us' },
 ]
 
 export default navItems

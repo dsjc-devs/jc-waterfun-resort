@@ -74,8 +74,10 @@ const ReusableTable = ({ columns, rows, settings, isLoading, searchableColumns =
     setPage(0);
   };
 
-  const paginatedRows = stableSort(filteredRows, getComparator(order, orderBy))
-    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const paginatedRows = filteredRows.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   return (
     <MainCard>

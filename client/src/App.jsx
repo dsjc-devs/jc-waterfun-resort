@@ -4,23 +4,32 @@ import { RouterProvider } from 'react-router-dom';
 import router from 'routes';
 import ThemeCustomization from 'themes';
 
-import ScrollTop from 'components/ScrollTop';
-
 import { JWTProvider as AuthProvider } from './contexts/JWTContext';
-import { SnackbarProvider } from 'contexts/SnackbarContext';
+import { Bounce, ToastContainer } from 'react-toastify';
 
 // ==============================|| APP - THEME, ROUTER, LOCAL ||============================== //
 
 export default function App() {
+
   return (
     <ThemeCustomization>
-      <ScrollTop>
-        <SnackbarProvider>
-          <AuthProvider>
-            <RouterProvider router={router} />
-          </AuthProvider>
-        </SnackbarProvider>
-      </ScrollTop>
-    </ThemeCustomization>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
+    </ThemeCustomization >
   );
 }

@@ -16,8 +16,8 @@ const createUser = expressAsync(async (req, res) => {
     const avatar = req.files && req.files['avatar'] ? req.files['avatar'][0].path : "";
     const payload = { ...req.body, avatar }
 
-    const response = await userServices.createUser(payload);
-    res.json(response)
+    const user = await userServices.createUser(payload);
+    res.json({ user, message: "User successfully created." })
   } catch (error) {
     console.error(error);
     throw new Error(error)
@@ -46,7 +46,11 @@ const getSingleUserById = expressAsync(async (req, res) => {
 
 const updateUserById = expressAsync(async (req, res) => {
   try {
-    const avatar = req.files && req.files['avatar'] ? req.files['avatar'][0].path : "";
+    const avatar =
+      req.files && req.files['avatar']
+        ? req.files['avatar'][0].path
+        : req.body.avatar;
+
     const payload = { ...req.body, avatar }
 
     const response = await userServices.updateUserById(req.params.userId, payload);

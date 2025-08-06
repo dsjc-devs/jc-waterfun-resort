@@ -7,8 +7,7 @@ const positionSchema = new mongoose.Schema(
     value: { type: String, required: true },
   },
   {
-    _id: false,
-    timestamps: false,
+    timestamps: true,
   }
 );
 
@@ -31,6 +30,9 @@ const usersSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true
+    },
+    phoneNumber: {
+      type: String,
     },
     avatar: {
       type: String

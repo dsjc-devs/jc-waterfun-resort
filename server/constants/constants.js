@@ -39,19 +39,29 @@ const USER_TYPES = [
     value: "MASTER_ADMIN"
   },
   {
+    label: "Admin",
+    value: "ADMIN"
+  },
+  {
+    label: "Receptionist",
+    value: "RECEPTIONIST"
+  },
+  {
     label: "Customer",
     value: "CUSTOMER"
   },
-  {
-    label: "Staff",
-    value: "STAFF"
-  },
 ]
+
+const USER_ROLES = USER_TYPES.reduce((acc, role) => {
+  acc[role.value] = role;
+  return acc;
+}, {});
 
 const USER_STATUSSES = ["ACTIVE", "INACTIVE", "ARCHIVED"]
 
 export {
   colours,
   USER_TYPES,
-  USER_STATUSSES
+  USER_STATUSSES,
+  USER_ROLES
 }

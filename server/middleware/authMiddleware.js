@@ -1,6 +1,19 @@
 import jwt from "jsonwebtoken";
 import Users from "../models/usersModels.js";
 
+const checkIfUserExists = async (req, res, next) => {
+  try {
+    const user = await Users.findOne({ emailAddress: req.body.emailAddress });
+    if (user) {
+      return res.status(400).json({ message: "User already exists." });
+    }
+    next();
+  } catch (error) {
+    console.error("Error checking user:", error);
+    return res.status(500).json({ message: "Internal server error." });
+  }
+};
+
 const protect = async (req, res, next) => {
   let token;
 
@@ -27,5 +40,6 @@ const protect = async (req, res, next) => {
 };
 
 export {
-  protect
+  protect,
+  checkIfUserExists
 }

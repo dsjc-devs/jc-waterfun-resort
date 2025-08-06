@@ -51,6 +51,22 @@ export const useGetSingleUser = (userId) => {
 }
 
 const Users = {
+  addUsers: async (payload) => {
+    try {
+      const response = await axiosServices.post(`/${endpoints.key}/create`, payload)
+      return response
+    } catch (error) {
+      throw new Error(error?.response?.data?.message);
+    }
+  },
+  editUser: async (userId, payload) => {
+    try {
+      const response = await axiosServices.patch(`/${endpoints.key}/${userId}`, payload)
+      return response
+    } catch (error) {
+      throw new Error(error?.response?.data?.message);
+    }
+  },
   deleteUser: async (userId) => {
     try {
       const response = await axiosServices.delete(`/${endpoints.key}/${userId}`)

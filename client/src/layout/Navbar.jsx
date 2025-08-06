@@ -1,115 +1,191 @@
-import React from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { Button, Stack, Typography } from '@mui/material'
+import React, { useState } from 'react'
+import { Stack, Typography, Drawer, IconButton, List, ListItem, ListItemText, Button, Container, Box } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
+import useMediaQuery from '@mui/material/useMediaQuery'
 
+// assets
 import navItems from './Wrapper/nav-items/navItems'
 import Logo from 'assets/images/logo/logo-circular.png'
+import { MenuOutlined } from '@ant-design/icons'
 
 const Navbar = () => {
   const navigate = useNavigate()
-  const location = useLocation()
-  const isHomePage = location.pathname === '/'
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
-  if (isHomePage) {
-    const total = navItems.length + 3
-    const logoIndex = Math.floor(total / 2)
+  const handleDrawerToggle = () => {
+    setDrawerOpen((prevState) => !prevState)
+  };
 
-    return (
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        spacing={6}
-        sx={{
-          position: 'absolute',
-          top: 0,
-          width: '100%',
-          backgroundColor: 'transparent',
-          paddingY: 2,
-          px: 4,
-          zIndex: 1000,
-        }}
-      >
-        {navItems.map((nav, index) => {
-          return (
-            <React.Fragment key={nav._id}>
-              {index === logoIndex - 1 && (
+  const middleIndex = Math.ceil(navItems.length / 2);
+  const firstHalf = navItems.slice(0, middleIndex);
+  const secondHalf = navItems.slice(middleIndex);
+
+  return (
+    <React.Fragment>
+      {!isMobile && (
+        <Box
+          sx={{
+            position: 'sticky',
+            top: 1,
+            width: '100%',
+            zIndex: 10,
+            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          }}
+        >
+          <Container>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              spacing={2}
+            >
+              {firstHalf.map((nav) => (
                 <Stack
-                  onClick={() => navigate('/')}
-                  sx={{ cursor: 'pointer', alignItems: 'center' }}
+                  key={nav._id}
+                  onClick={() => navigate(nav.link)}
+                  sx={{ cursor: 'pointer' }}
                 >
-                  <img src={Logo} alt="Logo" style={{ height: '70px' }} />
+                  <Typography variant="body2" color="#fff" sx={{ fontWeight: 'bold' }}>
+                    {nav.name}
+                  </Typography>
                 </Stack>
-              )}
-              <Typography
-                variant="body2"
-                onClick={() => navigate(nav.link)}
-                sx={{
-                  color: '#fff',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  letterSpacing: 1,
+              ))}
+
+              <Stack onClick={() => navigate('/')} sx={{ cursor: 'pointer', mx: 2 }}>
+                <Box
+                  component='img'
+                  src={Logo}
+                  sx={{
+                    height: 80,
+                    width: "100%",
+                    aspectRatio: "1/1",
+                    objectFit: "cover"
+                  }}
+                />
+              </Stack>
+
+              {secondHalf.map((nav) => (
+                <Stack
+                  key={nav._id}
+                  onClick={() => navigate(nav.link)}
+                  sx={{ cursor: 'pointer' }}
+                >
+                  <Typography variant="body2" color="#fff" sx={{ fontWeight: 'bold' }}>
+                    {nav.name}
+                  </Typography>
+                </Stack>
+              ))}
+
+              <Button
+                variant="contained"
+                sx={{ borderRadius: 2, marginLeft: 'auto' }}
+                onClick={() => {
+                  navigate('/login');
+                  setDrawerOpen?.(false);
                 }}
               >
-                {nav.name}
-              </Typography>
-            </React.Fragment>
-          )
-        })}
-        <Button
-          variant="contained"
-          sx={{ borderRadius: 2 }}
-          onClick={() => navigate('/login')}
-        >
-          Login
-        </Button>
-      </Stack>
-    )
-  }
-  return (
-    <Stack
-      sx={{
-        position: 'sticky',
-        top: 1,
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingInline: 20,
-        alignItems: 'center',
-        zIndex: 10,
-        background: 'linear-gradient(to right, rgb(31, 90, 158), rgb(46, 119, 180))',
-      }}
-    >
-      <Stack onClick={() => navigate('/')} sx={{ cursor: 'pointer' }}>
-        <img src={Logo} alt="Logo" style={{ height: '70px' }} />
-      </Stack>
+                Login
+              </Button>
+            </Stack>
+          </Container>
+        </Box>
+      )}
 
-      {navItems.map((nav) => (
-        <Stack
-          key={nav._id}
-          direction="row"
-          alignItems="center"
-          spacing={1}
-          onClick={() => navigate(nav.link)}
-          sx={{ paddingBlock: '3%', cursor: 'pointer' }}
-        >
-          {React.createElement(nav.icon, {
-            style: { color: 'white', fontSize: 18 },
-          })}
-          <Typography variant="body2" color="#fff" sx={{ fontWeight: 'normal' }}>
-            {nav.name}
-          </Typography>
-        </Stack>
-      ))}
-      <Button
-        variant="contained"
-        sx={{ borderRadius: 2 }}
-        onClick={() => navigate('/login')}
-      >
-        Login
-      </Button>
-    </Stack>
-  )
-}
+      {isMobile && (
+        <React.Fragment>
+          <Stack
+            sx={{
+              position: 'sticky',
+              top: 0,
+              width: '100%',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              zIndex: 1,
+              paddingInline: 2,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)'
+            }}
+          >
+            <Stack onClick={() => navigate('/')} sx={{ cursor: 'pointer', py: 2 }}>
+              <Box
+                component='img'
+                src={Logo}
+                sx={{
+                  height: 80,
+                  width: "100%",
+                  aspectRatio: "1/1",
+                  objectFit: "cover"
+                }}
+              />
+            </Stack>
+            <IconButton onClick={handleDrawerToggle} sx={{ color: '#fff' }}>
+              <MenuOutlined />
+            </IconButton>
+          </Stack>
 
-export default Navbar
+          <Drawer
+            anchor="left"
+            open={drawerOpen}
+            onClose={handleDrawerToggle}
+            PaperProps={{
+              sx: {
+                backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                padding: 2,
+              },
+            }}
+          >
+            <List sx={{ width: 250, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {[{ _id: "home", name: 'Home', link: '/' }, ...navItems].map((nav) => (
+                nav.name !== 'Login' ? (
+                  <ListItem
+                    sx={{
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
+                    }}
+                    button
+                    key={nav._id}
+                    onClick={() => {
+                      navigate(nav.link);
+                      setDrawerOpen(false);
+                    }}
+                  >
+                    <ListItemText
+                      primary={
+                        <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#fff' }}>
+                          {nav.name}
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                ) : null
+              ))}
+            </List>
+            <Stack
+              sx={{
+                padding: 2,
+                borderTop: '1px solid #fff',
+                marginTop: 'auto',
+                textAlign: 'center',
+              }}
+            >
+              <Button
+                variant='contained'
+                sx={{ borderRadius: 2 }}
+                onClick={() => {
+                  navigate('/login');
+                  setDrawerOpen(false);
+                }}
+              >
+                Login
+              </Button>
+            </Stack>
+          </Drawer>
+        </React.Fragment>
+      )}
+    </React.Fragment>
+  );
+};
+
+export default Navbar;

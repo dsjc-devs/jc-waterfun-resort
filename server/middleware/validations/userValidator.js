@@ -46,28 +46,17 @@ const createValid = [
     .isLength({ min: 8 })
     .withMessage('password must be at least 8 characters long'),
 
-  body("position")
+  body('position')
     .exists()
-    .withMessage("position is required")
-    .bail()
-    .isArray({ min: 1 })
-    .withMessage("position must be a non-empty array"),
-
-  body("position.*.value")
-    .exists()
-    .withMessage("position.value is required")
-    .bail()
-    .isIn(ALLOWED_POSITION_VALUES)
-    .withMessage(
-      `position.value must be one of: ${ALLOWED_POSITION_VALUES.join(", ")}`
-    ),
-
-  body("position.*.label")
-    .exists()
-    .withMessage("position.label is required")
+    .withMessage('position is required')
     .bail()
     .notEmpty()
-    .withMessage("position.label must not be empty"),
+    .withMessage('position must not be empty')
+    .isIn(["RECEPTIONIST", "ADMIN", "MASTER_ADMIN", "CUSTOMER"])
+    .withMessage(
+      `position.value must be one of: ${["RECEPTIONIST", "ADMIN", "MASTER_ADMIN", "CUSTOMER"].join(", ")}`
+    )
+
 ];
 
 export const createValidator = [...createValid, validate];

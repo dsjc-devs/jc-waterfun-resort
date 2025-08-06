@@ -1,4 +1,4 @@
-import { USER_TYPES } from '../constants/constants'
+import { USER_ROLES } from '../constants/constants'
 
 // assets
 import {
@@ -36,7 +36,7 @@ const modules = [
     id: 'group-dashboard',
     title: 'Dashboard',
     type: 'group',
-    access: [USER_TYPES[0].value, USER_TYPES[1].value, USER_TYPES[2].value],
+    access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value, USER_ROLES.CUSTOMER.value],
     children: [
       {
         id: 'dashboard',
@@ -45,7 +45,7 @@ const modules = [
         url: '/portal/dashboard',
         icon: icons.DashboardIcon,
         breadcrumbs: false,
-        access: [USER_TYPES[0].value, USER_TYPES[1].value, USER_TYPES[2].value],
+        access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value, USER_ROLES.CUSTOMER.value],
       }
     ]
   },
@@ -53,7 +53,7 @@ const modules = [
     id: 'human-resource',
     title: 'Human Resource',
     type: 'group',
-    access: [USER_TYPES[0].value, USER_TYPES[1].value],
+    access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
     children: [
       {
         id: 'staff-list',
@@ -62,7 +62,7 @@ const modules = [
         url: '/portal/staffs',
         icon: icons.AccountGroupIcon,
         breadcrumbs: false,
-        access: [USER_TYPES[0].value, USER_TYPES[1].value],
+        access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
       },
       {
         id: 'customer-list',
@@ -71,7 +71,7 @@ const modules = [
         url: '/portal/customers',
         icon: icons.AccountGroupIcon,
         breadcrumbs: false,
-        access: [USER_TYPES[0].value, USER_TYPES[1].value],
+        access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
       }
     ]
   },
@@ -79,16 +79,16 @@ const modules = [
     id: 'rooms',
     title: 'Rooms Management',
     type: 'group',
-    access: [USER_TYPES[0].value, USER_TYPES[1].value],
+    access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
     children: [
       {
         id: 'room-list',
-        title: 'Rooms List',
+        title: 'Rooms',
         type: 'item',
         url: '/portal/rooms',
         icon: icons.RoomIcon,
         breadcrumbs: false,
-        access: [USER_TYPES[0].value, USER_TYPES[1].value],
+        access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
       },
     ]
   },
@@ -96,16 +96,16 @@ const modules = [
     id: 'reservations',
     title: 'Reservations',
     type: 'group',
-    access: [USER_TYPES[0].value, USER_TYPES[1].value],
+    access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
     children: [
       {
         id: 'reservation-list',
-        title: 'Reservation List',
+        title: 'Reservations',
         type: 'item',
         url: '/portal/reservations',
         icon: icons.BookIcon,
         breadcrumbs: false,
-        access: [USER_TYPES[0].value, USER_TYPES[1].value],
+        access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
       },
       {
         id: 'calendar',
@@ -114,7 +114,7 @@ const modules = [
         url: '/portal/calendar',
         icon: icons.CalendarIcon,
         breadcrumbs: false,
-        access: [USER_TYPES[0].value, USER_TYPES[1].value],
+        access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
       }
     ]
   },
@@ -122,7 +122,7 @@ const modules = [
     id: 'marketing',
     title: 'Marketing Materials',
     type: 'group',
-    access: [USER_TYPES[0].value],
+    access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
     children: [
       {
         id: 'banners',
@@ -131,7 +131,7 @@ const modules = [
         url: '/portal/banners',
         icon: icons.ImageIcon,
         breadcrumbs: false,
-        access: [USER_TYPES[0].value],
+        access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
       },
       {
         id: 'promotions',
@@ -140,7 +140,7 @@ const modules = [
         url: '/portal/promotions',
         icon: icons.StarIcon,
         breadcrumbs: false,
-        access: [USER_TYPES[0].value],
+        access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
       }
     ]
   },
@@ -148,7 +148,7 @@ const modules = [
     id: 'customer-profile',
     title: 'My Account',
     type: 'group',
-    access: [USER_TYPES[2].value],
+    access: [USER_ROLES.CUSTOMER.value],
     children: [
       {
         id: 'my-reservations',
@@ -157,7 +157,7 @@ const modules = [
         url: '/portal/my-reservations',
         icon: icons.BookIcon,
         breadcrumbs: false,
-        access: [USER_TYPES[2].value],
+        access: [USER_ROLES.CUSTOMER.value],
       },
     ]
   }
