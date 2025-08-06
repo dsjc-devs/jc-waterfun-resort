@@ -4,17 +4,17 @@ import { EnvironmentFilled, MailFilled, PhoneFilled } from "@ant-design/icons";
 const address = [
   {
 
-    name: '3601 W Sahara Ave suite 207 Las Vegas, NV 89102',
+    name: 'R5 Brgy. Langkaan II, Dasmarinas Cavite',
     icon: EnvironmentFilled ,
     color: '#FF0000'
   },
   {
-    name: '702-983-3332',
+    name: '0917-123-4567',
     icon: PhoneFilled,
     color: '#ffffff'
   },
   {
-    name: 'info@investprorealty.net',
+    name: 'info@johncezarresort.com',
     icon: MailFilled,
     color: '#ffffff'
   }

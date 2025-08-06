@@ -15,7 +15,7 @@ const quickLinks = [
     link: '/'
   },
   {
-    name: 'Investpro Portal',
+    name: 'JC Waterfun Resort Portal',
     icon: RightOutlined,
     color: '#ffffff',
     link: '/'
