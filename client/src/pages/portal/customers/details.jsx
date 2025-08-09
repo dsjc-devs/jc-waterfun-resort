@@ -8,7 +8,7 @@ import Details from 'sections/portal/modules/customers/Details';
 
 const CustomerDetails = () => {
   const { id } = useParams()
-  const { user, isLoading } = useGetSingleUser(id)
+  const { user, isLoading, mutate } = useGetSingleUser(id)
 
   const { firstName, lastName } = user || {}
 
@@ -29,7 +29,7 @@ const CustomerDetails = () => {
         subheading={`Viewing details for customer ID: ${id}`}
       />
 
-      <Details isLoading={isLoading} user={user} />
+      <Details isLoading={isLoading} user={user} mutate={mutate} />
     </React.Fragment>
   )
 }

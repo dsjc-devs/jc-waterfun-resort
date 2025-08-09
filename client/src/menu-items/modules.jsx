@@ -71,7 +71,7 @@ const modules = [
         url: '/portal/customers',
         icon: icons.AccountGroupIcon,
         breadcrumbs: false,
-        access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+        access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
       }
     ]
   },

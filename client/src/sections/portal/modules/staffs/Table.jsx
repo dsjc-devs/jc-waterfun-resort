@@ -91,13 +91,21 @@ const UsersTable = ({ queryObj = {} }) => {
       )
     },
     {
-      id: 'userId',
+      id: 'position',
       align: 'center',
       disablePadding: true,
       label: 'Position',
+      sortValue: (row) => {
+        const _position = row?.position?.[0]?.value || '';
+        return {
+          MASTER_ADMIN: 3,
+          ADMIN: 2,
+          RECEPTIONIST: 1
+        }[_position] || 0;
+      },
       renderCell: (row) => {
-        const { position } = row || {}
-        const _position = position[0]?.value
+        const { position } = row || {};
+        const _position = position[0]?.value;
 
         return (
           <Chip
@@ -116,7 +124,7 @@ const UsersTable = ({ queryObj = {} }) => {
               ADMIN: 'info',
             }[_position] || 'default'}
           />
-        )
+        );
       }
     },
     {
@@ -124,8 +132,17 @@ const UsersTable = ({ queryObj = {} }) => {
       align: 'center',
       disablePadding: true,
       label: 'Status',
+      sortValue: (row) => {
+        const status = row?.status || '';
+        return {
+          BANNED: 4,
+          ARCHIVED: 3,
+          ACTIVE: 2,
+          INACTIVE: 1
+        }[status] || 0;
+      },
       renderCell: (row) => {
-        const { status } = row || {}
+        const { status } = row || {};
 
         return (
           <Chip
@@ -133,15 +150,19 @@ const UsersTable = ({ queryObj = {} }) => {
             label={<Typography variant='subtitle1'>
               {{
                 ACTIVE: 'Active',
-                INACTIVE: 'Inactive'
+                INACTIVE: 'Inactive',
+                ARCHIVED: 'Archived',
+                BANNED: 'Banned',
               }[status]}
             </Typography>}
             color={{
               ACTIVE: 'primary',
-              INACTIVE: 'error'
+              INACTIVE: 'error',
+              ARCHIVED: 'info',
+              BANNED: 'warning',
             }[status] || 'default'}
           />
-        )
+        );
       }
     },
     {
@@ -185,6 +206,7 @@ const UsersTable = ({ queryObj = {} }) => {
         columns={columns}
         rows={users || []}
         isLoading={isLoading || loading}
+        noMessage='No staffs found.'
         settings={{
           otherActionButton: (
             (isMasterAdmin || isAdmin) && <Button

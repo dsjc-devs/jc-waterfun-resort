@@ -57,7 +57,7 @@ const USER_ROLES = USER_TYPES.reduce((acc, role) => {
   return acc;
 }, {});
 
-const USER_STATUSSES = ["ACTIVE", "INACTIVE", "ARCHIVED"]
+const USER_STATUSSES = ["ACTIVE", "INACTIVE", "ARCHIVED", "BANNED"]
 
 const RESORT_DETAILS = {
   aboutUs: {

@@ -24,11 +24,15 @@ const USER_ROLES = USER_TYPES.reduce((acc, role) => {
   return acc;
 }, {});
 
+const USER_STATUSSES = ["ACTIVE", "INACTIVE", "ARCHIVED", "BANNED"]
+
+
 const BLANK_VALUE = "-"
 
 export {
   COMPANY_NAME,
   USER_TYPES,
   BLANK_VALUE,
-  USER_ROLES
+  USER_ROLES,
+  USER_STATUSSES
 }

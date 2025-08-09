@@ -28,7 +28,7 @@ const authUser = async (data) => {
   const token = jwt.sign(
     { userId: user.userId, emailAddress: user.emailAddress, ...userObj },
     process.env.JWT_SECRET,
-    { expiresIn: "30d" }
+    { expiresIn: "1d" }
   );
 
   return {
@@ -118,23 +118,28 @@ const getUsers = async (queryObject) => {
             $switch: {
               branches: [
                 {
-                  case: {
-                    $in: ["MASTER_ADMIN", "$position.value"]
-                  },
+                  case: { $in: ["MASTER_ADMIN", "$position.value"] },
                   then: 0
                 },
                 {
-                  case: {
-                    $in: ["ADMIN", "$position.value"]
-                  },
+                  case: { $in: ["ADMIN", "$position.value"] },
                   then: 1
                 },
                 {
-                  case: {
-                    $in: ["RECEPTIONIST", "$position.value"]
-                  },
+                  case: { $in: ["RECEPTIONIST", "$position.value"] },
                   then: 2
                 }
+              ],
+              default: 99
+            }
+          },
+          statusRank: {
+            $switch: {
+              branches: [
+                { case: { $eq: ["ACTIVE", "$status"] }, then: 0 },
+                { case: { $eq: ["INACTIVE", "$status"] }, then: 1 },
+                { case: { $eq: ["ARCHIVED", "$status"] }, then: 2 },
+                { case: { $eq: ["BANNED", "$status"] }, then: 3 }
               ],
               default: 99
             }
@@ -142,7 +147,8 @@ const getUsers = async (queryObject) => {
         }
       },
 
-      { $sort: { positionRank: 1, createdAt: -1 } },
+      // Sort by positionRank → statusRank → createdAt (desc)
+      { $sort: { positionRank: 1, statusRank: 1, createdAt: -1 } },
 
       { $skip: skip },
       { $limit: limit },
@@ -150,7 +156,8 @@ const getUsers = async (queryObject) => {
       {
         $project: {
           password: 0,
-          positionRank: 0
+          positionRank: 0,
+          statusRank: 0
         }
       }
     ]);

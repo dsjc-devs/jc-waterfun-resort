@@ -21,6 +21,7 @@ import Transitions from 'components/@extended/Transitions';
 
 // assets
 import useAuth from 'hooks/useAuth';
+import { useGetSingleUser } from 'api/users';
 
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
@@ -62,7 +63,8 @@ export default function Profile() {
     setValue(newValue);
   };
 
-  const { user } = useAuth();
+  const { user: loggedInUser } = useAuth();
+  const { user } = useGetSingleUser(loggedInUser?.userId)
   const { firstName, lastName, position } = user || {}
 
   const iconBackColorOpen = 'grey.100';

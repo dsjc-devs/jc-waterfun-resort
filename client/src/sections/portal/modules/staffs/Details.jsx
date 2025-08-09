@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router'
 import { useGetSingleUser } from 'api/users'
 import { CardAccountDetailsOutline } from 'mdi-material-ui'
-import { USER_ROLES, USER_TYPES } from 'constants/constants'
+import { USER_ROLES, USER_STATUSSES, USER_TYPES } from 'constants/constants'
 
 import LabeledValue from 'components/LabeledValue'
 import MainCard from 'components/MainCard'
@@ -18,6 +18,7 @@ import useAuth from 'hooks/useAuth'
 import emptyUser from 'assets/images/users/empty-user.png'
 import { useFormik } from 'formik'
 import AvatarUpload from 'components/dropzone/AvatarUpload'
+import titleCase from 'utils/titleCaseFormatter'
 
 const Details = ({ mutate }) => {
   const queryParams = new URLSearchParams(window.location.search)
@@ -25,7 +26,7 @@ const Details = ({ mutate }) => {
   const isEditMode = queryParams.get('isEditMode')
 
   const { user: loggedInUser } = useAuth()
-  const { user: viewUser, isLoading } = useGetSingleUser(userId) ?? {}
+  const { user: viewUser, isLoading, mutate: userMutate } = useGetSingleUser(userId) ?? {}
   const navigate = useNavigate()
 
   const [open, setOpen] = useState(false)
@@ -39,7 +40,8 @@ const Details = ({ mutate }) => {
       lastName: viewUser?.lastName || '',
       emailAddress: viewUser?.emailAddress || '',
       phoneNumber: viewUser?.phoneNumber || '',
-      position: viewUser?.position?.[0]?.value || ''
+      position: viewUser?.position?.[0]?.value || '',
+      status: viewUser?.status || ''
     },
     enableReinitialize: true,
     onSubmit: async (values) => {
@@ -67,6 +69,7 @@ const Details = ({ mutate }) => {
 
         handleClose()
         await mutate()
+        await userMutate()
       } catch (error) {
         toast.error(error?.message || "Something went wrong", {
           position: "top-right",
@@ -84,7 +87,8 @@ const Details = ({ mutate }) => {
     lastName,
     emailAddress,
     phoneNumber,
-    position
+    position,
+    status
   } = viewUser || {}
 
   useEffect(() => {
@@ -122,213 +126,248 @@ const Details = ({ mutate }) => {
   };
 
   const isSameRole = loggedInUser && loggedInUser?.position[0].value === viewUser?.position[0].value
-  const hasAccess = !isSameRole && loggedInUser?.position[0].value === USER_TYPES[0].value
+  const hasAccess = !isSameRole && loggedInUser?.position[0].value === USER_ROLES.MASTER_ADMIN.value
 
   return (
     <React.Fragment>
-      <Dialog
-        fullWidth
-        maxWidth="md"
-        open={open}
-        onClose={() => setOpen(false)}
-      >
-        <MainCard>
-          <Stack direction='row' alignItems='center' justifyContent='flex-end'>
-            <IconButton title='Close' color='secondary' onClick={handleClose}>
+      <Dialog fullWidth maxWidth="md" open={open} onClose={handleClose}>
+        <MainCard content={false}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}
+          >
+            <Box component="span" fontSize={18} fontWeight={600}>
+              {isEditMode ? 'Edit User' : 'User Details'}
+            </Box>
+            <IconButton title="Close" color="secondary" onClick={handleClose}>
               <CloseOutlined />
             </IconButton>
           </Stack>
 
-          <Box padding={2}>
-            {!isLoading && hasAccess && (
-              <Stack direction='row' alignItems='center' justifyContent='flex-end' spacing={2} marginBlockEnd={1}>
-                <AnimateButton>
-                  <LoadingButton
-                    loading={loading}
-                    disableElevation
-                    disabled={loading}
-                    loadingPosition="start"
-                    fullWidth
-                    onClick={() => setOpenDeleteDialog(true)}
-                    variant="contained"
-                    color="error"
-                    style={{ width: '120px' }}
-                    startIcon={<DeleteOutlined />}
-                  >
-                    Delete
-                  </LoadingButton>
-                </AnimateButton>
-              </Stack>
-            )}
-            <MainCard>
-              {isLoading ? (
-                <Grid container spacing={2} alignItems='center'>
-                  <Grid item sm={12} md={6}>
-                    <Skeleton variant="rectangular" height={390} sx={{ borderRadius: 2 }} />
-                  </Grid>
-                  <Grid item sm={12} md={6}>
-                    {[...Array(4)].map((_, idx) => (
-                      <Box key={idx} marginBottom={4}>
-                        <Skeleton variant="text" width="60%" height={30} />
-                        <Skeleton variant="text" width="80%" height={24} />
-                      </Box>
-                    ))}
-                  </Grid>
+          <Box sx={{ p: 3 }}>
+            {isLoading ? (
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={4}>
+                  <Skeleton variant="rounded" height={280} />
                 </Grid>
-              ) : (
-                <Grid container spacing={2} alignItems='center'>
-                  <Grid item sm={12} md={4}>
-                    <MainCard>
-                      {isEditMode ? (
-                        <MainCard title="Avatar" content={false}>
-                          {formik.values.avatar && (
-                            <Stack alignItems='flex-end' padding={1} >
-                              <AnimateButton>
-                                <Button color='error' onClick={() => formik.setFieldValue("avatar", "")}> X Clear Avatar </Button>
-                              </AnimateButton>
+                <Grid item xs={12} md={8}>
+                  {[...Array(5)].map((_, i) => (
+                    <Skeleton key={i} height={40} sx={{ mb: 2 }} />
+                  ))}
+                </Grid>
+              </Grid>
+            ) : (
+              <Grid container spacing={4}>
+                <Grid item xs={12} md={4}>
+                  <MainCard sx={{ p: 2, textAlign: 'center' }}>
+                    {isEditMode ? (
+                      <Stack justifyContent='center' alignItems='center'>
+                        <AvatarUpload
+                          file={formik.values.avatar}
+                          setFieldValue={(field, value) =>
+                            formik.setFieldValue('avatar', value)
+                          }
+                          initialFile={formik.values.avatar}
+                        />
+                        {formik.values.avatar && (
+                          <Button
+                            variant="text"
+                            color="error"
+                            onClick={() => formik.setFieldValue('avatar', '')}
+                            sx={{ mt: 1 }}
+                          >
+                            Clear Avatar
+                          </Button>
+                        )}
+                      </Stack>
+                    ) : (
+                      <Box
+                        component="img"
+                        src={avatar || emptyUser}
+                        sx={{
+                          width: '100%',
+                          borderRadius: 2,
+                          objectFit: 'cover'
+                        }}
+                      />
+                    )}
+                  </MainCard>
+                </Grid>
+
+                <Grid item xs={12} md={8}>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <LabeledValue
+                        title="Full Name"
+                        icon={<UserOutlined />}
+                        subTitle={
+                          isEditMode ? (
+                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                              <OutlinedInput
+                                fullWidth
+                                label="First Name"
+                                name="firstName"
+                                value={formik.values.firstName}
+                                onChange={formik.handleChange}
+                              />
+                              <OutlinedInput
+                                fullWidth
+                                label="Last Name"
+                                name="lastName"
+                                value={formik.values.lastName}
+                                onChange={formik.handleChange}
+                              />
                             </Stack>
-                          )}
-                          <Stack alignItems='center' padding={1}>
-                            <AvatarUpload
-                              file={formik.values.avatar}
-                              setFieldValue={(field, value) => formik.setFieldValue('avatar', value)}
-                              error={formik.touched.avatar && formik.errors.avatar}
-                              initialFile={formik.values.avatar}
+                          ) : (
+                            <Box fontWeight={500}>
+                              {firstName} {lastName}
+                            </Box>
+                          )
+                        }
+                      />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <LabeledValue
+                        title="Email Address"
+                        icon={<MailOutlined />}
+                        subTitle={
+                          isEditMode ? (
+                            <OutlinedInput
+                              fullWidth
+                              label="Email"
+                              name="emailAddress"
+                              value={formik.values.emailAddress}
+                              onChange={formik.handleChange}
                             />
-                          </Stack>
-                        </MainCard>
-                      ) : (
-                        <Box
-                          component='img'
-                          src={avatar || emptyUser}
-                          sx={{
-                            width: '100%',
-                            objectFit: 'cover',
-                            aspectRatio: "1/1",
-                            borderRadius: 4.5
-                          }}
-                        />
-                      )}
-                    </MainCard>
-                  </Grid>
+                          ) : (
+                            <Box>{emailAddress}</Box>
+                          )
+                        }
+                      />
+                    </Grid>
 
-                  <Grid item sm={12} md={8}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12}>
-                        <LabeledValue
-                          title='Full Name'
-                          icon={<UserOutlined />}
-                          subTitle={
-                            isEditMode ? (
-                              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-                                <OutlinedInput
-                                  fullWidth
-                                  name="firstName"
-                                  value={formik.values.firstName}
-                                  onChange={formik.handleChange}
-                                  placeholder="First Name"
-                                />
-                                <OutlinedInput
-                                  fullWidth
-                                  name="lastName"
-                                  value={formik.values.lastName}
-                                  onChange={formik.handleChange}
-                                  placeholder="Last Name"
-                                />
-                              </Stack>
-                            ) : `${firstName} ${lastName}`
-                          }
-                        />
-                      </Grid>
+                    <Grid item xs={12}>
+                      <LabeledValue
+                        title="Phone Number"
+                        icon={<PhoneOutlined />}
+                        subTitle={
+                          isEditMode ? (
+                            <OutlinedInput
+                              fullWidth
+                              label="Phone Number"
+                              name="phoneNumber"
+                              value={`+63 ${formik.values.phoneNumber}`}
+                              onChange={handlePhoneChange}
+                              inputProps={{
+                                inputMode: 'numeric',
+                                maxLength: 14
+                              }}
+                            />
+                          ) : (
+                            <Box>{phoneNumber}</Box>
+                          )
+                        }
+                      />
+                    </Grid>
 
-                      <Grid item xs={12}>
-                        <LabeledValue
-                          title='Email Address'
-                          icon={<MailOutlined />}
-                          subTitle={
-                            isEditMode ? (
-                              <OutlinedInput
-                                fullWidth
-                                name="emailAddress"
-                                value={formik.values.emailAddress}
-                                onChange={formik.handleChange}
-                                placeholder="Email Address"
-                              />
-                            ) : emailAddress
-                          }
-                        />
-                      </Grid>
+                    <Grid item xs={12}>
+                      <LabeledValue
+                        title="Position"
+                        icon={<CardAccountDetailsOutline />}
+                        subTitle={
+                          isEditMode ? (
+                            <Select
+                              fullWidth
+                              name="position"
+                              value={formik.values.position}
+                              onChange={formik.handleChange}
+                            >
+                              {USER_TYPES.filter(
+                                (f) => f.value !== USER_ROLES.CUSTOMER.value
+                              ).map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          ) : (
+                            position?.[0]?.label
+                          )
+                        }
+                      />
+                    </Grid>
 
-                      <Grid item xs={12}>
-                        <LabeledValue
-                          title='Phone Number'
-                          icon={<PhoneOutlined />}
-                          subTitle={
-                            isEditMode ? (
-                              <OutlinedInput
-                                fullWidth
-                                name="phoneNumber"
-                                type="tel"
-                                value={`+63 ${formik.values.phoneNumber}`}
-                                onBlur={formik.handleBlur}
-                                onChange={handlePhoneChange}
-                                placeholder="+63 --- --- ----"
-                                inputProps={{
-                                  inputMode: "numeric",
-                                  maxLength: 14,
-                                }}
-                              />
-                            ) : phoneNumber
-                          }
-                        />
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <LabeledValue
-                          title="Position"
-                          icon={<CardAccountDetailsOutline />}
-                          subTitle={
-                            isEditMode ? (
-                              <Select
-                                fullWidth
-                                name="position"
-                                value={formik.values.position}
-                                onChange={formik.handleChange}
-                              >
-                                {USER_TYPES.filter((f) => f.value !== USER_ROLES.CUSTOMER.value).map((option) => (
-                                  <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                  </MenuItem>
-                                ))}
-                              </Select>
-                            ) : viewUser && position?.[0]?.label
-                          }
-                        />
-                      </Grid>
+                    <Grid item xs={12}>
+                      <LabeledValue
+                        title="Status"
+                        icon={<CardAccountDetailsOutline />}
+                        subTitle={
+                          isEditMode ? (
+                            <Select
+                              fullWidth
+                              name="status"
+                              value={formik.values.status}
+                              onChange={formik.handleChange}
+                            >
+                              {USER_STATUSSES.map((option) => (
+                                <MenuItem key={option} value={option}>
+                                  {titleCase(option)}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          ) : (
+                            status
+                          )
+                        }
+                      />
                     </Grid>
                   </Grid>
                 </Grid>
+              </Grid>
+            )}
+
+            <Stack
+              direction="row"
+              justifyContent="flex-end"
+              spacing={2}
+              sx={{ mt: 4 }}
+            >
+              {!isEditMode && (
+                <Button
+                  variant="outlined"
+                  startIcon={<CardAccountDetailsOutline />}
+                  onClick={() =>
+                    navigate(`/portal/staffs?userId=${userId}&isEditMode=true`)
+                  }
+                >
+                  Edit
+                </Button>
               )}
-            </MainCard>
-            {(isEditMode) && (
-              <Stack direction='row' justifyContent='flex-end' marginTop={2}>
+              {hasAccess && !isEditMode && (
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<DeleteOutlined />}
+                  onClick={() => setOpenDeleteDialog(true)}
+                >
+                  Delete
+                </Button>
+              )}
+              {isEditMode && (
                 <AnimateButton>
                   <LoadingButton
                     loading={formik.isSubmitting}
-                    disableElevation
-                    disabled={formik.isSubmitting}
-                    loadingPosition="start"
-                    fullWidth
-                    onClick={formik.handleSubmit}
                     variant="contained"
-                    color="primary"
-                    sx={{ width: "150px" }}
+                    onClick={formik.handleSubmit}
                   >
-                    Save
+                    Save Changes
                   </LoadingButton>
                 </AnimateButton>
-              </Stack>
-            )}
+              )}
+            </Stack>
           </Box>
         </MainCard>
       </Dialog>

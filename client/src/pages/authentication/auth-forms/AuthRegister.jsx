@@ -44,8 +44,14 @@ export default function AuthRegister({ type = "CUSTOMER", isFromRegister = true,
 
   const [level, setLevel] = useState();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleClickShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const handleMouseDownPassword = (event) => {
@@ -71,12 +77,15 @@ export default function AuthRegister({ type = "CUSTOMER", isFromRegister = true,
           emailAddress: '',
           phoneNumber: '',
           password: '',
+          confirmPassword: '',
           position: ''
         }}
         onSubmit={async (values) => {
           try {
             const formData = new FormData()
             const _values = { ...values, position: values.position ? values.position : type, status: "ACTIVE" }
+
+            delete _values.confirmPassword;
 
             Object.keys(_values).forEach((key) => {
               if (key === 'avatar' && _values[key].length > 0) {
@@ -117,6 +126,9 @@ export default function AuthRegister({ type = "CUSTOMER", isFromRegister = true,
             .required("Phone Number is required")
             .matches(/^\d{10}$/, "Phone Number must be exactly 10 digits"),
           password: Yup.string().max(255).required('Password is required'),
+          confirmPassword: Yup.string()
+            .oneOf([Yup.ref('password'), null], 'Passwords must match')
+            .required('Confirm Password is required'),
           position: Yup.string()
             .max(255, 'Maximum 255 characters')
             .when('isFromRegister', {
@@ -292,7 +304,45 @@ export default function AuthRegister({ type = "CUSTOMER", isFromRegister = true,
                     </Grid>
                   </FormControl>
                 </Grid>
-                {!isFromRegister && (
+
+                {/* Confirm Password Field */}
+                <Grid item xs={12}>
+                  <Stack spacing={1}>
+                    <InputLabel htmlFor="confirmPassword-signup">Confirm Password</InputLabel>
+                    <OutlinedInput
+                      fullWidth
+                      error={Boolean(touched.confirmPassword && errors.confirmPassword)}
+                      id="confirmPassword-signup"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={values.confirmPassword}
+                      name="confirmPassword"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle confirm password visibility"
+                            onClick={handleClickShowConfirmPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                            color="secondary"
+                          >
+                            {showConfirmPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      placeholder="******"
+                      inputProps={{}}
+                    />
+                  </Stack>
+                  {touched.confirmPassword && errors.confirmPassword && (
+                    <FormHelperText error id="helper-text-confirmPassword-signup">
+                      {errors.confirmPassword}
+                    </FormHelperText>
+                  )}
+                </Grid>
+
+                {(!isFromRegister && type !== "CUSTOMER") && (
                   <Grid item xs={5}>
                     <Stack spacing={1}>
                       <InputLabel htmlFor="position-signup">Position</InputLabel>

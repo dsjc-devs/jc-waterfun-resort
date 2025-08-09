@@ -7,10 +7,17 @@ const DashboardDefault = Loadable(lazy(() => import('pages/portal/dashboard')));
 const UnderConstruction = Loadable(lazy(() => import('pages/maintenance/under-construction')));
 
 // pages
+
+// staffs
 const Staffs = Loadable(lazy(() => import('pages/portal/staffs')));
 
+// customers
 const Customers = Loadable(lazy(() => import('pages/portal/customers')));
 const CustomersDetails = Loadable(lazy(() => import('pages/portal/customers/details')));
+
+// profile
+const ViewProfile = Loadable(lazy(() => import('pages/portal/profile/view')));
+const EditProfile = Loadable(lazy(() => import('pages/portal/profile/edit')));
 
 const MainRoutes = {
   path: '/',
@@ -66,7 +73,20 @@ const MainRoutes = {
         {
           path: 'my-reservations',
           element: <UnderConstruction />
-        }
+        },
+        {
+          path: 'profile',
+          children: [
+            {
+              path: 'view',
+              element: <ViewProfile />
+            },
+            {
+              path: 'edit',
+              element: <EditProfile />
+            },
+          ]
+        },
       ]
     }
   ]
