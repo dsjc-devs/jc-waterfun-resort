@@ -59,9 +59,30 @@ const USER_ROLES = USER_TYPES.reduce((acc, role) => {
 
 const USER_STATUSSES = ["ACTIVE", "INACTIVE", "ARCHIVED"]
 
+const RESORT_DETAILS = {
+  aboutUs: {
+    mission: "To provide exceptional water recreation experiences while promoting family fun, safety, and environmental stewardship.",
+    vision: "To be the premier water resort destination known for innovation, sustainability, and unforgettable memories.",
+    goals: "Creating magical moments for families, maintaining world-class safety standards, and building a sustainable future for water recreation."
+  },
+  companyInfo: {
+    logo: "/images/jc-waterfun-logo.png",
+    name: "JC Waterfun Resort",
+    emailAddress: "info@jcwaterfun.com",
+    phoneNumber: "09123456789",
+    address: {
+      streetAddress: "Langkaan",
+      city: "Dasmarinas City",
+      province: "Cavite",
+      country: "Philippines"
+    }
+  }
+}
+
 export {
   colours,
   USER_TYPES,
   USER_STATUSSES,
-  USER_ROLES
+  USER_ROLES,
+  RESORT_DETAILS
 }
