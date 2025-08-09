@@ -44,9 +44,6 @@ const EditProfile = () => {
     phoneNumber: Yup.string()
       .matches(/^\d{10}$/, 'Phone Number must be exactly 10 digits')
       .required('Phone Number is required'),
-    avatar: Yup.array()
-      .min(1, 'Avatar is required')
-      .nullable(),
   });
 
   return (
@@ -68,8 +65,12 @@ const EditProfile = () => {
             const formData = new FormData();
 
             Object.keys(values).forEach((key) => {
-              if (key === 'avatar' && values[key].length > 0) {
-                formData.append('avatar', values[key][0]);
+              if (key === 'avatar') {
+                if (typeof values[key] === 'string') {
+                  formData.append('avatar', values[key]);
+                } else if (values[key] && values[key].length > 0) {
+                  formData.append('avatar', values[key][0]);
+                }
               } else {
                 formData.append(key, values[key]);
               }
@@ -102,9 +103,10 @@ const EditProfile = () => {
                     <Stack direction='row' justifyContent='center' alignItems='center' marginBottom={2} spacing={2}>
                       <AvatarUpload
                         file={values.avatar}
-                        setFieldValue={(field, value) => setFieldValue('avatar', value)}
-                        initialFile={values.avatar || ""}
-                        error={touched.avatar && Boolean(errors.avatar)}
+                        setFieldValue={(field, value) =>
+                          setFieldValue('avatar', value)
+                        }
+                        initialFile={values.avatar}
                       />
                     </Stack>
                     {touched.avatar && errors.avatar && (
@@ -233,6 +235,7 @@ const EditProfile = () => {
                   </MainCard>
                 </Grid>
               </Grid>
+              <pre>{JSON.stringify(values, null, 2)}</pre>
             </form>
           );
         }}
