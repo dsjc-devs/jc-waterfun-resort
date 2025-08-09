@@ -235,7 +235,6 @@ const EditProfile = () => {
                   </MainCard>
                 </Grid>
               </Grid>
-              <pre>{JSON.stringify(values, null, 2)}</pre>
             </form>
           );
         }}
