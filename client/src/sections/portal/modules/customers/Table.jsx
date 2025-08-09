@@ -6,17 +6,22 @@ import {
   EditOutlined,
   EllipsisOutlined,
   EyeOutlined,
-  PlusOutlined
+  PlusOutlined,
+  AppstoreOutlined,
+  UnorderedListOutlined
 } from '@ant-design/icons';
 import {
   Box,
   Button,
   Chip,
   Fade,
+  Grid,
   Menu,
   MenuItem,
+  Pagination,
   Stack,
-  Typography
+  Typography,
+  Tooltip
 } from '@mui/material';
 
 import agent from 'api';
@@ -26,31 +31,33 @@ import ConvertDate from 'components/ConvertDate';
 import ConfirmationDialog from 'components/ConfirmationDialog';
 import Table from 'components/Table';
 import RegistrationModal from 'components/RegistrationModal';
+import SimpleUserCard from 'components/SimpleUserCard';
 import { toast } from 'react-toastify';
 import UserEditModal from './UserEditModal';
 import { USER_ROLES } from 'constants/constants';
 import useAuth from 'hooks/useAuth';
 
 const CustomersTable = ({ queryObj = {} }) => {
-  const { user } = useAuth()
-
+  const { user: currentUser } = useAuth();
   const { data, isLoading, mutate } = useGetUsers({ queryObj });
   const { users: customers } = data || {};
 
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-
   const [modalState, setModalState] = useState({
     addCustomer: false,
     editUser: null,
-    deleteUserId: null,
+    deleteUserId: null
   });
-
   const [menuState, setMenuState] = useState({
     anchorEl: null,
     userId: null
   });
+
+  const [viewMode, setViewMode] = useState('list');
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 6;
 
   const handleMenuClick = (event, userId) => {
     setMenuState({ anchorEl: event.currentTarget, userId });
@@ -58,6 +65,23 @@ const CustomersTable = ({ queryObj = {} }) => {
 
   const handleMenuClose = () => {
     setMenuState({ anchorEl: null, userId: null });
+  };
+
+  const isMasterAdmin = currentUser?.position?.[0]?.value === USER_ROLES.MASTER_ADMIN.value;
+  const isAdmin = currentUser?.position?.[0]?.value === USER_ROLES.ADMIN.value;
+
+  const canEditOrDelete = (targetUser) => {
+    if (!currentUser) return { canEdit: false, canDelete: false };
+    const targetRole = targetUser?.position?.[0]?.value;
+    const currentRole = currentUser?.position?.[0]?.value;
+    const isSameUser = currentUser?.userId === targetUser?.userId;
+    const isSameRole = targetRole === currentRole;
+    const isTargetMasterAdmin = targetRole === USER_ROLES.MASTER_ADMIN.value;
+
+    return {
+      canEdit: isSameUser || (!isSameRole && !isTargetMasterAdmin && (isMasterAdmin || isAdmin)),
+      canDelete: !isSameUser && !isSameRole && !isTargetMasterAdmin && (isMasterAdmin || isAdmin)
+    };
   };
 
   const handleDelete = async () => {
@@ -78,7 +102,7 @@ const CustomersTable = ({ queryObj = {} }) => {
     if (!modalState.editUser) return;
     setLoading(true);
     try {
-      const formData = new FormData()
+      const formData = new FormData();
       Object.keys(values).forEach((key) => {
         if (key === 'avatar') {
           if (typeof values[key] === 'string') {
@@ -101,9 +125,6 @@ const CustomersTable = ({ queryObj = {} }) => {
       setLoading(false);
     }
   };
-
-  const isMasterAdmin = user?.position[0].value === USER_ROLES.MASTER_ADMIN.value
-  const isAdmin = user?.position[0].value === USER_ROLES.ADMIN.value
 
   const columns = useMemo(
     () => [
@@ -182,9 +203,7 @@ const CustomersTable = ({ queryObj = {} }) => {
         renderCell: (row) => (
           <IconButton
             aria-label="more"
-            aria-controls={
-              menuState.userId === row.userId ? 'row-menu' : undefined
-            }
+            aria-controls={menuState.userId === row.userId ? 'row-menu' : undefined}
             aria-haspopup="true"
             onClick={(e) => handleMenuClick(e, row.userId)}
           >
@@ -196,46 +215,93 @@ const CustomersTable = ({ queryObj = {} }) => {
     [customers, menuState.userId]
   );
 
+  const paginatedCustomers = useMemo(() => {
+    if (!customers) return [];
+    const startIndex = (page - 1) * itemsPerPage;
+    return customers.slice(startIndex, startIndex + itemsPerPage);
+  }, [customers, page]);
+
+  const otherActionButtons = (isMasterAdmin || isAdmin) && (
+    <React.Fragment>
+      <Button
+        variant="contained"
+        startIcon={<PlusOutlined />}
+        onClick={() => setIsOpenAddDialog((prev) => !prev)}
+        sx={{ width: '150px', mr: 1 }}
+      >
+        Add Staff
+      </Button>
+
+      <Button
+        variant="outlined"
+        onClick={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')}
+        sx={{ width: '150px' }}
+        startIcon={viewMode === 'list' ? <AppstoreOutlined /> : <UnorderedListOutlined />}
+      >
+        {viewMode === 'list' ? 'Grid View' : 'List View'}
+      </Button>
+    </React.Fragment>
+  )
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
   return (
     <>
-      <Table
-        searchableColumns={['emailAddress', 'firstName', 'lastName', 'userId']}
-        itemsPerPage={1}
-        columns={columns}
-        rows={customers || []}
-        noMessage="No customers found."
-        isLoading={isLoading || loading}
-        settings={{
-          otherActionButton: (
-            <Button
-              variant="contained"
-              startIcon={<PlusOutlined />}
-              onClick={() =>
-                setModalState((prev) => ({
-                  ...prev,
-                  addCustomer: true
-                }))
-              }
-              sx={{ width: '150px' }}
-            >
-              Add Customer
-            </Button>
-          )
-        }}
-      />
+      {viewMode === 'list' && (
+        <Table
+          searchableColumns={['emailAddress', 'firstName', 'lastName', 'userId']}
+          itemsPerPage={1}
+          columns={columns}
+          rows={customers || []}
+          isLoading={isLoading || loading}
+          noMessage="No customers found."
+          settings={{
+            otherActionButton: otherActionButtons
+          }}
+        />
+      )}
 
-      {/* Delete Confirmation */}
+      {viewMode === 'grid' && (
+        <>
+          <Grid container spacing={2}>
+            {paginatedCustomers.map((cust) => {
+              const { canEdit, canDelete } = canEditOrDelete(cust);
+              return (
+                <Grid item key={cust.userId} xs={12} md={4}>
+                  <SimpleUserCard
+                    user={cust}
+                    currentUser={currentUser}
+                    onView={(u) => navigate(`/portal/customers/details/${u.userId}`)}
+                    onEdit={canEdit ? (u) => setModalState((prev) => ({ ...prev, editUser: u })) : undefined}
+                    onDelete={canDelete ? (u) => setModalState((prev) => ({ ...prev, deleteUserId: u.userId })) : undefined}
+                  />
+                </Grid>
+              );
+            })}
+          </Grid>
+          <Box display="flex" justifyContent="center" mt={2}>
+            <Pagination
+              count={Math.ceil((customers?.length || 0) / itemsPerPage)}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+              size="small"
+              shape="rounded"
+            />
+          </Box>
+        </>
+      )}
+
       <ConfirmationDialog
         title="Delete User"
         description="Are you sure you want to delete this user?"
         handleConfirm={handleDelete}
         open={Boolean(modalState.deleteUserId)}
-        handleClose={() =>
-          setModalState((prev) => ({ ...prev, deleteUserId: null }))
-        }
+        handleClose={() => setModalState((prev) => ({ ...prev, deleteUserId: null }))}
       />
 
-      {/* Row Actions Menu */}
       <Menu
         id={`row-menu-${menuState.userId}`}
         anchorEl={menuState.anchorEl}
@@ -252,38 +318,53 @@ const CustomersTable = ({ queryObj = {} }) => {
           <EyeOutlined style={{ marginRight: 8 }} />
           View
         </MenuItem>
-        <MenuItem
-          onClick={() => {
-            const user = customers.find((c) => c.userId === menuState.userId);
-            setModalState((prev) => ({ ...prev, editUser: user }));
-            handleMenuClose();
-          }}
-        >
-          <EditOutlined style={{ marginRight: 8 }} />
-          Edit
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            setModalState((prev) => ({
-              ...prev,
-              deleteUserId: menuState.userId
-            }));
-            handleMenuClose();
-          }}
-        >
-          <DeleteOutlined style={{ marginRight: 8 }} />
-          Delete
-        </MenuItem>
+
+        {(() => {
+          const targetUser = customers?.find((c) => c.userId === menuState.userId);
+          if (!targetUser) return null;
+          const { canEdit, canDelete } = canEditOrDelete(targetUser);
+
+          return (
+            <>
+              <Tooltip title={canEdit ? '' : 'Not authorized to edit this user'} arrow>
+                <span>
+                  <MenuItem
+                    onClick={() => {
+                      if (canEdit) setModalState((prev) => ({ ...prev, editUser: targetUser }));
+                      handleMenuClose();
+                    }}
+                    disabled={!canEdit}
+                  >
+                    <EditOutlined style={{ marginRight: 8 }} />
+                    Edit
+                  </MenuItem>
+                </span>
+              </Tooltip>
+
+              <Tooltip title={canDelete ? '' : 'Not authorized to delete this user'} arrow>
+                <span>
+                  <MenuItem
+                    onClick={() => {
+                      if (canDelete) setModalState((prev) => ({ ...prev, deleteUserId: menuState.userId }));
+                      handleMenuClose();
+                    }}
+                    disabled={!canDelete}
+                  >
+                    <DeleteOutlined style={{ marginRight: 8 }} />
+                    Delete
+                  </MenuItem>
+                </span>
+              </Tooltip>
+            </>
+          );
+        })()}
       </Menu>
 
       <RegistrationModal
-        handleClose={() =>
-          setModalState((prev) => ({ ...prev, addCustomer: false }))
-        }
+        handleClose={() => setModalState((prev) => ({ ...prev, addCustomer: false }))}
         open={modalState.addCustomer}
         title="Create Customer"
       />
-
       <UserEditModal
         formData={modalState.editUser || {}}
         onClose={() => setModalState((prev) => ({ ...prev, editUser: null }))}
