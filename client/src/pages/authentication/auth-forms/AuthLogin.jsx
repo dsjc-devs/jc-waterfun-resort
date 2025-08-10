@@ -60,7 +60,6 @@ export default function AuthLogin() {
             await login(values.emailAddress, values.password);
             setStatus({ success: true });
             setSubmitting(false);
-            toast.success('Login successful!');
             navigate('/portal/dashboard');
           } catch (error) {
             setStatus({ success: false });
