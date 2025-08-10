@@ -6,19 +6,19 @@ const quickLinks = [
     name: 'About Us',
     icon: RightOutlined,
     color: '#ffffff',
-    link: '/'
+    link: '/about-us'
   },
-    {
+  {
     name: 'Contact Us',
     icon: RightOutlined,
     color: '#ffffff',
-    link: '/'
+    link: '/contact-us'
   },
   {
     name: 'JC Waterfun Resort Portal',
     icon: RightOutlined,
     color: '#ffffff',
-    link: '/'
+    link: '/portal/dashboard'
   },
 
 ];
