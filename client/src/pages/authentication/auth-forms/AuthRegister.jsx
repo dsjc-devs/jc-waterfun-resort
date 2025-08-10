@@ -356,7 +356,7 @@ export default function AuthRegister({ type = "CUSTOMER", isFromRegister = true,
                         {USER_TYPES
                           .filter((f) => f.value !== USER_ROLES.CUSTOMER.value)
                           .filter((f) => {
-                            if (user.position === USER_ROLES.MASTER_ADMIN.value) return true;
+                            if (user.position[0]?.value === USER_ROLES.MASTER_ADMIN.value) return true;
                             return f.value === USER_ROLES.RECEPTIONIST.value;
                           })
                           .map((option) => (
