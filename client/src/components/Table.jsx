@@ -37,11 +37,13 @@ const ReusableTable = ({ columns, rows, settings, isLoading, searchableColumns =
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
   const [visibleColumns, setVisibleColumns] = useState(
     JSON.parse(localStorage.getItem("table_visible_columns")) ||
-    columns
-      .filter(c => c.label && c.id !== "actions")
-      .map(col => col.id)
+    [
+      ...columns
+        .filter(c => c.label)
+        .map(col => col.id),
+      "actions"
+    ]
   );
-
   const [anchorEl, setAnchorEl] = useState(null);
 
   const theme = useTheme()
