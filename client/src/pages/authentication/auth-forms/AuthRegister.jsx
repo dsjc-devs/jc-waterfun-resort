@@ -39,7 +39,7 @@ import { USER_ROLES, USER_TYPES } from 'constants/constants';
 // ============================|| JWT - REGISTER ||============================ //
 
 export default function AuthRegister({ type = "CUSTOMER", isFromRegister = true, handleClose = () => { } }) {
-  const { login } = useAuth()
+  const { login, user } = useAuth()
   const navigate = useNavigate()
 
   const [level, setLevel] = useState();
@@ -350,14 +350,20 @@ export default function AuthRegister({ type = "CUSTOMER", isFromRegister = true,
                         fullWidth
                         name="position"
                         value={values.position}
-                        onChange={(e) => setFieldValue('position', e.target.value)}
+                        onChange={(e) => setFieldValue("position", e.target.value)}
                         error={Boolean(touched.position && errors.position)}
                       >
-                        {USER_TYPES.filter((f) => f.value !== USER_ROLES.CUSTOMER.value).map((option) => (
-                          <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                          </MenuItem>
-                        ))}
+                        {USER_TYPES
+                          .filter((f) => f.value !== USER_ROLES.CUSTOMER.value)
+                          .filter((f) => {
+                            if (user.position === USER_ROLES.MASTER_ADMIN.value) return true;
+                            return f.value === USER_ROLES.RECEPTIONIST.value;
+                          })
+                          .map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                              {option.label}
+                            </MenuItem>
+                          ))}
                       </Select>
                       {touched.position && errors.position && (
                         <FormHelperText error id="helper-text-position">
