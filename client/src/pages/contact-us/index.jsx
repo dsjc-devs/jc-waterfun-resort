@@ -8,14 +8,14 @@ import {
   Stack,
   Container,
 } from '@mui/material';
-
+import { useGetResortDetails } from 'api/resort-details';
+import { EnvironmentFilled, MailFilled, PhoneFilled } from '@ant-design/icons';
 import { useTheme } from '@mui/material/styles';
 
 import PageTitle from 'components/PageTitle';
 import MainCard from 'components/MainCard';
 import Banner from 'components/Banner';
-import { useGetResortDetails } from 'api/resort-details';
-import { EnvironmentFilled, MailFilled, PhoneFilled } from '@ant-design/icons';
+import Logo from 'components/logo/LogoMain'
 
 const ContactUs = () => {
   const theme = useTheme()
@@ -125,9 +125,9 @@ const ContactUs = () => {
             </Grid>
 
             <Grid item xs={12} md={5}>
-              <Box sx={{ width: '100%', textAlign: 'center' }}>
-                <img src={logo} alt="logo" style={{ maxWidth: '45%', height: 'auto' }} />
-              </Box>
+              <Stack alignItems='center' marginBlockEnd={2}>
+                <Logo isPadded={false} />
+              </Stack>
               <MainCard
                 style={{
                   display: "flex",
