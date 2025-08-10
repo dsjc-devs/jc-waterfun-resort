@@ -126,7 +126,7 @@ const ContactUs = () => {
 
             <Grid item xs={12} md={5}>
               <Stack alignItems='center' marginBlockEnd={2}>
-                <Logo isPadded={false} />
+                <Logo isPadded={true} />
               </Stack>
               <MainCard
                 style={{

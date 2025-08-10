@@ -16,7 +16,7 @@ export default function DrawerHeader({ open }) {
   return (
     <DrawerHeaderStyled theme={theme} open={!!open}>
       <Stack direction='row' justifyContent='center'>
-        <Logo isIcon={!open} sx={{ marginBlock: "3em 2em" }} isPadded={false} />
+        <Logo isIcon={!open} sx={{ marginBlock: "3em 2em" }} isPadded={true} />
       </Stack>
     </DrawerHeaderStyled>
   );
