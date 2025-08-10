@@ -5,10 +5,15 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 
 // assets
 import navItems from './Wrapper/nav-items/navItems'
-import Logo from 'assets/images/logo/logo-circular.png'
 import { MenuOutlined } from '@ant-design/icons'
+import { useGetResortDetails } from 'api/resort-details'
+import Logo from 'components/logo/LogoMain'
 
 const Navbar = () => {
+  const { resortDetails } = useGetResortDetails()
+  const { companyInfo } = resortDetails || {}
+  const { logo } = companyInfo || {}
+
   const navigate = useNavigate()
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -53,16 +58,7 @@ const Navbar = () => {
               ))}
 
               <Stack onClick={() => navigate('/')} sx={{ cursor: 'pointer', mx: 2 }}>
-                <Box
-                  component='img'
-                  src={Logo}
-                  sx={{
-                    height: 80,
-                    width: "100%",
-                    aspectRatio: "1/1",
-                    objectFit: "cover"
-                  }}
-                />
+                <Logo />
               </Stack>
 
               {secondHalf.map((nav) => (
@@ -108,16 +104,7 @@ const Navbar = () => {
             }}
           >
             <Stack onClick={() => navigate('/')} sx={{ cursor: 'pointer', py: 2 }}>
-              <Box
-                component='img'
-                src={Logo}
-                sx={{
-                  height: 80,
-                  width: "100%",
-                  aspectRatio: "1/1",
-                  objectFit: "cover"
-                }}
-              />
+              <Logo />
             </Stack>
             <IconButton onClick={handleDrawerToggle} sx={{ color: '#fff' }}>
               <MenuOutlined />

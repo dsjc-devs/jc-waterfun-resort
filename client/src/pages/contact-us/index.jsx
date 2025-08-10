@@ -6,17 +6,36 @@ import {
   Typography,
   Button,
   Stack,
-  Container
+  Container,
 } from '@mui/material';
 
-import logo from 'assets/images/logo/logo.png'
+import { useTheme } from '@mui/material/styles';
 
 import PageTitle from 'components/PageTitle';
 import MainCard from 'components/MainCard';
 import Banner from 'components/Banner';
-import address from 'layout/Wrapper/footer-items/address';
+import { useGetResortDetails } from 'api/resort-details';
+import { EnvironmentFilled, MailFilled, PhoneFilled } from '@ant-design/icons';
 
 const ContactUs = () => {
+  const theme = useTheme()
+
+  const { resortDetails } = useGetResortDetails()
+  const { companyInfo } = resortDetails || {}
+  const {
+    address,
+    emailAddress,
+    phoneNumber,
+    logo
+  } = companyInfo || {}
+
+  const {
+    streetAddress,
+    city,
+    province,
+    country
+  } = address || {}
+
   return (
     <React.Fragment>
       <PageTitle title="Contact Us" isOnportal={false} />
@@ -118,19 +137,20 @@ const ContactUs = () => {
                 }}
               >
                 <Typography variant="h4" textAlign='center' gutterBottom>Contact Information</Typography>
-                {address.map((ad, index) => (
-                  <Stack key={ad.name} direction="row" alignItems="center" spacing={2} mb={1.5}>
-                    {React.createElement(ad.icon, {
-                      style: {
-                        color: index === 0 ? ad.color : '#000000',
-                        fontSize: 18
-                      }
-                    })}
-                    <Typography variant="subtitle2">
-                      {ad.name}
-                    </Typography>
+                <Box>
+                  <Stack direction="row" alignItems="center" spacing={2} mb={1} >
+                    <EnvironmentFilled style={{ color: theme.palette.error.main }} />
+                    <Typography variant='body'> {streetAddress}, {city} {province}, {country} </Typography>
                   </Stack>
-                ))}
+                  <Stack direction="row" alignItems="center" spacing={2} mb={1} >
+                    <PhoneFilled style={{ color: theme.palette.primary.light }} />
+                    <Typography variant='body'> {phoneNumber} </Typography>
+                  </Stack>
+                  <Stack direction="row" alignItems="center" spacing={2} mb={1} >
+                    <MailFilled style={{ color: theme.palette.primary.dark }} />
+                    <Typography variant='body'> {emailAddress} </Typography>
+                  </Stack>
+                </Box>
               </MainCard>
             </Grid>
           </Grid>

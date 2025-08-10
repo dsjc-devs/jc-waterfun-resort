@@ -12,11 +12,11 @@ import config from 'config';
 
 // ==============================|| MAIN LOGO ||============================== //
 
-const LogoSection = ({ sx, to }) => {
+const LogoSection = ({ sx, to, isPadded = true }) => {
   return (
     <ButtonBase disableRipple component={Link} to={!to ? config.defaultPath : to} sx={{ ...sx }}>
       <Stack direction="row" spacing={1} alignItems="center">
-        <Logo />
+        <Logo isPadded={isPadded} />
       </Stack>
     </ButtonBase>
   );

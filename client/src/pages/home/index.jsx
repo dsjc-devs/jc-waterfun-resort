@@ -24,7 +24,7 @@ const Home = () => {
                 sx={{
                   width: '100%',
                   height: '100dvh',
-                  objectFit: 'cover'
+                  objectFit: 'cover',
                 }}
               />
             </Card>

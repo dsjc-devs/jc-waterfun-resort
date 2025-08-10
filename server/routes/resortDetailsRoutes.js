@@ -24,12 +24,14 @@ router.post(
 router.get("/", getResortDetails);
 
 router.patch(
-  "/", // Remove /:resortId
+  "/",
   protect,
   createUploadMiddleware({
-    fields: [{ name: "logo", maxCount: 1 }],
+    fields: [
+      { name: 'logo', maxCount: 1 },
+    ],
     fieldFolders: {
-      logo: "resort_logos",
+      logo: 'resort_logos',
     },
   }),
   updateResortDetails

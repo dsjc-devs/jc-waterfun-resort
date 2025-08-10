@@ -6,10 +6,19 @@ import { AimOutlined, HeartOutlined, TeamOutlined } from '@ant-design/icons'
 import PageTitle from 'components/PageTitle'
 import Banner from 'components/Banner'
 import TitleTag from 'components/TitleTag'
+import { useGetResortDetails } from 'api/resort-details'
 
 const AboutUs = () => {
-
   const theme = useTheme()
+
+  const { resortDetails } = useGetResortDetails()
+  const { aboutUs } = resortDetails || {}
+
+  const {
+    mission,
+    vision,
+    goals
+  } = aboutUs || {}
 
   return (
     <React.Fragment>
@@ -43,14 +52,14 @@ const AboutUs = () => {
               </Box>
               <Box mt={7}>
                 <Typography variant="body1" color="text.secondary" textAlign="justify">
-                  At JC Waterfun Resort, our mission is to provide a fun and safe environment for families to enjoy water activities and create lasting memories. We are committed to excellence in service and ensuring the highest standards of safety and enjoyment for all our guests.
+                  {mission}
                 </Typography>
               </Box>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
               <Box textAlign="center">
                 <TitleTag
-                  title="Our Team"
+                  title="Vision"
                   subtitle="Meet Our Experts"
                   icon={
                     <TeamOutlined
@@ -61,14 +70,14 @@ const AboutUs = () => {
               </Box>
               <Box mt={7}>
                 <Typography variant="body1" color="text.secondary" textAlign="justify">
-                  Our team is composed of dedicated professionals who are passionate about water sports and customer service. Each member brings unique skills and experiences, ensuring that your visit is both enjoyable and memorable.
+                  {vision}
                 </Typography>
               </Box>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
               <Box textAlign="center">
                 <TitleTag
-                  title="Our Values"
+                  title="Our Goals"
                   subtitle="What Drives Us"
                   icon={
                     <HeartOutlined
@@ -79,7 +88,7 @@ const AboutUs = () => {
               </Box>
               <Box mt={7}>
                 <Typography variant="body1" color="text.secondary" textAlign="justify">
-                  We believe in integrity, respect, and teamwork. Our values guide us in providing exceptional service and creating a welcoming atmosphere for all our guests. We strive to foster a community where everyone feels valued and appreciated.
+                  {goals}
                 </Typography>
               </Box>
             </Grid>

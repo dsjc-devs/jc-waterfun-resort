@@ -19,6 +19,10 @@ const CustomersDetails = Loadable(lazy(() => import('pages/portal/customers/deta
 const ViewProfile = Loadable(lazy(() => import('pages/portal/profile/view')));
 const EditProfile = Loadable(lazy(() => import('pages/portal/profile/edit')));
 
+// content management
+const AboutUs = Loadable(lazy(() => import('pages/portal/content-management/about-us')));
+const CompanyInfo = Loadable(lazy(() => import('pages/portal/content-management/company-info')));
+
 const MainRoutes = {
   path: '/',
   element: <DashboardLayout />,
@@ -73,6 +77,19 @@ const MainRoutes = {
         {
           path: 'my-reservations',
           element: <UnderConstruction />
+        },
+        {
+          path: 'content-management',
+          children: [
+            {
+              path: 'about-us',
+              element: <AboutUs />
+            },
+            {
+              path: 'company-info',
+              element: <CompanyInfo />
+            },
+          ]
         },
         {
           path: 'profile',

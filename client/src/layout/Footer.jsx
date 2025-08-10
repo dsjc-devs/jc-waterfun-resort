@@ -1,19 +1,33 @@
 import React from 'react';
 import { useTheme } from '@mui/material/styles'
 import { useNavigate } from 'react-router-dom'
-import { Grid, Typography, Stack, } from '@mui/material'
+import { Grid, Typography, Stack, Box, } from '@mui/material'
 
-
-import address from 'layout/Wrapper/footer-items/address'
 import quickLinks from 'layout/Wrapper/footer-items/quickLinks'
-import { COMPANY_NAME } from 'constants/constants';
-
+import { useGetResortDetails } from 'api/resort-details';
+import { EnvironmentFilled, MailFilled, PhoneFilled } from '@ant-design/icons';
 
 const Footer = () => {
   const theme = useTheme();
   const date = new Date();
   const currentYear = date.getFullYear();
   const navigate = useNavigate();
+
+  const { resortDetails } = useGetResortDetails()
+  const { companyInfo } = resortDetails || {}
+  const {
+    address,
+    name: COMPANY_NAME,
+    emailAddress,
+    phoneNumber
+  } = companyInfo || {}
+
+  const {
+    streetAddress,
+    city,
+    province,
+    country
+  } = address || {}
 
   return (
     <React.Fragment>
@@ -28,14 +42,20 @@ const Footer = () => {
           <Typography mb={2} variant="h4" color="#ffffff">
             Contact Information
           </Typography>
-          {address.map((ad) => (
-            <Stack key={ad.name} direction="row" alignItems="center" spacing={2} mb={1.5} >
-              {React.createElement(ad.icon, { style: { color: ad.color, fontSize: 18 } })}
-              <Typography variant="subtitle2" color="#ffffff">
-                {ad.name}
-              </Typography>
+          <Box>
+            <Stack direction="row" alignItems="center" spacing={2} mb={1} >
+              <EnvironmentFilled style={{ color: theme.palette.error.main }} />
+              <Typography variant='body' color='#fff'> {streetAddress}, {city} {province}, {country} </Typography>
             </Stack>
-          ))}
+            <Stack direction="row" alignItems="center" spacing={2} mb={1} >
+              <PhoneFilled style={{ color: theme.palette.primary.light }} />
+              <Typography variant='body' color='#fff'> {phoneNumber} </Typography>
+            </Stack>
+            <Stack direction="row" alignItems="center" spacing={2} mb={1} >
+              <MailFilled style={{ color: "#fff" }} />
+              <Typography variant='body' color='#fff'> {emailAddress} </Typography>
+            </Stack>
+          </Box>
         </Grid>
         <Grid item md={4} sm={12}>
           <Typography mb={2} variant="h4" color="#ffffff">

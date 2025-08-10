@@ -8,7 +8,14 @@ import {
   CalendarOutlined,
   StarOutlined,
   PictureOutlined,
-  UserOutlined
+  UserOutlined,
+  InfoCircleOutlined,
+  HomeOutlined,
+  QuestionCircleOutlined,
+  BellOutlined,
+  FileTextOutlined,
+  LockOutlined,
+  MessageOutlined
 } from '@ant-design/icons';
 
 import {
@@ -26,7 +33,14 @@ const icons = {
   ImageIcon: PictureOutlined,
   AccountIcon: UserOutlined,
   AccountGroupIcon: AccountGroup,
-  RoomIcon: BedOutline
+  RoomIcon: BedOutline,
+  InfoCircleOutlined,
+  HomeOutlined,
+  QuestionCircleOutlined,
+  BellOutlined,
+  FileTextOutlined,
+  LockOutlined,
+  MessageOutlined
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
@@ -144,6 +158,87 @@ const modules = [
       }
     ]
   },
+  {
+    id: 'content-management',
+    title: 'Content Management',
+    type: 'group',
+    access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+    children: [
+      {
+        id: 'about-us',
+        title: 'About Us',
+        type: 'item',
+        url: '/portal/content-management/about-us',
+        icon: icons.InfoCircleOutlined,
+        breadcrumbs: false,
+        access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value]
+      },
+      {
+        id: 'company-info',
+        title: 'Company Info',
+        type: 'item',
+        url: '/portal/content-management/company-info',
+        icon: icons.HomeOutlined,
+        breadcrumbs: false,
+        access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value]
+      },
+      // {
+      //   id: 'faqs',
+      //   title: 'FAQs',
+      //   type: 'item',
+      //   url: '/content-management/faqs',
+      //   icon: icons.QuestionCircleOutlined,
+      //   breadcrumbs: false,
+      //   access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+      // },
+      // {
+      //   id: 'gallery',
+      //   title: 'Gallery',
+      //   type: 'item',
+      //   url: '/content-management/gallery',
+      //   icon: icons.ImageIcon,
+      //   breadcrumbs: false,
+      //   access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+      // },
+      // {
+      //   id: 'announcements',
+      //   title: 'Announcements',
+      //   type: 'item',
+      //   url: '/content-management/announcements',
+      //   icon: icons.BellOutlined,
+      //   breadcrumbs: false,
+      //   access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+      // },
+      // {
+      //   id: 'terms-conditions',
+      //   title: 'Terms & Conditions',
+      //   type: 'item',
+      //   url: '/content-management/terms-conditions',
+      //   icon: icons.FileTextOutlined,
+      //   breadcrumbs: false,
+      //   access: [USER_ROLES.MASTER_ADMIN.value],
+      // },
+      // {
+      //   id: 'privacy-policy',
+      //   title: 'Privacy Policy',
+      //   type: 'item',
+      //   url: '/content-management/privacy-policy',
+      //   icon: icons.LockOutlined,
+      //   breadcrumbs: false,
+      //   access: [USER_ROLES.MASTER_ADMIN.value],
+      // },
+      // {
+      //   id: 'testimonials',
+      //   title: 'Testimonials',
+      //   type: 'item',
+      //   url: '/content-management/testimonials',
+      //   icon: icons.MessageOutlined,
+      //   access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+      // }
+    ]
+  },
+
+  // customers
   {
     id: 'customer-profile',
     title: 'My Account',
