@@ -36,6 +36,7 @@ import { toast } from 'react-toastify';
 import UserEditModal from './UserEditModal';
 import { USER_ROLES } from 'constants/constants';
 import useAuth from 'hooks/useAuth';
+import MainCard from 'components/MainCard';
 
 const CustomersTable = ({ queryObj = {} }) => {
   const { user: currentUser } = useAuth();
@@ -226,10 +227,10 @@ const CustomersTable = ({ queryObj = {} }) => {
       <Button
         variant="contained"
         startIcon={<PlusOutlined />}
-        onClick={() => setIsOpenAddDialog((prev) => !prev)}
+        onClick={() => setModalState((prev) => ({ ...prev, addCustomer: true }))}
         sx={{ width: '150px', mr: 1 }}
       >
-        Add Staff
+        Add Customer
       </Button>
 
       <Button
@@ -240,7 +241,7 @@ const CustomersTable = ({ queryObj = {} }) => {
       >
         {viewMode === 'list' ? 'Grid View' : 'List View'}
       </Button>
-    </React.Fragment>
+    </React.Fragment >
   )
 
   const handlePageChange = (event, value) => {
@@ -264,23 +265,43 @@ const CustomersTable = ({ queryObj = {} }) => {
       )}
 
       {viewMode === 'grid' && (
-        <>
-          <Grid container spacing={2}>
-            {paginatedCustomers.map((cust) => {
-              const { canEdit, canDelete } = canEditOrDelete(cust);
-              return (
-                <Grid item key={cust.userId} xs={12} md={4}>
-                  <SimpleUserCard
-                    user={cust}
-                    currentUser={currentUser}
-                    onView={(u) => navigate(`/portal/customers/details/${u.userId}`)}
-                    onEdit={canEdit ? (u) => setModalState((prev) => ({ ...prev, editUser: u })) : undefined}
-                    onDelete={canDelete ? (u) => setModalState((prev) => ({ ...prev, deleteUserId: u.userId })) : undefined}
-                  />
-                </Grid>
-              );
-            })}
-          </Grid>
+        <React.Fragment>
+          <Box padding={2} display="flex" justifyContent="flex-end" mb={1}>
+            <Button
+              variant="contained"
+              startIcon={<PlusOutlined />}
+              onClick={() => setModalState((prev) => ({ ...prev, addCustomer: true }))}
+              sx={{ width: '150px', mr: 1 }}
+            >
+              Add Customer
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<UnorderedListOutlined />}
+              onClick={() => setViewMode('list')}
+            >
+              List View
+            </Button>
+          </Box>
+          <MainCard>
+            <Grid container spacing={2}>
+              {paginatedCustomers.map((cust) => {
+                const { canEdit, canDelete } = canEditOrDelete(cust);
+                return (
+                  <Grid item key={cust.userId} xs={12} md={4}>
+                    <SimpleUserCard
+                      user={cust}
+                      currentUser={currentUser}
+                      onView={(u) => navigate(`/portal/customers/details/${u.userId}`)}
+                      onEdit={canEdit ? (u) => setModalState((prev) => ({ ...prev, editUser: u })) : undefined}
+                      onDelete={canDelete ? (u) => setModalState((prev) => ({ ...prev, deleteUserId: u.userId })) : undefined}
+                    />
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </MainCard>
           <Box display="flex" justifyContent="center" mt={2}>
             <Pagination
               count={Math.ceil((customers?.length || 0) / itemsPerPage)}
@@ -291,7 +312,7 @@ const CustomersTable = ({ queryObj = {} }) => {
               shape="rounded"
             />
           </Box>
-        </>
+        </React.Fragment>
       )}
 
       <ConfirmationDialog
