@@ -112,7 +112,7 @@ const Navbar = () => {
           </Stack>
 
           <Drawer
-            anchor="left"
+            anchor="right"
             open={drawerOpen}
             onClose={handleDrawerToggle}
             PaperProps={{

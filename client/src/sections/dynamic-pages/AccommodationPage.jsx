@@ -171,54 +171,66 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
 
             <Divider sx={{ mb: 2 }} />
 
-            <Stack spacing={5} marginBlock={2}>
+            <Grid container spacing={3} marginBlock={2}>
               {isOnPortal && (
-                <LabeledValue
-                  title="Status"
-                  subTitle={
-                    <Chip
-                      label={status}
-                      color={{
-                        POSTED: 'success',
-                        ARCHIVED: 'error'
-                      }[status]}
-                      size="small"
-                    />
-                  }
-                  icon={<CheckOutlined style={{ fontSize: 20 }} />}
-                />
+                <Grid item xs={12} sm={6} md={4}>
+                  <LabeledValue
+                    title="Status"
+                    subTitle={
+                      <Chip
+                        label={status}
+                        color={{
+                          POSTED: "success",
+                          ARCHIVED: "error",
+                        }[status]}
+                        size="small"
+                      />
+                    }
+                    icon={<CheckOutlined style={{ fontSize: 20 }} />}
+                  />
+                </Grid>
               )}
 
-              <LabeledValue
-                title="Capacity"
-                subTitle={`${capacity} Guests`}
-                icon={<UserOutlined style={{ fontSize: 20 }} />}
-              />
+              <Grid item xs={12} sm={6} md={4}>
+                <LabeledValue
+                  title="Capacity"
+                  subTitle={`${capacity} Guests`}
+                  icon={<UserOutlined style={{ fontSize: 20 }} />}
+                />
+              </Grid>
 
-              <LabeledValue
-                title="Day Price"
-                subTitle={formatPeso(price?.day)}
-                icon={<PayCircleOutlined style={{ fontSize: 20 }} />}
-              />
+              <Grid item xs={12} sm={6} md={4}>
+                <LabeledValue
+                  title="Day Price"
+                  subTitle={formatPeso(price?.day)}
+                  icon={<PayCircleOutlined style={{ fontSize: 20 }} />}
+                />
+              </Grid>
 
-              <LabeledValue
-                title="Night Price"
-                subTitle={formatPeso(price?.night)}
-                icon={<PayCircleOutlined style={{ fontSize: 20 }} />}
-              />
+              <Grid item xs={12} sm={6} md={4}>
+                <LabeledValue
+                  title="Night Price"
+                  subTitle={formatPeso(price?.night)}
+                  icon={<PayCircleOutlined style={{ fontSize: 20 }} />}
+                />
+              </Grid>
 
-              <LabeledValue
-                title="Extra Person Fee"
-                subTitle={formatPeso(extraPersonFee)}
-                icon={<DollarOutlined style={{ fontSize: 20 }} />}
-              />
+              <Grid item xs={12} sm={6} md={4}>
+                <LabeledValue
+                  title="Extra Person Fee"
+                  subTitle={formatPeso(extraPersonFee)}
+                  icon={<DollarOutlined style={{ fontSize: 20 }} />}
+                />
+              </Grid>
 
-              <LabeledValue
-                title="Max Stay"
-                subTitle={`${maxStayDuration} Hours`}
-                icon={<ClockCircleOutlined style={{ fontSize: 20 }} />}
-              />
-            </Stack>
+              <Grid item xs={12} sm={6} md={4}>
+                <LabeledValue
+                  title="Max Stay"
+                  subTitle={`${maxStayDuration} Hours`}
+                  icon={<ClockCircleOutlined style={{ fontSize: 20 }} />}
+                />
+              </Grid>
+            </Grid>
 
             <Divider sx={{ mb: 2 }} />
             {notes && <Box marginBlock='2em' dangerouslySetInnerHTML={{ __html: notes }} />}

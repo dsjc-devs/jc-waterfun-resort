@@ -96,7 +96,7 @@ const getModules = ({ accommodations = [] }) => {
     },
     {
       id: 'accommodations',
-      title: 'Accomodations',
+      title: 'Accommodations',
       type: 'group',
       access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
       children: [

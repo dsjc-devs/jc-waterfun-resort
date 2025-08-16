@@ -3,38 +3,38 @@
 export default function Typography() {
   return {
     htmlFontSize: 16,
-    fontFamily: `'Istok Web', sans-serif`,
+    fontFamily: `'inter', sans-serif`,
     fontWeightLight: 300,
     fontWeightRegular: 400,
     fontWeightMedium: 500,
     fontWeightBold: 700,
 
     h1: {
-      fontFamily: `'Cinzel', serif`,
+      fontFamily: `'inter', serif`,
       fontWeight: 900,
       fontSize: '2.375rem',
       lineHeight: 1.21,
     },
     h2: {
-      fontFamily: `'Cinzel', serif`,
+      fontFamily: `'inter', serif`,
       fontWeight: 800,
       fontSize: '1.875rem',
       lineHeight: 1.27,
     },
     h3: {
-      fontFamily: `'Cinzel', serif`,
+      fontFamily: `'inter', serif`,
       fontWeight: 700,
       fontSize: '1.5rem',
       lineHeight: 1.33,
     },
     h4: {
-      fontFamily: `'Cinzel', serif`,
+      fontFamily: `'inter', serif`,
       fontWeight: 600,
       fontSize: '1.25rem',
       lineHeight: 1.4,
     },
     h5: {
-      fontFamily: `'Cinzel', serif`,
+      fontFamily: `'inter', serif`,
       fontWeight: 500,
       fontSize: '1rem',
       lineHeight: 1.5,

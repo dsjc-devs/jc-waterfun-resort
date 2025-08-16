@@ -8,6 +8,8 @@ import { JWTProvider as AuthProvider } from './contexts/JWTContext';
 import { Bounce, ToastContainer } from 'react-toastify';
 import { SnackbarProvider } from 'contexts/SnackbarContext';
 
+import 'styles/main.css'
+
 // ==============================|| APP - THEME, ROUTER, LOCAL ||============================== //
 
 export default function App() {

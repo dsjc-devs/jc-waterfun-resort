@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tooltip, Box, Typography } from '@mui/material';
-import 'styles/LabeledValue.css';
+import 'styles/main.css';
 import classNames from 'classnames';
 import { BLANK_VALUE } from 'constants/constants';
 
