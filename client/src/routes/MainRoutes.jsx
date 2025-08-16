@@ -15,6 +15,11 @@ const Staffs = Loadable(lazy(() => import('pages/portal/staffs')));
 const Customers = Loadable(lazy(() => import('pages/portal/customers')));
 const CustomersDetails = Loadable(lazy(() => import('pages/portal/customers/details')));
 
+// accommodations
+const Accommodations = Loadable(lazy(() => import('pages/portal/accommodations')));
+const AccommodationDetails = Loadable(lazy(() => import('pages/portal/accommodations/details')));
+const AccommodationForm = Loadable(lazy(() => import('pages/portal/accommodations/form')));
+
 // profile
 const ViewProfile = Loadable(lazy(() => import('pages/portal/profile/view')));
 const EditProfile = Loadable(lazy(() => import('pages/portal/profile/edit')));
@@ -55,8 +60,21 @@ const MainRoutes = {
           ]
         },
         {
-          path: 'rooms',
-          element: <UnderConstruction />
+          path: 'accommodations',
+          children: [
+            {
+              index: true,
+              element: <Accommodations />
+            },
+            {
+              path: 'details/:id',
+              element: <AccommodationDetails />
+            },
+            {
+              path: 'form',
+              element: <AccommodationForm />
+            }
+          ]
         },
         {
           path: 'reservations',

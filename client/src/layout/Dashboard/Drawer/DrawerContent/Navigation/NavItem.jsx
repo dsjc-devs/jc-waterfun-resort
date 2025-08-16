@@ -33,8 +33,19 @@ export default function NavItem({ item, level }) {
   const Icon = item.icon;
   const itemIcon = item.icon ? <Icon style={{ fontSize: drawerOpen ? '1rem' : '1.25rem' }} /> : false;
 
-  const { pathname } = useLocation();
-  const isSelected = !!matchPath({ path: item.url, end: false }, pathname) || openItem === item.id;
+  const location = useLocation();
+  const { pathname, search } = location;
+
+  const params = new URLSearchParams(search);
+  const typeParam = params.get('type');
+
+  // Parse the item's query type from its url
+  const itemUrl = new URL(item.url, window.location.origin);
+  const itemType = itemUrl.searchParams.get('type');
+
+  const isSelected =
+    !!matchPath({ path: itemUrl.pathname, end: false }, pathname) &&
+    itemType === typeParam;
 
   // active menu item on page load
   useEffect(() => {
@@ -99,11 +110,11 @@ export default function NavItem({ item, level }) {
             }),
             ...(!drawerOpen &&
               isSelected && {
-                bgcolor: 'primary.lighter',
-                '&:hover': {
-                  bgcolor: 'primary.lighter'
-                }
-              })
+              bgcolor: 'primary.lighter',
+              '&:hover': {
+                bgcolor: 'primary.lighter'
+              }
+            })
           }}
         >
           {itemIcon}

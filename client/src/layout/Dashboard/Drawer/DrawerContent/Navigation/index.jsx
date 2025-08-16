@@ -3,17 +3,33 @@ import Box from '@mui/material/Box';
 
 // project import
 import NavGroup from './NavGroup';
-import menuItem from 'menu-items';
 import useAuth from 'hooks/useAuth';
+import getModules, { icons } from 'menu-items/modules';
+import { USER_ROLES } from 'constants/constants';
+import { useGetAccommodationTypes } from 'api/accomodationsType';
 
 // ==============================|| DRAWER CONTENT - NAVIGATION ||============================== //
 
 export default function Navigation() {
   const { user } = useAuth()
-
   const userRole = user?.position[0]?.value
 
-  const navGroups = menuItem.items
+  const { accomodationTypes } = useGetAccommodationTypes()
+
+  const accommodations = accomodationTypes?.map((item) => {
+    return {
+      ...item,
+      type: 'item',
+      url: `/portal/accommodations?type=${item?.slug}`,
+      icon: icons.CaretRightOutlined,
+      breadcrumbs: false,
+      access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+    }
+  })
+
+  const menuItems = getModules({ accommodations });
+
+  const navGroups = menuItems
     .filter((item) => {
       if (item?.access?.includes(userRole)) {
         const filteredChildren = item.children?.filter((child) =>

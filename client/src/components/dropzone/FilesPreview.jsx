@@ -43,6 +43,7 @@ export default function FilesPreview({ showList = false, files, onRemove, type, 
     >
       {files.map((file, index) => {
         const { key, name, size, preview, type } = getDropzoneData(file, index);
+
         if (showList) {
           return (
             <ListItem
@@ -60,16 +61,14 @@ export default function FilesPreview({ showList = false, files, onRemove, type, 
                 overflow: 'hidden'
               }}
             >
-              {type?.includes('image') && (
-                <img alt="preview" src={preview} style={{ width: '100%' }} />
-              )}
+              <img alt="preview" src={preview} style={{ width: '100%' }} />
               {!type?.includes('image') && (
                 <FileFilled
                   style={{ width: '100%', fontSize: '1.5rem', justifyContent: 'center' }}
                 />
               )}
 
-              {onRemove && size && (
+              {onRemove && (
                 <IconButton
                   size="small"
                   color="error"
@@ -89,6 +88,7 @@ export default function FilesPreview({ showList = false, files, onRemove, type, 
                   <CloseCircleFilled />
                 </IconButton>
               )}
+
             </ListItem>
           );
         }

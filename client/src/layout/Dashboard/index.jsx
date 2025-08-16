@@ -9,7 +9,6 @@ import Box from '@mui/material/Box';
 // project import
 import Drawer from './Drawer';
 import Header from './Header';
-import navigation from 'menu-items';
 import Loader from 'components/Loader';
 import Breadcrumbs from 'components/@extended/Breadcrumbs';
 
@@ -36,7 +35,6 @@ export default function DashboardLayout() {
         <Drawer />
         <Box component="main" sx={{ width: 'calc(100% - 260px)', flexGrow: 1, p: { xs: 2, sm: 3 } }}>
           <Toolbar />
-          <Breadcrumbs navigation={navigation} title />
           <Outlet />
         </Box>
       </Box>

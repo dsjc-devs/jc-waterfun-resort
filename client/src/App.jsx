@@ -6,6 +6,7 @@ import ThemeCustomization from 'themes';
 
 import { JWTProvider as AuthProvider } from './contexts/JWTContext';
 import { Bounce, ToastContainer } from 'react-toastify';
+import { SnackbarProvider } from 'contexts/SnackbarContext';
 
 // ==============================|| APP - THEME, ROUTER, LOCAL ||============================== //
 
@@ -13,9 +14,11 @@ export default function App() {
 
   return (
     <ThemeCustomization>
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
+      <SnackbarProvider>
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </SnackbarProvider>
 
       <ToastContainer
         position="top-right"

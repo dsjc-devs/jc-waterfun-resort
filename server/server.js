@@ -21,6 +21,8 @@ import testimonialsRoutes from './routes/testimonialsRoutes.js';
 import marketingMaterialsRoutes from './routes/marketingMaterialsRoutes.js';
 import contactUsRoutes from './routes/contactUsRoutes.js';
 import resortDetailsRoutes from './routes/resortDetailsRoutes.js';
+import accommodationTypeRoutes from './routes/accommodationTypeRoutes.js';
+import accommodationRoutes from './routes/accommodationRoutes.js';
 import faqsRoutes from './routes/faqsRoutes.js';
 
 const app = express();
@@ -54,6 +56,8 @@ app.use(`/api/${API_VERSION}/testimonials`, testimonialsRoutes);
 app.use(`/api/${API_VERSION}/marketing-material`, marketingMaterialsRoutes);
 app.use(`/api/${API_VERSION}/contact`, contactUsRoutes);
 app.use(`/api/${API_VERSION}/resort-details`, resortDetailsRoutes);
+app.use(`/api/${API_VERSION}/accommodation-type`, accommodationTypeRoutes);
+app.use(`/api/${API_VERSION}/accommodations`, accommodationRoutes);
 app.use(`/api/${API_VERSION}/faqs`, faqsRoutes);
 
 if (process.env.NODE_ENV === 'production') {

@@ -70,34 +70,33 @@ const MultiFileUpload = ({
     multiple,
     accept: acceptedFileTypes,
     onDrop: (acceptedFiles) => {
-      if (files) {
-        setFieldValue('files', [
-          ...files,
-          ...acceptedFiles.map((file) =>
-            Object.assign(file, {
-              preview: URL.createObjectURL(file)
-            })
-          )
-        ]);
-      } else {
-        setFieldValue(
-          'files',
-          acceptedFiles.map((file) =>
-            Object.assign(file, {
-              preview: URL.createObjectURL(file)
-            })
-          )
-        );
-      }
-    }
+      const mappedFiles = acceptedFiles.map((file) =>
+        Object.assign(file, {
+          preview: URL.createObjectURL(file),
+          isExisting: false
+        })
+      );
+
+      setFieldValue('files', files ? [...files, ...mappedFiles] : mappedFiles);
+    },
+
   });
 
   const onRemoveAll = () => {
-    setFieldValue('files', null);
+    setFieldValue('files', []);
   };
 
-  const onRemove = (file) => {
-    const filteredItems = files && files.filter((_file) => _file !== file);
+  const onRemove = (fileToRemove) => {
+    if (!files) return;
+
+    const filteredItems = files.filter((file) => {
+      if (fileToRemove.isExisting) {
+        return file.preview !== fileToRemove.preview;
+      } else {
+        return file !== fileToRemove;
+      }
+    });
+
     setFieldValue('files', filteredItems);
   };
 

@@ -1,5 +1,7 @@
 // project import
-import modules from './modules';
+import getModules from "./modules";
+
+const modules = getModules({ accommodations: [] })
 
 // ==============================|| MENU ITEMS ||============================== //
 
