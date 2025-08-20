@@ -126,7 +126,7 @@ const AccommodationGroup = ({ type = '' }) => {
           ))}
 
           {!isLoading && accommodations.length === 0 && (
-            <EmptyUserCard title={`No ${textFormatter.fromSlug(type)} as of the moment`} />
+            <EmptyUserCard title={`No ${textFormatter.fromSlug(type)}s as of the moment`} />
           )}
         </Grid>
 
