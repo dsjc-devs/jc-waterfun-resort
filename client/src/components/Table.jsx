@@ -39,7 +39,6 @@ const ReusableTable = ({
 
   const theme = useTheme();
 
-  // local state only
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
@@ -212,6 +211,8 @@ const ReusableTable = ({
                         orderBy === column.id
                           ? theme.palette.action.hover
                           : "transparent",
+                      borderRight: `1px solid ${theme.palette.divider}`,
+                      "&:last-of-type": { borderRight: "none" },
                     }}
                   >
                     <TableSortLabel
@@ -280,7 +281,10 @@ const ReusableTable = ({
                   {columns
                     .filter((col) => visibleColumns.includes(col.id))
                     .map((column) => (
-                      <TableCell key={column.id} align={column.align || "left"}>
+                      <TableCell key={column.id} align={column.align || "left"} sx={{
+                        borderRight: `1px solid ${theme.palette.divider}`,
+                        "&:last-of-type": { borderRight: "none" },
+                      }}>
                         {column.renderCell
                           ? column.renderCell(row)
                           : row[column.id]}
@@ -294,30 +298,32 @@ const ReusableTable = ({
       </TableContainer>
 
       {/* Pagination */}
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 15]}
-        count={filteredRows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        labelRowsPerPage="Rows:"
-        sx={{
-          backgroundColor: theme.palette.background.default,
-          borderTop: `1px solid ${theme.palette.divider}`,
-          "& .MuiTablePagination-actions button": {
-            borderRadius: "12px",
-            transition: "all 0.25s ease",
-            backgroundColor: theme.palette.action.hover,
-            color: theme.palette.primary.dark,
-            "&:hover": {
-              backgroundColor: theme.palette.primary.light,
-              transform: "scale(1.15)",
-              boxShadow: `0px 3px 6px ${theme.palette.primary.main}50`,
+      <Box sx={{ my: 1 }} >
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 15]}
+          count={filteredRows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Rows:"
+          sx={{
+            backgroundColor: theme.palette.background.default,
+            borderTop: `1px solid ${theme.palette.divider}`,
+            "& .MuiTablePagination-actions button": {
+              borderRadius: "12px",
+              transition: "all 0.25s ease",
+              backgroundColor: theme.palette.action.hover,
+              color: theme.palette.primary.dark,
+              "&:hover": {
+                backgroundColor: theme.palette.primary.light,
+                transform: "scale(1.15)",
+                boxShadow: `0px 3px 6px ${theme.palette.primary.main}50`,
+              },
             },
-          },
-        }}
-      />
+          }}
+        />
+      </Box>
     </MainCard>
   );
 };
