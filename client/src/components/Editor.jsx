@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import debounce from 'lodash/debounce';
 import draftToHtml from 'draftjs-to-html';
 import htmlToDraft from 'html-to-draftjs';
-import { Editor } from 'react-draft-wysiwyg';
+import { Editor as WYIWYG } from 'react-draft-wysiwyg';
 import { ContentState, EditorState, convertToRaw } from 'draft-js';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
-const WYSIWYG = ({ content, formik, readonly, field = 'description', forceUpdate = false }) => {
+const Editor = ({ content, formik, readonly, field = 'description', forceUpdate = false }) => {
   const [editorState, setEditorState] = useState(() => {
     if (content && content.value) {
       // Assuming `content.value` could be HTML, convert it to Draft.js compatible format
@@ -33,7 +33,7 @@ const WYSIWYG = ({ content, formik, readonly, field = 'description', forceUpdate
   };
 
   return (
-    <Editor
+    <WYIWYG
       spellCheck
       readOnly={readonly}
       editorState={editorState}
@@ -45,4 +45,4 @@ const WYSIWYG = ({ content, formik, readonly, field = 'description', forceUpdate
   );
 };
 
-export default WYSIWYG;
+export default Editor;
