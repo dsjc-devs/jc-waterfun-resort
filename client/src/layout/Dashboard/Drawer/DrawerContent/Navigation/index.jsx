@@ -31,12 +31,13 @@ export default function Navigation() {
 
   const navGroups = menuItems
     .filter((item) => {
-      if (item?.access?.includes(userRole)) {
-        const filteredChildren = item.children?.filter((child) =>
-          child.access?.includes(userRole)
-        );
+      if (!item.access || item.access.includes(userRole)) {
+        const filteredChildren = item.children?.filter((child) => {
+          if (!child.access) return true;
+          return child.access.includes(userRole);
+        });
 
-        if (!filteredChildren?.length) {
+        if (item.children && !filteredChildren?.length) {
           return false;
         }
 

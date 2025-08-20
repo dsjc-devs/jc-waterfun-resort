@@ -17,12 +17,14 @@ import {
   LockOutlined,
   MessageOutlined,
   CaretRightOutlined,
-  FormOutlined
+  FormOutlined,
+  HomeFilled
 } from '@ant-design/icons';
 
 import {
   AccountGroup,
-  BedOutline
+  BedOutline,
+  HomeGroup
 } from 'mdi-material-ui';
 
 // icon map
@@ -44,7 +46,9 @@ export const icons = {
   LockOutlined,
   MessageOutlined,
   CaretRightOutlined,
-  FormOutlined
+  FormOutlined,
+  HomeFilled,
+  HomeGroup
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
@@ -95,22 +99,19 @@ const getModules = ({ accommodations = [] }) => {
       ]
     },
     {
-      id: 'accommodations',
-      title: 'Accommodations',
-      type: 'group',
-      access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+      id: "accommodations",
+      title: "Accommodations",
       children: [
-        ...(accommodations?.map((item) => ({
-          ...item,
-        })) || []),
         {
-          id: 'create-accommodation',
-          title: 'Accommodation Form',
-          type: 'item',
-          url: '/portal/accommodations/form',
-          icon: icons.FormOutlined,
-          breadcrumbs: false,
-          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
+          id: "roomsGroup",
+          type: "collapse",
+          title: "Spaces",
+          icon: icons.HomeGroup,
+          children: [
+            ...(accommodations?.map((item) => ({
+              ...item,
+            })) || []),
+          ]
         },
       ]
     },
