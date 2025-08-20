@@ -24,7 +24,9 @@ import {
 import {
   AccountGroup,
   BedOutline,
-  HomeGroup
+  HomeGroup,
+  ChevronDown,
+  ChevronUp
 } from 'mdi-material-ui';
 
 // icon map
@@ -48,7 +50,9 @@ export const icons = {
   CaretRightOutlined,
   FormOutlined,
   HomeFilled,
-  HomeGroup
+  HomeGroup,
+  ChevronDown,
+  ChevronUp
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
