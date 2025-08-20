@@ -105,7 +105,7 @@ const getModules = ({ accommodations = [] }) => {
         })) || []),
         {
           id: 'create-accommodation',
-          title: 'Form',
+          title: 'Accommodation Form',
           type: 'item',
           url: '/portal/accommodations/form',
           icon: icons.FormOutlined,
