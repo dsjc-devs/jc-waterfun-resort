@@ -12,7 +12,8 @@ import {
   TextField,
   Typography,
   MenuItem,
-  Select
+  Select,
+  Box
 } from '@mui/material';
 
 import { UserOutlined } from '@ant-design/icons';
@@ -119,7 +120,7 @@ const AccommodationForm = () => {
 
       <Breadcrumbs
         custom
-        heading={isEditMode ? `Edit ${data?.name}` : `Create New Accommodation`}
+        heading={isEditMode ? `Edit ${data?.name || "-"}` : `Create New Accommodation`}
         links={
           isEditMode
             ? [
@@ -142,7 +143,7 @@ const AccommodationForm = () => {
       {isLoading && <EmptyUserCard title='Loading....' />}
 
       {!isLoading && (
-        <React.Fragment>
+        <Box position='relative'>
           <Alert severity='info' color={isEditMode ? 'warning' : 'info'}>
             {!isEditMode ? 'Add Mode' : 'Edit Mode'}
           </Alert>
@@ -194,6 +195,7 @@ const AccommodationForm = () => {
                 <Typography variant='body1'>Accommodation Type *</Typography>
                 <Autocomplete
                   value={formik.values.type && `${textFormatter.fromSlug(formik.values.type)}`}
+                  disabled={!!_type}
                   onChange={(event, newValue) => {
                     let valueToSet;
                     if (typeof newValue === 'string') {
@@ -362,30 +364,42 @@ const AccommodationForm = () => {
                 </MainCard>
               </Grid>
             </Grid>
-
-            <Stack direction='row' justifyContent='flex-end' spacing={2} marginBlock={1}>
-              <AnimateButton>
-                <Button onClick={() => navigate('/portal/dashboard')}>Back</Button>
-              </AnimateButton>
-
-              <AnimateButton>
-                <LoadingButton
-                  loading={formik.isSubmitting}
-                  disableElevation
-                  disabled={formik.isSubmitting}
-                  loadingPosition='start'
-                  fullWidth
-                  variant='contained'
-                  color='primary'
-                  onClick={formik.handleSubmit}
-                  sx={{ width: "150px" }}
-                >
-                  {formik.isSubmitting ? 'Saving...' : 'Save'}
-                </LoadingButton>
-              </AnimateButton>
-            </Stack>
           </FormWrapper>
-        </React.Fragment>
+
+          <Stack
+            direction="row"
+            justifyContent="flex-end"
+            spacing={2}
+            sx={{
+              position: "sticky",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 1300,
+              backgroundColor: "#fff",
+              padding: 2,
+              borderTop: "1px solid #eee",
+            }}
+          >
+            <AnimateButton>
+              <Button onClick={() => navigate("/portal/dashboard")}>Back</Button>
+            </AnimateButton>
+            <AnimateButton>
+              <LoadingButton
+                loading={formik.isSubmitting}
+                disableElevation
+                disabled={formik.isSubmitting}
+                loadingPosition="start"
+                variant="contained"
+                color="primary"
+                onClick={formik.handleSubmit}
+                sx={{ width: "150px" }}
+              >
+                {formik.isSubmitting ? "Saving..." : "Save"}
+              </LoadingButton>
+            </AnimateButton>
+          </Stack>
+        </Box>
       )}
     </React.Fragment>
   );
