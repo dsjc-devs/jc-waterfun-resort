@@ -6,14 +6,11 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 // assets
 import navItems from './Wrapper/nav-items/navItems'
 import { MenuOutlined } from '@ant-design/icons'
-import { useGetResortDetails } from 'api/resort-details'
 import Logo from 'components/logo/LogoMain'
+import useAuth from 'hooks/useAuth'
 
 const Navbar = () => {
-  const { resortDetails } = useGetResortDetails()
-  const { companyInfo } = resortDetails || {}
-  const { logo } = companyInfo || {}
-
+  const { isLoggedIn } = useAuth()
   const navigate = useNavigate()
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -81,7 +78,7 @@ const Navbar = () => {
                   setDrawerOpen?.(false);
                 }}
               >
-                Login
+                {isLoggedIn ? "Portal" : "Login"}
               </Button>
             </Stack>
           </Container>
