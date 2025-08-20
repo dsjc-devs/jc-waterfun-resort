@@ -18,7 +18,7 @@ const NavCollapse = ({ item, level = 1 }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const { pathname } = location;
+  const { pathname, search } = location;
 
   const { menuMaster } = useGetMenuMaster();
   const drawerOpen = menuMaster.isDashboardDrawerOpened;
@@ -101,7 +101,8 @@ const NavCollapse = ({ item, level = 1 }) => {
           {item.children?.map((child) => {
             const isSelected =
               !!matchPath({ path: child.url, end: false }, pathname) ||
-              openItem === child.id; // also selected if it's the active item in state
+              pathname + search === child.url
+            openItem === child.id;
 
             return (
               <ListItemButton
