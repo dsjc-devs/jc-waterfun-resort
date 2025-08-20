@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -23,38 +23,32 @@ import {
 import { SearchOutlined, MoreOutlined } from "@ant-design/icons";
 import { useTheme } from "@mui/material/styles";
 
-const ReusableTable = ({ columns, rows, settings, isLoading, searchableColumns = [], noMessage = "No Matching Records found" }) => {
+const ReusableTable = ({
+  columns,
+  rows,
+  settings,
+  isLoading,
+  searchableColumns = [],
+  noMessage = "No Matching Records found",
+}) => {
   const {
     order: defaultOrder = "asc",
     orderBy: defaultOrderBy = "createdAt",
     otherActionButton,
-  } = settings;
+  } = settings || {};
 
-  const [page, setPage] = useState(Number(localStorage.getItem("table_page")) || 0);
-  const [rowsPerPage, setRowsPerPage] = useState(Number(localStorage.getItem("table_rows_per_page")) || 5);
+  const theme = useTheme();
+
+  // local state only
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
   const [order, setOrder] = useState(defaultOrder);
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
   const [visibleColumns, setVisibleColumns] = useState(
-    JSON.parse(localStorage.getItem("table_visible_columns")) ||
-    [
-      ...columns
-        .filter(c => c.label)
-        .map(col => col.id),
-      "actions"
-    ]
+    columns.map((col) => col.id)
   );
   const [anchorEl, setAnchorEl] = useState(null);
-
-  const theme = useTheme()
-
-  useEffect(() => {
-    localStorage.setItem("table_visible_columns", JSON.stringify(visibleColumns));
-  }, [visibleColumns]);
-
-  useEffect(() => {
-    localStorage.setItem("table_rows_per_page", rowsPerPage);
-  }, [page, rowsPerPage]);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -62,7 +56,7 @@ const ReusableTable = ({ columns, rows, settings, isLoading, searchableColumns =
   };
 
   const descendingComparator = (a, b, property) => {
-    const colDef = columns.find(col => col.id === property);
+    const colDef = columns.find((col) => col.id === property);
     const aValue = colDef?.sortValue ? colDef.sortValue(a) : a[property];
     const bValue = colDef?.sortValue ? colDef.sortValue(b) : b[property];
     if (bValue < aValue) return -1;
@@ -109,15 +103,14 @@ const ReusableTable = ({ columns, rows, settings, isLoading, searchableColumns =
   };
 
   const handleChangeRowsPerPage = (event) => {
-    const newValue = parseInt(event.target.value, 10);
-    setRowsPerPage(newValue);
+    setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
   const toggleColumnVisibility = (columnId) => {
-    setVisibleColumns(prev =>
+    setVisibleColumns((prev) =>
       prev.includes(columnId)
-        ? prev.filter(id => id !== columnId)
+        ? prev.filter((id) => id !== columnId)
         : [...prev, columnId]
     );
   };
@@ -132,7 +125,7 @@ const ReusableTable = ({ columns, rows, settings, isLoading, searchableColumns =
           gap: "1em",
           alignItems: "center",
           mt: 1,
-          mb: 3
+          mb: 3,
         }}
       >
         <TextField
@@ -172,15 +165,17 @@ const ReusableTable = ({ columns, rows, settings, isLoading, searchableColumns =
             open={Boolean(anchorEl)}
             onClose={() => setAnchorEl(null)}
           >
-            {columns.filter((col) => col.label).map((col) => (
-              <MenuItem key={col.id}>
-                <Checkbox
-                  checked={visibleColumns.includes(col.id)}
-                  onChange={() => toggleColumnVisibility(col.id)}
-                />
-                {col.label}
-              </MenuItem>
-            ))}
+            {columns
+              .filter((col) => col.label)
+              .map((col) => (
+                <MenuItem key={col.id}>
+                  <Checkbox
+                    checked={visibleColumns.includes(col.id)}
+                    onChange={() => toggleColumnVisibility(col.id)}
+                  />
+                  {col.label}
+                </MenuItem>
+              ))}
           </Menu>
         </Box>
       </Box>
@@ -197,13 +192,14 @@ const ReusableTable = ({ columns, rows, settings, isLoading, searchableColumns =
           <TableHead>
             <TableRow
               sx={{
-                background: theme.palette.mode === "light"
-                  ? theme.palette.grey[100]
-                  : theme.palette.background.default,
+                background:
+                  theme.palette.mode === "light"
+                    ? theme.palette.grey[100]
+                    : theme.palette.background.default,
               }}
             >
               {columns
-                .filter(col => visibleColumns.includes(col.id))
+                .filter((col) => visibleColumns.includes(col.id))
                 .map((column) => (
                   <TableCell
                     key={column.id}
@@ -212,9 +208,10 @@ const ReusableTable = ({ columns, rows, settings, isLoading, searchableColumns =
                     sx={{
                       fontWeight: "bold",
                       color: theme.palette.primary.dark,
-                      backgroundColor: orderBy === column.id
-                        ? theme.palette.action.hover
-                        : "transparent",
+                      backgroundColor:
+                        orderBy === column.id
+                          ? theme.palette.action.hover
+                          : "transparent",
                     }}
                   >
                     <TableSortLabel
@@ -226,7 +223,9 @@ const ReusableTable = ({ columns, rows, settings, isLoading, searchableColumns =
                         "&:hover": { color: theme.palette.primary.dark },
                       }}
                     >
-                      <Typography variant="subtitle1">{column.label}</Typography>
+                      <Typography variant="subtitle1">
+                        {column.label}
+                      </Typography>
                     </TableSortLabel>
                   </TableCell>
                 ))}
@@ -247,7 +246,10 @@ const ReusableTable = ({ columns, rows, settings, isLoading, searchableColumns =
             ) : filteredRows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={visibleColumns.length} align="center">
-                  <Typography variant="body1" sx={{ py: 3, color: theme.palette.text.secondary }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ py: 3, color: theme.palette.text.secondary }}
+                  >
                     {noMessage}
                   </Typography>
                 </TableCell>
@@ -276,10 +278,12 @@ const ReusableTable = ({ columns, rows, settings, isLoading, searchableColumns =
                   key={row.id || index}
                 >
                   {columns
-                    .filter(col => visibleColumns.includes(col.id))
+                    .filter((col) => visibleColumns.includes(col.id))
                     .map((column) => (
                       <TableCell key={column.id} align={column.align || "left"}>
-                        {column.renderCell ? column.renderCell(row) : row[column.id]}
+                        {column.renderCell
+                          ? column.renderCell(row)
+                          : row[column.id]}
                       </TableCell>
                     ))}
                 </TableRow>
