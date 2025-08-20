@@ -11,6 +11,7 @@ const ContactUs = Loadable(lazy(() => import('pages/contact-us/index')));
 const BookNow = Loadable(lazy(() => import('pages/book-now/index')));
 const Admission = Loadable(lazy(() => import('pages/addmission/index')));
 const Media = Loadable(lazy(() => import('pages/media/index')));
+const FAQs = Loadable(lazy(() => import('pages/faqs/index')));
 
 const NotFoundPage = Loadable(lazy(() => import('pages/maintenance/404')));
 
@@ -46,6 +47,14 @@ const AbsoluteRoutes = {
     {
       path: '*',
       element: <NotFoundPage />
+    },
+    {
+      path: '*',
+      element: <NotFoundPage />
+    },
+    {
+      path: '/faqs',
+      element: <PageWrapper children={<FAQs />} />
     },
   ]
 

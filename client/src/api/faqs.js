@@ -19,7 +19,7 @@ export const useGetFAQS = () => {
   const { data, isLoading, error, mutate } = useSWR(key, fetcher, options);
 
   const memoizedValue = useMemo(() => ({
-    faqs: data,
+    data,
     isLoading,
     mutate,
     error
