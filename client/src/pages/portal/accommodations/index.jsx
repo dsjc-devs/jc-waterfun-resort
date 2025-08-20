@@ -26,7 +26,7 @@ const Accommodations = () => {
 
   let breadcrumbLinks = [
     { title: 'Home', to: APP_DEFAULT_PATH },
-    { title: `Accommodations - ${type}` }
+    { title: `Spaces - ${type}` }
   ];
 
   return (
@@ -35,7 +35,7 @@ const Accommodations = () => {
 
       <Breadcrumbs
         custom
-        heading={type || 'Accommodations'}
+        heading={type || 'Spaces'}
         links={breadcrumbLinks}
         subheading={subheading}
       />
