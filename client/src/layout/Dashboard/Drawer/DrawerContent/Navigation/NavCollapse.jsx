@@ -11,8 +11,8 @@ import {
   Stack
 } from "@mui/material";
 import { useNavigate, useLocation, matchPath } from "react-router-dom";
-import { ArrowDownOutlined, ArrowUpOutlined } from "@ant-design/icons";
 import { handlerActiveItem, useGetMenuMaster } from "api/menu";
+import { icons } from "menu-items/modules";
 
 const NavCollapse = ({ item, level = 1 }) => {
   const theme = useTheme();
@@ -93,7 +93,7 @@ const NavCollapse = ({ item, level = 1 }) => {
           />
         )}
 
-        {open ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
+        {open ? <icons.ChevronUp /> : <icons.ChevronDown />}
       </ListItemButton>
 
       <Collapse in={open} timeout="auto" unmountOnExit>
