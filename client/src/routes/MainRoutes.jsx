@@ -27,6 +27,7 @@ const EditProfile = Loadable(lazy(() => import('pages/portal/profile/edit')));
 // content management
 const AboutUs = Loadable(lazy(() => import('pages/portal/content-management/about-us')));
 const CompanyInfo = Loadable(lazy(() => import('pages/portal/content-management/company-info')));
+const Faqs = Loadable(lazy(() => import('pages/portal/content-management/faqs')));
 
 const MainRoutes = {
   path: '/',
@@ -107,6 +108,10 @@ const MainRoutes = {
               path: 'company-info',
               element: <CompanyInfo />
             },
+            {
+              path: 'faqs',
+              element: <Faqs />
+            }
           ]
         },
         {
