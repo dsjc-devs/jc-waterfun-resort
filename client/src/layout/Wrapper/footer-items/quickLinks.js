@@ -20,6 +20,13 @@ const quickLinks = [
     color: '#ffffff',
     link: '/portal/dashboard'
   },
+  {
+    name: 'FAQs',
+    icon: RightOutlined,
+    color: '#ffffff',
+    link: '/faqs'
+  }
+
 
 ];
 
