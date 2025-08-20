@@ -16,9 +16,10 @@ export default function Navigation() {
 
   const { accomodationTypes } = useGetAccommodationTypes()
 
-  const accommodations = accomodationTypes?.map((item) => {
+  const accommodations = accomodationTypes?.map((item, idx) => {
     return {
       ...item,
+      id: idx,
       type: 'item',
       url: `/portal/accommodations?type=${item?.slug}`,
       icon: icons.CaretRightOutlined,
