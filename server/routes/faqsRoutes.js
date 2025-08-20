@@ -6,12 +6,10 @@ import {
   getSingleFaqById,
   updateFaqById,
   deleteFaqById,
-  getPublishedFaqs,
 } from "../controllers/faqsControllers.js";
 
 const router = express.Router();
 
-router.get('/published', getPublishedFaqs); 
 router.post('/', protect, createFaq);
 router.get('/', getAllFaqs);
 router.get('/:faqId', getSingleFaqById);

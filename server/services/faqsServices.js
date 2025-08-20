@@ -113,38 +113,10 @@ const deleteFaqById = async (faqId) => {
   }
 };
 
-const getPublishedFaqs = async (queryObject) => {
-  try {
-    const page = parseInt(queryObject.page) || 1;
-    const limit = parseInt(queryObject.limit) || 10;
-    const skip = (page - 1) * limit;
-
-    const filters = { status: "POSTED" };
-
-    const faqs = await Faq.find(filters)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    const totalCount = await Faq.countDocuments(filters);
-
-    return {
-      faqs,
-      totalPages: Math.ceil(totalCount / limit),
-      currentPage: page,
-      totalFaqs: totalCount,
-    };
-  } catch (error) {
-    console.error("Error fetching published FAQs:", error.message);
-    throw new Error(error);
-  }
-};
-
 export default {
   createFaq,
   getAllFaqs,
   getSingleFaqById,
   updateFaqById,
   deleteFaqById,
-  getPublishedFaqs,
 };
