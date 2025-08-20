@@ -24,6 +24,7 @@ import Loader from 'components/Loader';
 import IconButton from 'components/@extended/IconButton';
 import LabeledValue from 'components/LabeledValue';
 import formatPeso from 'utils/formatPrice';
+import MainCard from 'components/MainCard';
 
 const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const navigate = useNavigate();
@@ -169,71 +170,76 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
               <Typography variant='body1' color='secondary'>{description}</Typography>
             </Box>
 
-            <Divider sx={{ mb: 2 }} />
+            <MainCard title="Details">
+              <Grid container spacing={3} marginBlock={2}>
+                {isOnPortal && (
+                  <Grid item xs={12} sm={6} md={4}>
+                    <LabeledValue
+                      title="Status"
+                      subTitle={
+                        <Chip
+                          label={status}
+                          color={{
+                            POSTED: "success",
+                            ARCHIVED: "error",
+                          }[status]}
+                          size="small"
+                        />
+                      }
+                      icon={<CheckOutlined style={{ fontSize: 20 }} />}
+                    />
+                  </Grid>
+                )}
 
-            <Grid container spacing={3} marginBlock={2}>
-              {isOnPortal && (
                 <Grid item xs={12} sm={6} md={4}>
                   <LabeledValue
-                    title="Status"
-                    subTitle={
-                      <Chip
-                        label={status}
-                        color={{
-                          POSTED: "success",
-                          ARCHIVED: "error",
-                        }[status]}
-                        size="small"
-                      />
-                    }
-                    icon={<CheckOutlined style={{ fontSize: 20 }} />}
+                    title="Capacity"
+                    subTitle={`${capacity} Guests`}
+                    icon={<UserOutlined style={{ fontSize: 20 }} />}
                   />
                 </Grid>
-              )}
 
-              <Grid item xs={12} sm={6} md={4}>
-                <LabeledValue
-                  title="Capacity"
-                  subTitle={`${capacity} Guests`}
-                  icon={<UserOutlined style={{ fontSize: 20 }} />}
-                />
-              </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <LabeledValue
+                    title="Day Price"
+                    subTitle={formatPeso(price?.day)}
+                    icon={<PayCircleOutlined style={{ fontSize: 20 }} />}
+                  />
+                </Grid>
 
-              <Grid item xs={12} sm={6} md={4}>
-                <LabeledValue
-                  title="Day Price"
-                  subTitle={formatPeso(price?.day)}
-                  icon={<PayCircleOutlined style={{ fontSize: 20 }} />}
-                />
-              </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <LabeledValue
+                    title="Night Price"
+                    subTitle={formatPeso(price?.night)}
+                    icon={<PayCircleOutlined style={{ fontSize: 20 }} />}
+                  />
+                </Grid>
 
-              <Grid item xs={12} sm={6} md={4}>
-                <LabeledValue
-                  title="Night Price"
-                  subTitle={formatPeso(price?.night)}
-                  icon={<PayCircleOutlined style={{ fontSize: 20 }} />}
-                />
-              </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <LabeledValue
+                    title="Extra Person Fee"
+                    subTitle={formatPeso(extraPersonFee)}
+                    icon={<DollarOutlined style={{ fontSize: 20 }} />}
+                  />
+                </Grid>
 
-              <Grid item xs={12} sm={6} md={4}>
-                <LabeledValue
-                  title="Extra Person Fee"
-                  subTitle={formatPeso(extraPersonFee)}
-                  icon={<DollarOutlined style={{ fontSize: 20 }} />}
-                />
+                <Grid item xs={12} sm={6} md={4}>
+                  <LabeledValue
+                    title="Max Stay"
+                    subTitle={`${maxStayDuration} Hours`}
+                    icon={<ClockCircleOutlined style={{ fontSize: 20 }} />}
+                  />
+                </Grid>
               </Grid>
-
-              <Grid item xs={12} sm={6} md={4}>
-                <LabeledValue
-                  title="Max Stay"
-                  subTitle={`${maxStayDuration} Hours`}
-                  icon={<ClockCircleOutlined style={{ fontSize: 20 }} />}
-                />
-              </Grid>
-            </Grid>
+            </MainCard>
 
             <Divider sx={{ mb: 2 }} />
-            {notes && <Box marginBlock='2em' dangerouslySetInnerHTML={{ __html: notes }} />}
+
+            {notes && (
+              <MainCard title="Notes">
+                {<Box dangerouslySetInnerHTML={{ __html: notes }} />}
+              </MainCard>
+            )}
           </Grid>
 
           <Grid item xs={12} md={4}>
