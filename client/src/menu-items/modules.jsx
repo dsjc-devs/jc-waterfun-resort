@@ -26,7 +26,10 @@ import {
   BedOutline,
   HomeGroup,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  TableFurniture as TableIcon,
+  OfficeBuilding as EventHallIcon,
+  HomeGroup as CottageIcon,
 } from 'mdi-material-ui';
 
 // icon map
@@ -52,7 +55,10 @@ export const icons = {
   HomeFilled,
   HomeGroup,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  TableIcon,
+  EventHallIcon,
+  CottageIcon
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //

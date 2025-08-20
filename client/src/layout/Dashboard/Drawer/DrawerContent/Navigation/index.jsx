@@ -17,16 +17,35 @@ export default function Navigation() {
   const { accomodationTypes } = useGetAccommodationTypes()
 
   const accommodations = accomodationTypes?.map((item, idx) => {
+    let icon;
+
+    switch (item?.slug) {
+      case 'table':
+        icon = icons.TableIcon;
+        break;
+      case 'event_hall':
+        icon = icons.EventHallIcon;
+        break;
+      case 'room':
+        icon = icons.RoomIcon;
+        break;
+      case 'cottage':
+        icon = icons.CottageIcon;
+        break;
+      default:
+        icon = icons.CaretRightOutlined;
+    }
+
     return {
       ...item,
       id: idx,
       type: 'item',
       url: `/portal/accommodations?type=${item?.slug}`,
-      icon: icons.CaretRightOutlined,
+      icon: icon,
       breadcrumbs: false,
       access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
-    }
-  })
+    };
+  });
 
   const menuItems = getModules({ accommodations });
 
