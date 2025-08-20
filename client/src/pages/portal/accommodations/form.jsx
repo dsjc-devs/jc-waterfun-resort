@@ -29,10 +29,10 @@ import AnimateButton from 'components/@extended/AnimateButton';
 import LoadingButton from 'components/@extended/LoadingButton';
 import SingleFileUpload from 'components/dropzone/FileUpload';
 import MultiFileUpload from 'components/dropzone/MultiFile';
-import textFormatter from 'utils/textFormatter';
-import WYSIWYG from 'components/Editor';
+import Editor from 'components/Editor';
 import MainCard from 'components/MainCard';
 import EmptyUserCard from 'components/cards/skeleton/EmptyUserCard';
+import textFormatter from 'utils/textFormatter';
 
 const AccommodationForm = () => {
   const { search } = useLocation();
@@ -100,7 +100,7 @@ const AccommodationForm = () => {
           await agent.Accommodations.addAccommodation(formData);
         }
 
-        toast.success(`Accommodation ${isEditMode ? 'updated' : 'created'} successfully!`);
+        toast.success(`${formattedType} ${isEditMode ? 'updated' : 'created'} successfully!`);
         navigate(`/portal/accommodations?type=${formik.values.type}`)
       } catch (error) {
         console.error(error);
@@ -114,23 +114,25 @@ const AccommodationForm = () => {
     formik.setFieldValue('files', updatedFiles);
   };
 
+  const formattedType = textFormatter.fromSlug(_type)
+
   return (
     <React.Fragment>
-      <PageTitle title={`Accommodation - ${isEditMode ? 'Edit' : 'Create'}`} />
+      <PageTitle title={`${formattedType} - ${isEditMode ? 'Edit' : 'Create'}`} />
 
       <Breadcrumbs
         custom
-        heading={isEditMode ? `Edit ${data?.name || "-"}` : `Create New Accommodation`}
+        heading={isEditMode ? `Edit Form` : `Create New ${formattedType}`}
         links={
           isEditMode
             ? [
               { title: 'Home', to: APP_DEFAULT_PATH },
               { title: data?.name, to: `/portal/accommodations/details/${id}` },
-              { title: 'Edit Form' }
+              { title: 'Edit' }
             ]
             : [
               { title: 'Home', to: APP_DEFAULT_PATH },
-              { title: 'Create Accommodation' }
+              { title: `Create ${formattedType}` }
             ]
         }
         subheading={
@@ -149,7 +151,7 @@ const AccommodationForm = () => {
           </Alert>
 
           <FormWrapper
-            title={isEditMode ? 'Edit Accommodation Information' : 'Accommodation Information'}
+            title={isEditMode ? `Edit ${data?.name} Information` : `${formattedType} Information`}
             caption={
               isEditMode
                 ? `Modify the information below to update ${data?.name}.`
@@ -159,7 +161,7 @@ const AccommodationForm = () => {
             <Grid container spacing={2}>
               {isEditMode && (
                 <Grid item xs={6}>
-                  <Typography variant='body1'>Status *</Typography>
+                  <Typography variant='body1'>Status (Required)</Typography>
                   <TextField
                     select
                     name='status'
@@ -181,7 +183,7 @@ const AccommodationForm = () => {
               )}
 
               <Grid item xs={12}>
-                <Typography variant='body1'>Accommodation Name *</Typography>
+                <Typography variant='body1'>Name (Required)</Typography>
                 <TextField
                   name='name'
                   value={formik.values.name}
@@ -192,60 +194,23 @@ const AccommodationForm = () => {
               </Grid>
 
               <Grid item xs={12} md={6}>
-                <Typography variant='body1'>Accommodation Type *</Typography>
-                <Autocomplete
-                  value={formik.values.type && `${textFormatter.fromSlug(formik.values.type)}`}
-                  disabled={!!_type}
-                  onChange={(event, newValue) => {
-                    let valueToSet;
-                    if (typeof newValue === 'string') {
-                      valueToSet = newValue;
-                    } else if (newValue?.inputValue) {
-                      valueToSet = newValue.inputValue;
-                    } else {
-                      valueToSet = newValue?.title || '';
-                    }
-
-                    formik.setFieldValue('type', textFormatter.toSlug(valueToSet));
-                  }}
-                  filterOptions={(options, params) => {
-                    const filtered = options.filter((option) =>
-                      option.title.toLowerCase().includes(params.inputValue.toLowerCase())
-                    );
-
-                    const { inputValue } = params;
-                    const isExisting = options.some(
-                      (option) => option.title.toLowerCase() === inputValue.toLowerCase()
-                    );
-                    if (inputValue !== '' && !isExisting) {
-                      filtered.push({
-                        inputValue,
-                        title: `Add "${inputValue}"`
-                      });
-                    }
-
-                    return filtered;
-                  }}
-                  selectOnFocus
-                  clearOnBlur
-                  handleHomeEndKeys
-                  freeSolo
-                  options={accomodationTypes}
-                  getOptionLabel={(option) => (typeof option === 'string' ? option : option.inputValue || option.title)}
-                  renderOption={(props, option) => <li {...props}>{option.title}</li>}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder='Select or add type'
-                      fullWidth
-                      variant='outlined'
-                    />
-                  )}
-                />
+                <Typography variant='body1'>Type (Required)</Typography>
+                <Select
+                  fullWidth
+                  name='type'
+                  value={formik.values.type || ''}
+                  onChange={formik.handleChange}
+                >
+                  {accomodationTypes.map((item) => (
+                    <MenuItem key={item._id} value={item.slug}>
+                      {item.title}
+                    </MenuItem>
+                  ))}
+                </Select>
               </Grid>
 
               <Grid item xs={12}>
-                <Typography variant='body1'>Description *</Typography>
+                <Typography variant='body1'>Description (Required)</Typography>
                 <TextField
                   name='description'
                   value={formik.values.description}
@@ -258,7 +223,7 @@ const AccommodationForm = () => {
               </Grid>
 
               <Grid item xs={12} md={4}>
-                <Typography variant='body1'>Price (Day) *</Typography>
+                <Typography variant='body1'>Price (Day) (Required)</Typography>
                 <TextField
                   name='dayPrice'
                   value={formik.values.dayPrice}
@@ -273,7 +238,7 @@ const AccommodationForm = () => {
               </Grid>
 
               <Grid item xs={12} md={4}>
-                <Typography variant='body1'>Price (Night) *</Typography>
+                <Typography variant='body1'>Price (Night) (Required)</Typography>
                 <TextField
                   name='nightPrice'
                   value={formik.values.nightPrice}
@@ -288,35 +253,7 @@ const AccommodationForm = () => {
               </Grid>
 
               <Grid item xs={12} md={4}>
-                <Typography variant='body1'>Extra Person Fee *</Typography>
-                <TextField
-                  name='extraPersonFee'
-                  value={formik.values.extraPersonFee}
-                  onChange={formik.handleChange}
-                  fullWidth
-                  type='number'
-                  placeholder='e.g. 500'
-                  InputProps={{
-                    startAdornment: <InputAdornment position='start'>₱</InputAdornment>
-                  }}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Typography variant='body1'>Maximum Capacity (Pax) *</Typography>
-                <TextField
-                  name='capacity'
-                  value={formik.values.capacity}
-                  onChange={formik.handleChange}
-                  fullWidth
-                  type='number'
-                  placeholder='Maximum number of guests, e.g. 4'
-                  startAdornment={<InputAdornment position='start'><UserOutlined /></InputAdornment>}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Typography variant='body1'>Maximum Stay Duration (Hours) *</Typography>
+                <Typography variant='body1'>Maximum Stay Duration (Hours) (Required)</Typography>
                 <Select
                   fullWidth
                   name='maxStayDuration'
@@ -331,8 +268,36 @@ const AccommodationForm = () => {
                 </Select>
               </Grid>
 
+              <Grid item xs={12} md={6}>
+                <Typography variant='body1'>Maximum Capacity (Pax) (Required)</Typography>
+                <TextField
+                  name='capacity'
+                  value={formik.values.capacity}
+                  onChange={formik.handleChange}
+                  fullWidth
+                  type='number'
+                  placeholder='Maximum number of guests, e.g. 4'
+                  startAdornment={<InputAdornment position='start'><UserOutlined /></InputAdornment>}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Typography variant='body1'>Extra Person Fee (Optional)</Typography>
+                <TextField
+                  name='extraPersonFee'
+                  value={formik.values.extraPersonFee}
+                  onChange={formik.handleChange}
+                  fullWidth
+                  type='number'
+                  placeholder='e.g. 500'
+                  InputProps={{
+                    startAdornment: <InputAdornment position='start'>₱</InputAdornment>
+                  }}
+                />
+              </Grid>
+
               <Grid item xs={12} md={5}>
-                <Typography variant='body1'>Thumbnail *</Typography>
+                <Typography variant='body1'>Thumbnail (Required)</Typography>
                 <SingleFileUpload
                   fieldName='thumbnail'
                   file={formik.values.thumbnail || ''}
@@ -342,7 +307,7 @@ const AccommodationForm = () => {
               </Grid>
 
               <Grid item xs={12}>
-                <Typography variant='body1'>Pictures *</Typography>
+                <Typography variant='body1'>Pictures (Required)</Typography>
                 <MultiFileUpload
                   setFieldValue={formik.setFieldValue}
                   files={formik.values.files || []}
@@ -354,9 +319,9 @@ const AccommodationForm = () => {
               </Grid>
 
               <Grid item xs={12} md={12}>
-                <Typography variant='body1'>Notes *</Typography>
+                <Typography variant='body1'>Notes (Required)</Typography>
                 <MainCard >
-                  <WYSIWYG
+                  <Editor
                     content={{ ...formik.getFieldProps('notes') }}
                     formik={formik.setFieldValue}
                     field='notes'
@@ -364,41 +329,32 @@ const AccommodationForm = () => {
                 </MainCard>
               </Grid>
             </Grid>
-          </FormWrapper>
 
-          <Stack
-            direction="row"
-            justifyContent="flex-end"
-            spacing={2}
-            sx={{
-              position: "sticky",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              zIndex: 1300,
-              backgroundColor: "#fff",
-              padding: 2,
-              borderTop: "1px solid #eee",
-            }}
-          >
-            <AnimateButton>
-              <Button onClick={() => navigate("/portal/dashboard")}>Back</Button>
-            </AnimateButton>
-            <AnimateButton>
-              <LoadingButton
-                loading={formik.isSubmitting}
-                disableElevation
-                disabled={formik.isSubmitting}
-                loadingPosition="start"
-                variant="contained"
-                color="primary"
-                onClick={formik.handleSubmit}
-                sx={{ width: "150px" }}
-              >
-                {formik.isSubmitting ? "Saving..." : "Save"}
-              </LoadingButton>
-            </AnimateButton>
-          </Stack>
+            <Stack
+              direction="row"
+              justifyContent="flex-end"
+              spacing={2}
+              marginBlockStart={3}
+            >
+              <AnimateButton>
+                <Button onClick={() => navigate("/portal/dashboard")}>Back</Button>
+              </AnimateButton>
+              <AnimateButton>
+                <LoadingButton
+                  loading={formik.isSubmitting}
+                  disableElevation
+                  disabled={formik.isSubmitting}
+                  loadingPosition="start"
+                  variant="contained"
+                  color="primary"
+                  onClick={formik.handleSubmit}
+                  sx={{ width: "150px" }}
+                >
+                  {formik.isSubmitting ? "Saving..." : "Save"}
+                </LoadingButton>
+              </AnimateButton>
+            </Stack>
+          </FormWrapper>
         </Box>
       )}
     </React.Fragment>
