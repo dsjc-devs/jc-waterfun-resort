@@ -84,6 +84,9 @@ const accommodationsSchema = new mongoose.Schema(
     },
     notes: {
       type: String
+    },
+    groupKey: {
+      type: String
     }
   },
   {

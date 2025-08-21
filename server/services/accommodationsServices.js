@@ -1,9 +1,17 @@
 import Accommodations from "../models/accommodationsModel.js";
+import textFormatter from "../utils/textFormatter.js";
 
 const createAccommodation = async (accomData) => {
+  const count = accomData?.count || 1
   try {
-    const accommodation = await Accommodations.create(accomData);
-    return accommodation;
+    const payloads = Array.from({ length: count }, (_, i) => ({
+      ...accomData,
+      name: count > 1 ? `${accomData.name} ${i + 1}` : accomData.name,
+      groupKey: count > 1 ? `${textFormatter.toSlug(accomData.name)}` : "",
+    }));
+
+    const accommodations = await Accommodations.insertMany(payloads);
+    return accommodations;
   } catch (error) {
     console.error(error.message);
     throw new Error(error.message || "Failed to create accommodation");
@@ -55,11 +63,27 @@ const getAccommodationById = async (id) => {
 
 const updateAccommodationById = async (id, updateData) => {
   try {
-    const updatedAccommodation = await Accommodations.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true }
-    );
+    const { isUpdateSameType, ...fieldsToUpdate } = updateData;
+
+    let updatedAccommodation;
+
+    if (isUpdateSameType) {
+      const accommodation = await Accommodations.findById(id);
+      if (!accommodation) throw new Error("Accommodation not found");
+
+      updatedAccommodation = await Accommodations.updateMany(
+        { groupKey: accommodation.groupKey },
+        { $set: fieldsToUpdate },
+        { runValidators: true }
+      );
+    } else {
+      updatedAccommodation = await Accommodations.findByIdAndUpdate(
+        id,
+        { $set: fieldsToUpdate },
+        { new: true, runValidators: true }
+      );
+    }
+
     if (!updatedAccommodation) throw new Error("Accommodation not found");
     return updatedAccommodation;
   } catch (error) {

@@ -24,11 +24,15 @@ const createAccommodation = expressAsync(async (req, res) => {
       await accommodationTypeServices.createAccommodationType({ title: textFormatter.fromSlug(req.body.type) })
     }
 
-    const accommodation = await accommodationsServices.createAccommodation(payload);
+    const accommodations = await accommodationsServices.createAccommodation(payload);
 
     res.status(201).json({
-      message: `${accommodation?.name} has been successfully added.`,
-      data: accommodation,
+      success: true,
+      count: Array.isArray(accommodations) ? accommodations.length : 1,
+      message: Array.isArray(accommodations)
+        ? `${accommodations.length} accommodations have been successfully added.`
+        : `${accommodations?.name} has been successfully added.`,
+      data: accommodations,
     });
   } catch (error) {
     console.error(error);
