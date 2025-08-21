@@ -39,7 +39,12 @@ const MainRoutes = {
     },
     {
       path: 'portal',
+      element: <DashboardDefault />,
       children: [
+        {
+          path: 'dashboard',
+          element: <DashboardDefault />
+        },
         {
           path: 'dashboard',
           element: <DashboardDefault />
