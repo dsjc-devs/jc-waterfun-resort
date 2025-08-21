@@ -158,23 +158,14 @@ const getModules = ({ accommodations = [] }) => {
       access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
       children: [
         {
-          id: 'banners',
-          title: 'Banners',
+          id: 'materials',
+          title: 'Materials',
           type: 'item',
-          url: '/portal/banners',
+          url: '/portal/marketing-materials',
           icon: icons.ImageIcon,
           breadcrumbs: false,
           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
         },
-        {
-          id: 'promotions',
-          title: 'Promotions',
-          type: 'item',
-          url: '/portal/promotions',
-          icon: icons.StarIcon,
-          breadcrumbs: false,
-          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
-        }
       ]
     },
     {
