@@ -9,10 +9,16 @@ import { Bounce, ToastContainer } from 'react-toastify';
 import { SnackbarProvider } from 'contexts/SnackbarContext';
 
 import 'styles/main.css'
+import { Helmet } from 'react-helmet';
+import { useGetResortDetails } from 'api/resort-details';
 
 // ==============================|| APP - THEME, ROUTER, LOCAL ||============================== //
 
 export default function App() {
+  const { resortDetails } = useGetResortDetails()
+
+  console.log(resortDetails);
+
 
   return (
     <ThemeCustomization>
@@ -35,6 +41,15 @@ export default function App() {
         theme="light"
         transition={Bounce}
       />
+
+      <Helmet>
+        <title>{resortDetails?.companyInfo?.name}</title>
+        <meta
+          name="description"
+          content="Enjoy family fun and relaxation at JC Waterfun Resort."
+        />
+        <link rel="icon" type="image/png" href={resortDetails?.companyInfo?.logo} />
+      </Helmet>
     </ThemeCustomization >
   );
 }
