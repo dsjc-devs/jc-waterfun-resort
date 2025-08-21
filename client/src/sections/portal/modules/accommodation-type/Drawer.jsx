@@ -11,6 +11,8 @@ const AccommodationTypeDrawer = ({ open, handleClose, mutate, typeData }) => {
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
   const [loading, setLoading] = useState(false);
 
+  console.log(`typeData: `, typeData);
+
   const isEditMode = !!typeData?._id
 
   const previousTitle = typeData?.title
@@ -18,7 +20,7 @@ const AccommodationTypeDrawer = ({ open, handleClose, mutate, typeData }) => {
 
   useEffect(() => {
     if (typeData) {
-      setFormData({ title: typeData.title || '' });
+      setFormData({ title: typeData?.title || '' });
     } else {
       setFormData({ title: '' });
     }
@@ -43,7 +45,6 @@ const AccommodationTypeDrawer = ({ open, handleClose, mutate, typeData }) => {
       console.error(error);
     } finally {
       setLoading(false)
-      handleClose()
       await mutate()
     }
   };
@@ -51,7 +52,7 @@ const AccommodationTypeDrawer = ({ open, handleClose, mutate, typeData }) => {
   const handleEditConfirm = async () => {
     setLoading(true)
     try {
-      await agent.AccommodationType.editAccommodationType(typeData._id, formData)
+      await agent.AccommodationType.editAccommodationType(typeData?._id, formData)
       await mutate()
       setOpenConfirmDialog(false)
     } catch (error) {
