@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import NavGroup from './NavGroup';
 import useAuth from 'hooks/useAuth';
 import getModules, { icons } from 'menu-items/modules';
-import { USER_ROLES } from 'constants/constants';
+import { NO_CATEGORY, USER_ROLES } from 'constants/constants';
 import { useGetAccommodationTypes } from 'api/accomodationsType';
 
 // ==============================|| DRAWER CONTENT - NAVIGATION ||============================== //
@@ -14,7 +14,11 @@ export default function Navigation() {
   const { user } = useAuth()
   const userRole = user?.position[0]?.value
 
-  const { accomodationTypes } = useGetAccommodationTypes()
+  const { accomodationTypes: _accomodationTypes } = useGetAccommodationTypes()
+
+  const accomodationTypes = _accomodationTypes
+    ?.filter(item => item.title !== NO_CATEGORY)
+    .concat(_accomodationTypes.filter(item => item.title === NO_CATEGORY));
 
   const accommodations = accomodationTypes?.map((item, idx) => {
     let icon;
@@ -31,6 +35,9 @@ export default function Navigation() {
         break;
       case 'cottage':
         icon = icons.CottageIcon;
+        break;
+      case 'no_category':
+        icon = icons.QuestionCircleOutlined;
         break;
       default:
         icon = icons.CaretRightOutlined;

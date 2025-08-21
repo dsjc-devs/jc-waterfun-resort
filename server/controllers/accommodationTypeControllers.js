@@ -1,8 +1,14 @@
 import expressAsync from "express-async-handler";
 import accommodationTypeServices from "../services/accommodationTypeServices.js";
+import textFormatter from "../utils/textFormatter.js";
 
 const createAccommodationType = expressAsync(async (req, res) => {
   try {
+    const isExist = await accommodationTypeServices.getSingleAccomodationType(textFormatter.toSlug(req.body.title))
+    if (!!isExist) {
+      throw new Error(`Type ${req.body.title} already exists.`)
+    }
+
     const accommodation = await accommodationTypeServices.createAccommodationType(req.body);
     res.status(201).json({ message: `${accommodation?.title} has been successfully added.` });
   } catch (error) {
@@ -23,11 +29,16 @@ const getAllAccommodationTypes = expressAsync(async (req, res) => {
 
 const updateAccomodationType = expressAsync(async (req, res) => {
   try {
+    const isExist = await accommodationTypeServices.getSingleAccomodationType(textFormatter.toSlug(req.body.title))
+    if (!!isExist) {
+      throw new Error(`Type ${req.body.title} already exists.`)
+    }
+
     const updatedAccomodation = await accommodationTypeServices.updateAccomodationType(
       req.params.id,
       req.body
     );
-    res.json({ message: `${updatedAccomodation?.title} has been successfully updated.` });
+    res.json(updatedAccomodation);
   } catch (error) {
     console.error(error);
     throw new Error(error);

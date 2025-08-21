@@ -118,7 +118,7 @@ const AccommodationGroup = ({ type = '' }) => {
               <RoomCard
                 roomData={acc}
                 onView={() => navigate(`/portal/accommodations/details/${acc._id}`)}
-                onEdit={() => navigate(`/portal/accommodations/form?id=${acc?._id}&isEditMode=true`)}
+                onEdit={() => navigate(`/portal/accommodations/form?id=${acc?._id}&isEditMode=true&type=${acc?.type}`)}
                 onDelete={() => setDeleteConfigs(({ id: acc?._id, open: true }))}
                 isOnPortal={true}
               />

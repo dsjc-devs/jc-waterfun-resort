@@ -56,7 +56,6 @@ const accommodationsSchema = new mongoose.Schema(
     },
     extraPersonFee: {
       type: Number,
-      required: true
     },
     price: {
       type: priceSchema,
@@ -69,7 +68,7 @@ const accommodationsSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      enum: ["POSTED", "ARCHIVED"],
+      enum: ["POSTED", "ARCHIVED", "UNPOSTED"],
       default: "POSTED"
     },
     type: {

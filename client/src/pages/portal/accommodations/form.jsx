@@ -33,6 +33,7 @@ import Editor from 'components/Editor';
 import MainCard from 'components/MainCard';
 import EmptyUserCard from 'components/cards/skeleton/EmptyUserCard';
 import textFormatter from 'utils/textFormatter';
+import { NO_CATEGORY } from 'constants/constants';
 
 const AccommodationForm = () => {
   const { search } = useLocation();
@@ -169,7 +170,7 @@ const AccommodationForm = () => {
                     onChange={(e) => formik.setFieldValue("status", e.target.value)}
                     fullWidth
                   >
-                    {['POSTED', 'ARCHIVED'].map((statusOption) => (
+                    {['POSTED', 'ARCHIVED', 'UNPOSTED'].map((statusOption) => (
                       <MenuItem
                         key={statusOption}
                         value={statusOption}
@@ -201,7 +202,7 @@ const AccommodationForm = () => {
                   value={formik.values.type || ''}
                   onChange={formik.handleChange}
                 >
-                  {accomodationTypes.map((item) => (
+                  {accomodationTypes?.filter((f) => f.title !== NO_CATEGORY).map((item) => (
                     <MenuItem key={item._id} value={item.slug}>
                       {item.title}
                     </MenuItem>

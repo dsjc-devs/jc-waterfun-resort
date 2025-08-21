@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardMedia, CardContent, Typography, Box, Chip, Stack, Button } from '@mui/material';
 import { UserOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import textFormatter from 'utils/textFormatter';
+import { NO_CATEGORY } from 'constants/constants';
 
 const RoomCard = ({ roomData, onView, onEdit, onDelete, isOnPortal = true }) => {
   const { thumbnail, name, description, capacity, price, type, status } = roomData;
@@ -27,8 +28,8 @@ const RoomCard = ({ roomData, onView, onEdit, onDelete, isOnPortal = true }) => 
           <Chip
             color={{
               ARCHIVED: 'error',
-              POSTED: 'success'
-            }[status]}
+              POSTED: 'success',
+            }[status] || "secondary"}
             label={status}
           />
         </Box>
@@ -39,7 +40,7 @@ const RoomCard = ({ roomData, onView, onEdit, onDelete, isOnPortal = true }) => 
           <Typography gutterBottom variant="h6" component="div">
             {name}
           </Typography>
-          <Chip label={textFormatter.fromSlug(type)} color="primary" size="small" />
+          {textFormatter.fromSlug(type) !== NO_CATEGORY && <Chip label={textFormatter.fromSlug(type)} color="primary" size="small" />}
         </Stack>
 
         <Typography

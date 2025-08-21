@@ -79,10 +79,13 @@ const RESORT_DETAILS = {
   }
 }
 
+const NO_CATEGORY = "No Category"
+
 export {
   colours,
   USER_TYPES,
   USER_STATUSSES,
   USER_ROLES,
-  RESORT_DETAILS
+  RESORT_DETAILS,
+  NO_CATEGORY
 }

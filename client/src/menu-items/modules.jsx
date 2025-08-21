@@ -184,6 +184,15 @@ const getModules = ({ accommodations = [] }) => {
       access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
       children: [
         {
+          id: 'accommodation-type',
+          title: 'Accommodation Types',
+          type: 'item',
+          url: '/portal/content-management/accommodation-type',
+          icon: icons.FormOutlined,
+          breadcrumbs: false,
+          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
+        },
+        {
           id: 'about-us',
           title: 'About Us',
           type: 'item',
@@ -201,14 +210,14 @@ const getModules = ({ accommodations = [] }) => {
           breadcrumbs: false,
           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value]
         },
-         {
+        {
           id: 'faqs',
           title: 'FAQs',
           type: 'item',
           url: '/portal/content-management/faqs',
-           icon: icons.QuestionCircleOutlined,
+          icon: icons.QuestionCircleOutlined,
           breadcrumbs: false,
-           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
         },
         // {
         //   id: 'gallery',
