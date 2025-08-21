@@ -455,6 +455,8 @@ const AccommodationForm = () => {
               position: "sticky",
               bottom: 10,
               width: "100%",
+              py: 2,
+              borderTop: "1px solid rgba(238, 238, 238, .8)",
               background: (theme) => theme.palette.secondary.contrastText
             }}
           >
@@ -477,8 +479,6 @@ const AccommodationForm = () => {
               </LoadingButton>
             </AnimateButton>
           </Stack>
-          {JSON.stringify(formik.values, null, 2)}
-          {JSON.stringify(formik.errors, null, 2)}
         </Box>
       )}
     </React.Fragment>
