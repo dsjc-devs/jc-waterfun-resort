@@ -27,3 +27,34 @@ export const useGetFAQS = () => {
 
   return memoizedValue;
 };
+
+const FAQS = {
+   addFAQ: async (payload) => {
+    try {
+      const response = await axiosServices.post(`/${endpoints.key}`, payload)
+      return response
+    } catch (error) {
+      throw new Error(error?.response?.data?.message);
+    }
+  },
+  editFAQ: async (faqId, payload) => {
+    try {
+      const response = await axiosServices.patch(`/${endpoints.key}/${faqId}`, payload)
+      return response
+    } catch (error) {
+      throw new Error(error?.response?.data?.message);
+    }
+  },
+  deleteFAQ: async (faqId) => {
+    try {
+      const response = await axiosServices.delete(`/${endpoints.key}/${faqId}`)
+      return response
+    } catch (error) {
+      throw new Error(error?.response?.data?.message);
+    }
+  }
+}
+
+export default {
+  FAQS
+}

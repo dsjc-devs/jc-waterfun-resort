@@ -201,15 +201,15 @@ const getModules = ({ accommodations = [] }) => {
           breadcrumbs: false,
           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value]
         },
-        // {
-        //   id: 'faqs',
-        //   title: 'FAQs',
-        //   type: 'item',
-        //   url: '/content-management/faqs',
-        //   icon: icons.QuestionCircleOutlined,
-        //   breadcrumbs: false,
-        //   access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
-        // },
+         {
+          id: 'faqs',
+          title: 'FAQs',
+          type: 'item',
+          url: '/portal/content-management/faqs',
+           icon: icons.QuestionCircleOutlined,
+          breadcrumbs: false,
+           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+        },
         // {
         //   id: 'gallery',
         //   title: 'Gallery',
