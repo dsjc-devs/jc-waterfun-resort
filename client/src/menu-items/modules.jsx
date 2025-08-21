@@ -115,7 +115,7 @@ const getModules = ({ accommodations = [] }) => {
         {
           id: "roomsGroup",
           type: "collapse",
-          title: "Spaces",
+          title: "Accommodations",
           icon: icons.HomeGroup,
           children: [
             ...(accommodations?.map((item) => ({
@@ -152,23 +152,6 @@ const getModules = ({ accommodations = [] }) => {
       ]
     },
     {
-      id: 'marketing',
-      title: 'Marketing Materials',
-      type: 'group',
-      access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
-      children: [
-        {
-          id: 'materials',
-          title: 'Materials',
-          type: 'item',
-          url: '/portal/marketing-materials',
-          icon: icons.ImageIcon,
-          breadcrumbs: false,
-          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
-        },
-      ]
-    },
-    {
       id: 'content-management',
       title: 'Content Management',
       type: 'group',
@@ -184,31 +167,50 @@ const getModules = ({ accommodations = [] }) => {
           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
         },
         {
-          id: 'about-us',
-          title: 'About Us',
+          id: 'marketing-materials',
+          title: 'Marketing Materials',
           type: 'item',
-          url: '/portal/content-management/about-us',
+          url: '/portal/content-management/marketing-materials',
+          icon: icons.ImageIcon,
+          breadcrumbs: false,
+          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
+        },
+        {
+          id: 'resort-details',
+          title: 'Resort Details',
+          type: 'collapse',
           icon: icons.InfoCircleOutlined,
           breadcrumbs: false,
-          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value]
-        },
-        {
-          id: 'company-info',
-          title: 'Company Info',
-          type: 'item',
-          url: '/portal/content-management/company-info',
-          icon: icons.HomeOutlined,
-          breadcrumbs: false,
-          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value]
-        },
-        {
-          id: 'faqs',
-          title: 'FAQs',
-          type: 'item',
-          url: '/portal/content-management/faqs',
-          icon: icons.QuestionCircleOutlined,
-          breadcrumbs: false,
           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+          children: [
+            {
+              id: 'about-us',
+              title: 'About Us',
+              type: 'item',
+              url: '/portal/content-management/about-us',
+              icon: icons.InfoCircleOutlined,
+              breadcrumbs: false,
+              access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value]
+            },
+            {
+              id: 'company-info',
+              title: 'Company Info',
+              type: 'item',
+              url: '/portal/content-management/company-info',
+              icon: icons.HomeOutlined,
+              breadcrumbs: false,
+              access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value]
+            },
+            {
+              id: 'faqs',
+              title: 'FAQs',
+              type: 'item',
+              url: '/portal/content-management/faqs',
+              icon: icons.QuestionCircleOutlined,
+              breadcrumbs: false,
+              access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+            },
+          ]
         },
         // {
         //   id: 'gallery',

@@ -106,6 +106,10 @@ const MainRoutes = {
               element: <AccommodationType />
             },
             {
+              path: 'marketing-materials',
+              element: <UnderConstruction />
+            },
+            {
               path: 'about-us',
               element: <AboutUs />
             },
