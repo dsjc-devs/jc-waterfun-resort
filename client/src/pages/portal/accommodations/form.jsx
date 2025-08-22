@@ -311,6 +311,7 @@ const AccommodationForm = () => {
                     name='type'
                     value={formik.values.type || ''}
                     onChange={formik.handleChange}
+                    disabled={!!_type}
                   >
                     {accomodationTypes?.filter((f) => f.title !== NO_CATEGORY).map((item) => (
                       <MenuItem key={item._id} value={item.slug}>
