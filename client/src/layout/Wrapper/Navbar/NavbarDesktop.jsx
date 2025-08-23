@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import Logo from 'components/logo/LogoMain'
 import useAuth from 'hooks/useAuth'
 import useMediaQuery from '@mui/material/useMediaQuery'
-import navItems from '../nav-items/navItems'
+import navItems from './nav-items/navItems'
 
 const NavbarDesktop = () => {
   const { isLoggedIn } = useAuth()

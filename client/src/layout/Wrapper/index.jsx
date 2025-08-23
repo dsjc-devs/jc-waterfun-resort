@@ -2,8 +2,8 @@ import React, { useEffect } from 'react'
 import { Box } from '@mui/material'
 import { useLocation } from 'react-router'
 
-import Footer from 'layout/Footer'
 import Navbar from './Navbar'
+import Footer from './Footer'
 
 const Wrapper = ({ children }) => {
   const location = useLocation()

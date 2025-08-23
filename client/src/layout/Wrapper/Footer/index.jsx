@@ -1,11 +1,11 @@
-import React from 'react';
 import { useTheme } from '@mui/material/styles'
 import { useNavigate } from 'react-router-dom'
 import { Grid, Typography, Stack, Box, } from '@mui/material'
-
-import quickLinks from 'layout/Wrapper/footer-items/quickLinks'
 import { useGetResortDetails } from 'api/resort-details';
 import { EnvironmentFilled, MailFilled, PhoneFilled } from '@ant-design/icons';
+
+import React from 'react';
+import quickLinks from 'layout/Wrapper/Footer/footer-items/quickLinks'
 
 const Footer = () => {
   const theme = useTheme();

@@ -2,7 +2,7 @@ import { lazy } from 'react';
 
 // project import
 import Loadable from 'components/Loadable';
-import PageWrapper from '../layout/Wrapper/Wrapper'
+import PageWrapper from '../layout/Wrapper'
 
 // render - absolute pages
 const Home = Loadable(lazy(() => import('pages/home/index')));

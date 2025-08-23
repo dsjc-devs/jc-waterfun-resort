@@ -3,7 +3,7 @@ import { MenuOutlined } from '@ant-design/icons'
 
 import React from 'react'
 import Logo from 'components/logo/LogoMain'
-import navItems from '../nav-items/navItems'
+import navItems from './nav-items/navItems'
 import { useNavigate } from 'react-router'
 
 const NavbarMobile = ({ handleDrawerToggle, drawerOpen }) => {
