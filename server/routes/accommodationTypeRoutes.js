@@ -10,7 +10,7 @@ import { protect } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 router.post("/", protect, createAccommodationType);
-router.get("/", protect, getAllAccommodationTypes);
+router.get("/", getAllAccommodationTypes);
 router.patch("/:id", protect, updateAccomodationType);
 router.delete("/:id", protect, deleteAccomodationType);
 

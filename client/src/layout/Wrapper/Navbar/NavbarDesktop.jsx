@@ -17,7 +17,7 @@ import accom3 from 'assets/images/upload/accom3.jpg'
 import accom4 from 'assets/images/upload/accom4.jpg'
 
 const NavbarDesktop = () => {
-  const { accomodationTypes } = useGetAccommodationTypes()
+  const { accomodationTypes, isLoading } = useGetAccommodationTypes()
 
   const { isLoggedIn } = useAuth()
   const navigate = useNavigate()
@@ -221,6 +221,7 @@ const NavbarDesktop = () => {
               item={hoveredItem}
               backgroundImage={hoveredItem.backgroundImage}
               sublinks={hoveredItem.sublinks}
+              isLoading={isLoading}
             />
           )}
         </Paper>

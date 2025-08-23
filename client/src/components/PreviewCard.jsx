@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router";
 
-const PreviewCard = ({ sublinks = [], backgroundImage = "" }) => {
+const PreviewCard = ({ sublinks = [], backgroundImage = "", isLoading = false }) => {
   const navigate = useNavigate()
 
   return (
@@ -39,7 +39,7 @@ const PreviewCard = ({ sublinks = [], backgroundImage = "" }) => {
           p: 3
         }}
       >
-        {sublinks.map((item) => (
+        {!isLoading && sublinks.map((item) => (
           <Typography
             onClick={() => navigate(`${item.link}`)}
             sx={{
@@ -57,6 +57,26 @@ const PreviewCard = ({ sublinks = [], backgroundImage = "" }) => {
             {item.title}
           </Typography>
         ))}
+
+        {(isLoading && sublinks?.length === 0) && (
+          Array.from({ length: 4 }).map((_) => (
+            <Typography
+              sx={{
+                fontFamily: 'Istok Web',
+                borderBottom: 1,
+                width: "40%",
+                transition: '.3s',
+                my: 2,
+                '&:hover': {
+                  cursor: "pointer",
+                  opacity: .7,
+                }
+              }}
+            >
+              Loading...
+            </Typography>
+          ))
+        )}
       </Box>
     </Box>
   );
