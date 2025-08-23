@@ -1,82 +1,229 @@
-import React from 'react'
-import { Stack, Typography, Button, Container, Box } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Stack, Container, Box, Link, Button, Typography, Grid, Popper, Paper } from '@mui/material'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useGetAccommodationTypes } from 'api/accomodationsType'
+import { NO_CATEGORY } from 'constants/constants'
 
-import Logo from 'components/logo/LogoMain'
 import useAuth from 'hooks/useAuth'
-import useMediaQuery from '@mui/material/useMediaQuery'
 import navItems from './nav-items/navItems'
+import LogoSection from 'components/logo'
+import AnimateButton from 'components/@extended/AnimateButton'
+import PreviewCard from 'components/PreviewCard'
+import textFormatter from 'utils/textFormatter'
+
+import accom1 from 'assets/images/upload/accom1.jpg'
+import accom2 from 'assets/images/upload/accom2.jpg'
+import accom3 from 'assets/images/upload/accom3.jpg'
+import accom4 from 'assets/images/upload/accom4.jpg'
 
 const NavbarDesktop = () => {
+  const { accomodationTypes } = useGetAccommodationTypes()
+
   const { isLoggedIn } = useAuth()
   const navigate = useNavigate()
-  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
+  const location = useLocation()
 
-  const middleIndex = Math.ceil(navItems.length / 2);
-  const firstHalf = navItems.slice(0, middleIndex);
-  const secondHalf = navItems.slice(middleIndex);
+  const [scrolled, setScrolled] = useState(false)
+  const [anchorEl, setAnchorEl] = useState(null)
+  const [hoveredItem, setHoveredItem] = useState(null)
+
+  const [open, setOpen] = useState(false)
+  let timer = null
+
+  const handleEnter = (event, item) => {
+    clearTimeout(timer)
+    setAnchorEl(event.currentTarget)
+    setHoveredItem(item)
+    setOpen(true)
+  }
+
+  const handleLeave = () => {
+    timer = setTimeout(() => {
+      setOpen(false)
+      setAnchorEl(null)
+      setHoveredItem(null)
+    }, 50)
+  }
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const _navItems = [
+    {
+      title: "Accommodations",
+      subtitle: "Our Spaces",
+      link: "/accommodations",
+      backgroundImage: accom1,
+      sublinks: accomodationTypes
+        ?.filter((f) => f.title !== NO_CATEGORY)
+        .map((f) => ({
+          title: f.title,
+          link: `/accommodations?type=${textFormatter.toSlug(f.title)}`
+        })),
+    },
+    {
+      title: "Amenities",
+      subtitle: "Facilities",
+      link: "/amenities",
+      backgroundImage: accom2,
+      sublinks: [
+        { title: "Swimming Pool", link: "/amenities?type=swimming-pool" },
+        { title: "Billiards", link: "/amenities?type=billiards" },
+        { title: "Karaoke", link: "/amenities?type=karaoke" }
+      ]
+    },
+    {
+      title: "Gallery",
+      subtitle: "Memories",
+      link: "/gallery",
+      backgroundImage: accom3,
+      sublinks: [
+        { title: "Resort Gallery", link: "/gallery" },
+      ]
+    },
+    {
+      title: "Rates",
+      subtitle: "Pricing",
+      link: "/rates",
+      backgroundImage: accom4,
+      sublinks: [
+        { title: "Day Tour", link: "/rates?type=day-tour" },
+        { title: "Overnight Stay", link: "/rates?type=overnight-stay" },
+      ]
+    }
+  ]
 
   return (
-    <React.Fragment>
-      {!isMobile && (
-        <Box
-          sx={{
-            position: 'sticky',
-            top: 1,
-            width: '100%',
-            zIndex: 10,
-            backgroundColor: 'rgba(0, 0, 0, 0.4)',
-          }}
-        >
-          <Container>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-              spacing={2}
-            >
-              {firstHalf.map((nav) => (
-                <Stack
-                  key={nav._id}
-                  onClick={() => navigate(nav.link)}
-                  sx={{ cursor: 'pointer' }}
+    <Box sx={{ position: "absolute", width: "100%" }}>
+      <Box
+        sx={{
+          position: scrolled ? 'fixed' : 'relative',
+          top: !scrolled ? 20 : 0,
+          width: '100%',
+          minHeight: '80px',
+          zIndex: 20,
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        }}
+      >
+        <Container>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
+            <LogoSection />
+            <Stack direction="row" alignItems='center' spacing={5}>
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.link
+                return (
+                  <Link
+                    key={item.name}
+                    onClick={() => navigate(item.link)}
+                    sx={{
+                      borderTop: isActive ? "3px solid" : "3px solid transparent",
+                      fontFamily: "'Cinzel', sans-serif",
+                      borderColor: isActive ? (theme) => theme.palette.secondary.contrastText : "transparent",
+                      paddingTop: .5,
+                      color: (theme) => theme.palette.secondary.contrastText,
+                      fontWeight: 500,
+                      '&:hover': {
+                        cursor: 'pointer',
+                        color: (theme) => theme.palette.primary.main,
+                      },
+                    }}
+                  >
+                    {item.name}
+                  </Link>
+                )
+              })}
+
+              <AnimateButton>
+                <Button
+                  variant='contained'
+                  size='small'
+                  onClick={() => navigate('/login')}
                 >
-                  <Typography variant="body2" color="#fff" sx={{ fontWeight: 'bold' }}>
-                    {nav.name}
-                  </Typography>
-                </Stack>
-              ))}
-
-              <Stack onClick={() => navigate('/')} sx={{ cursor: 'pointer', mx: 2 }}>
-                <Logo />
-              </Stack>
-
-              {secondHalf.map((nav) => (
-                <Stack
-                  key={nav._id}
-                  onClick={() => navigate(nav.link)}
-                  sx={{ cursor: 'pointer' }}
-                >
-                  <Typography variant="body2" color="#fff" sx={{ fontWeight: 'bold' }}>
-                    {nav.name}
-                  </Typography>
-                </Stack>
-              ))}
-
-              <Button
-                variant="contained"
-                sx={{ borderRadius: 2, marginLeft: 'auto' }}
-                onClick={() => {
-                  navigate('/login');
-                }}
-              >
-                {isLoggedIn ? "Portal" : "Login"}
-              </Button>
+                  {isLoggedIn ? "Go to Portal" : "Login"}
+                </Button>
+              </AnimateButton>
             </Stack>
-          </Container>
-        </Box>
-      )}
-    </React.Fragment>
+          </Stack>
+        </Container>
+      </Box>
+
+      <Box
+        sx={{
+          position: 'relative',
+          top: 20,
+          width: '100%',
+          py: 2,
+          minHeight: "57px !important",
+          zIndex: 999,
+          backgroundColor: 'rgba(0, 0, 0, 0.15)',
+        }}
+      >
+        <Container>
+          <Grid container textAlign="center" spacing={2}>
+            {_navItems.map((item, index) => (
+              <Grid item md={3} key={item.title}>
+                <Box
+                  onClick={() => navigate(item.link)}
+                  sx={{
+                    cursor: "pointer",
+                    borderRight: index !== _navItems.length - 1 ? "2px solid #fff" : "none",
+                    pr: 3,
+                  }}
+                >
+                  <Typography
+                    onMouseEnter={(e) => handleEnter(e, item)}
+                    sx={{
+                      fontFamily: "Cinzel",
+                      fontWeight: "normal",
+                      fontSize: "1rem",
+                      color: (theme) => theme.palette.secondary.contrastText,
+                      transition: '.3s',
+                      '&:hover': {
+                        opacity: .4
+                      }
+                    }}
+                  >
+                    {item.title}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "Cinzel",
+                      fontWeight: "700",
+                      fontSize: "85%",
+                      color: (theme) => theme.palette.secondary.contrastText,
+                      opacity: 0.8,
+                    }}
+                  >
+                    {item.subtitle}
+                  </Typography>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+
+      <Popper
+        open={open}
+        anchorEl={anchorEl}
+        placement="bottom"
+        onMouseEnter={() => clearTimeout(timer)}
+        onMouseLeave={handleLeave}
+      >
+        <Paper sx={{ p: 1, borderRadius: .5, my: 5 }}>
+          {hoveredItem && (
+            <PreviewCard
+              item={hoveredItem}
+              backgroundImage={hoveredItem.backgroundImage}
+              sublinks={hoveredItem.sublinks}
+            />
+          )}
+        </Paper>
+      </Popper>
+    </Box>
   )
 }
 

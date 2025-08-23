@@ -40,7 +40,7 @@ const ContactUs = () => {
     <React.Fragment>
       <PageTitle title="Contact Us" isOnportal={false} />
 
-      <Box sx={{ mt: -15 }}>
+      <Box>
         <Banner
           image={"https://www.anvayacove.com/beach-nature-club/wp-content/uploads/2014/09/header_contactus1.jpg"}
           title='Contact Us'

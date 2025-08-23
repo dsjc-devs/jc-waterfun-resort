@@ -47,7 +47,7 @@ const NavbarMobile = ({ handleDrawerToggle, drawerOpen }) => {
             }}
           >
             <List sx={{ width: 250, display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {[{ _id: "home", name: 'Home', link: '/' }, ...navItems].map((nav) => (
+              {navItems.map((nav) => (
                 nav.name !== 'Login' ? (
                   <ListItem
                     sx={{
@@ -59,7 +59,6 @@ const NavbarMobile = ({ handleDrawerToggle, drawerOpen }) => {
                     key={nav._id}
                     onClick={() => {
                       navigate(nav.link);
-                      setDrawerOpen(false);
                     }}
                   >
                     <ListItemText
@@ -86,7 +85,6 @@ const NavbarMobile = ({ handleDrawerToggle, drawerOpen }) => {
                 sx={{ borderRadius: 2 }}
                 onClick={() => {
                   navigate('/login');
-                  setDrawerOpen(false);
                 }}
               >
                 Login

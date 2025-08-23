@@ -17,9 +17,6 @@ import { useGetResortDetails } from 'api/resort-details';
 export default function App() {
   const { resortDetails } = useGetResortDetails()
 
-  console.log(resortDetails);
-
-
   return (
     <ThemeCustomization>
       <SnackbarProvider>

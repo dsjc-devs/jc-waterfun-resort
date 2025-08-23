@@ -16,13 +16,11 @@ const FAQS = () => {
     const faqs = data?.faqs || []
     return (
         <React.Fragment>
-            <Box sx={{ mt: -15 }}>
-                <Banner
-                    image="https://www.anvayacove.com/beach-nature-club/wp-content/uploads/2014/09/header_contactus1.jpg"
-                    title="FAQs"
-                    subtitle="A place to find answers"
-                />
-            </Box>
+            <Banner
+                image="https://www.anvayacove.com/beach-nature-club/wp-content/uploads/2014/09/header_contactus1.jpg"
+                title="FAQs"
+                subtitle="A place to find answers"
+            />
             {isLoading && Array.from({ length: 5 }).map((_, index) => (
                 <Skeleton key={index} variant='rectangular' height={48} sx={{ marginBottom: 1 }} />
             ))}

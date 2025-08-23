@@ -1,8 +1,10 @@
+import ContactUs from 'pages/contact-us'
 import React from 'react'
 
 const Home = () => {
   return (
-    <div>Home</div>
+    <div>
+    </div>
   )
 }
 

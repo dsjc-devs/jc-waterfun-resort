@@ -24,7 +24,7 @@ const AboutUs = () => {
     <React.Fragment>
       <PageTitle title="About Us" isOnportal={false} />
 
-      <Box sx={{ mt: -15 }}>
+      <React.Fragment>
         <Banner
           image="https://www.anvayacove.com/beach-nature-club/wp-content/uploads/2014/09/header_contactus1.jpg"
           title="About Us"
@@ -94,7 +94,7 @@ const AboutUs = () => {
             </Grid>
           </Grid>
         </Container>
-      </Box>
+      </React.Fragment>
     </React.Fragment>
   )
 }

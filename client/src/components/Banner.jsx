@@ -9,7 +9,7 @@ const Banner = ({ image = '', title = '', subtitle = '' }) => {
       sx={{
         position: 'relative',
         width: '100%',
-        height: '40dvh',
+        height: '50dvh',
         overflow: 'hidden',
       }}
     >
@@ -29,7 +29,6 @@ const Banner = ({ image = '', title = '', subtitle = '' }) => {
           bottom: isMobile ? 40 : 50,
           left: 0,
           right: 0,
-          zIndex: 1,
           color: '#fff',
         }}
       >
