@@ -106,3 +106,7 @@ dist
 
 # wincompare file
 .bak
+
+# Dependency lock files
+package-lock.json
+yarn.lock
