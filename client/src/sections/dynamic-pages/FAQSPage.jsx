@@ -1,5 +1,6 @@
 import React from 'react'
-
+import { DownOutlined } from '@ant-design/icons'
+import { useGetFAQS } from 'api/faqs'
 import {
     Accordion,
     AccordionDetails,
@@ -9,14 +10,10 @@ import {
     Container,
     Box
 } from '@mui/material'
-import { DownOutlined } from '@ant-design/icons'
-import { useGetFAQS } from 'api/faqs'
 import Banner from 'components/Banner'
-
 const FAQS = () => {
-    const { data, isLoading } = useGetFAQS()
+    const { data, isLoading } = useGetFAQS({ status: 'POSTED' });
     const faqs = data?.faqs || []
-
     return (
         <React.Fragment>
             <Box sx={{ mt: -15 }}>
@@ -26,11 +23,9 @@ const FAQS = () => {
                     subtitle="A place to find answers"
                 />
             </Box>
-
             {isLoading && Array.from({ length: 5 }).map((_, index) => (
                 <Skeleton key={index} variant='rectangular' height={48} sx={{ marginBottom: 1 }} />
             ))}
-
             {!isLoading && faqs.length > 0 && faqs.map((faq, index) => (
                 <Container key={index} sx={{ my: 2 }}>
                     <Accordion>

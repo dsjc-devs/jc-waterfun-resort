@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import {
-  Box,
   Button,
   Chip,
   Dialog,
@@ -9,24 +8,21 @@ import {
   DialogTitle,
   Grid,
   MenuItem,
-  Pagination,
   Stack,
   TextField,
   Tooltip,
   Typography,
-  useMediaQuery
 } from '@mui/material';
 import {
   EditOutlined,
   DeleteOutlined,
   PlusOutlined
 } from '@ant-design/icons';
-
 import { useGetFAQS } from 'api/faqs';
+import { toast } from 'react-toastify';
 import agent from 'api';
 import Table from 'components/Table';
 import ConfirmationDialog from 'components/ConfirmationDialog';
-import { toast } from 'react-toastify';
 import IconButton from 'components/@extended/IconButton';
 import ConvertDate from 'components/ConvertDate';
 
@@ -35,7 +31,6 @@ const statusLabels = {
   UNPUBLISHED: 'Unpublished',
   ARCHIVED: 'Archived'
 };
-
 const statusColors = {
   POSTED: 'primary',
   UNPUBLISHED: 'warning',
@@ -43,7 +38,6 @@ const statusColors = {
 };
 const FAQsTable = () => {
   const { data, isLoading, mutate } = useGetFAQS();
-  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
   const faqs = data?.faqs || [];
   const [modalState, setModalState] = useState({
     open: false,
@@ -179,15 +173,7 @@ const FAQsTable = () => {
           otherActionButton: otherActionButtons
         }}
       />
-      <Box display="flex" justifyContent="center" mt={2}>
-        <Pagination
-          count={Math.ceil(faqs.length / itemsPerPage)}
-          page={page}
-          onChange={(e, value) => setPage(value)}
-          color="primary"
-          shape="rounded"
-        />
-      </Box>
+
       <Dialog
         open={modalState.open}
         onClose={() => setModalState({ open: false, editingFaq: null })}

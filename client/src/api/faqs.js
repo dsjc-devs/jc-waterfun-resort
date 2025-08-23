@@ -5,29 +5,23 @@ import useSWR from "swr";
 export const endpoints = {
   key: `${import.meta.env.VITE_API_KEY_}/${import.meta.env.VITE_API_VER}/faqs`,
 };
-
 const options = {
   revalidateIfStale: true,
   revalidateOnFocus: true,
   revalidateOnReconnect: true,
-  onSuccess: (data, key, config) => data
+  onSuccess: (data,) => data
 };
-
-export const useGetFAQS = () => {
-  const key = `/${endpoints.key}`;
-
-  const { data, isLoading, error, mutate } = useSWR(key, fetcher, options);
-
+export const useGetFAQS = (queryObj = {}) => {
+  const key = `/${endpoints.key}?${new URLSearchParams(queryObj).toString()}`;
+  const { data, isLoading, error, mutate } = useSWR(key, fetcher, options) ;
   const memoizedValue = useMemo(() => ({
     data,
     isLoading,
     mutate,
     error
   }), [data, isLoading, mutate, error]);
-
   return memoizedValue;
 };
-
 const FAQS = {
    addFAQ: async (payload) => {
     try {
@@ -54,7 +48,6 @@ const FAQS = {
     }
   }
 }
-
 export default {
   FAQS
 }
