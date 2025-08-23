@@ -1,90 +1,17 @@
-import React, { useState } from 'react'
-import { Stack, Typography, Drawer, IconButton, List, ListItem, ListItemText, Button, Container, Box } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
-import useMediaQuery from '@mui/material/useMediaQuery'
-
-// assets
-import navItems from './Wrapper/nav-items/navItems'
+import { Stack, Typography, Drawer, IconButton, List, ListItem, ListItemText, Button, useMediaQuery } from '@mui/material'
 import { MenuOutlined } from '@ant-design/icons'
+
+import React from 'react'
 import Logo from 'components/logo/LogoMain'
-import useAuth from 'hooks/useAuth'
+import navItems from '../nav-items/navItems'
+import { useNavigate } from 'react-router'
 
-const Navbar = () => {
-  const { isLoggedIn } = useAuth()
-  const navigate = useNavigate()
+const NavbarMobile = ({ handleDrawerToggle, drawerOpen }) => {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
-  const [drawerOpen, setDrawerOpen] = useState(false)
-
-  const handleDrawerToggle = () => {
-    setDrawerOpen((prevState) => !prevState)
-  };
-
-  const middleIndex = Math.ceil(navItems.length / 2);
-  const firstHalf = navItems.slice(0, middleIndex);
-  const secondHalf = navItems.slice(middleIndex);
+  const navigate = useNavigate()
 
   return (
     <React.Fragment>
-      {!isMobile && (
-        <Box
-          sx={{
-            position: 'sticky',
-            top: 1,
-            width: '100%',
-            zIndex: 10,
-            backgroundColor: 'rgba(0, 0, 0, 0.4)',
-          }}
-        >
-          <Container>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-              spacing={2}
-            >
-              {firstHalf.map((nav) => (
-                <Stack
-                  key={nav._id}
-                  onClick={() => navigate(nav.link)}
-                  sx={{ cursor: 'pointer' }}
-                >
-                  <Typography variant="body2" color="#fff" sx={{ fontWeight: 'bold' }}>
-                    {nav.name}
-                  </Typography>
-                </Stack>
-              ))}
-
-              <Stack onClick={() => navigate('/')} sx={{ cursor: 'pointer', mx: 2 }}>
-                <Logo />
-              </Stack>
-
-              {secondHalf.map((nav) => (
-                <Stack
-                  key={nav._id}
-                  onClick={() => navigate(nav.link)}
-                  sx={{ cursor: 'pointer' }}
-                >
-                  <Typography variant="body2" color="#fff" sx={{ fontWeight: 'bold' }}>
-                    {nav.name}
-                  </Typography>
-                </Stack>
-              ))}
-
-              <Button
-                variant="contained"
-                sx={{ borderRadius: 2, marginLeft: 'auto' }}
-                onClick={() => {
-                  navigate('/login');
-                  setDrawerOpen?.(false);
-                }}
-              >
-                {isLoggedIn ? "Portal" : "Login"}
-              </Button>
-            </Stack>
-          </Container>
-        </Box>
-      )}
-
       {isMobile && (
         <React.Fragment>
           <Stack
@@ -169,7 +96,7 @@ const Navbar = () => {
         </React.Fragment>
       )}
     </React.Fragment>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default NavbarMobile
