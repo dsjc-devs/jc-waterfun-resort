@@ -21,7 +21,15 @@ export default function HeaderContent() {
 
       <Stack gap={3} marginInline={3} flexDirection='row' alignItems='center'>
         <Box sx={{ flexShrink: 0, mx: 1, display: 'flex', alignItems: 'center' }}>
-          <Button sx={{ color: 'text.primary' }} onClick={() => navigate('/', '_blank')}> Home Website </Button>
+          <Button
+            component="a"
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ color: 'text.primary' }}
+          >
+            Home Website
+          </Button>
         </Box>
       </Stack>
       {!downLG && <Profile />}

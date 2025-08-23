@@ -166,7 +166,7 @@ const NavbarDesktop = () => {
             {_navItems.map((item, index) => (
               <Grid item md={3} key={item.title}>
                 <Box
-                  onClick={() => navigate(item.link)}
+                  onMouseLeave={handleLeave}
                   sx={{
                     cursor: "pointer",
                     borderRight: index !== _navItems.length - 1 ? "2px solid #fff" : "none",
@@ -180,10 +180,8 @@ const NavbarDesktop = () => {
                       fontWeight: "normal",
                       fontSize: "1rem",
                       color: (theme) => theme.palette.secondary.contrastText,
-                      transition: '.3s',
-                      '&:hover': {
-                        opacity: .4
-                      }
+                      transition: ".3s",
+                      "&:hover": { opacity: 0.4 }
                     }}
                   >
                     {item.title}
@@ -210,10 +208,14 @@ const NavbarDesktop = () => {
         open={open}
         anchorEl={anchorEl}
         placement="bottom"
+        disablePortal={false}
+        modifiers={[
+          { name: "zIndex", enabled: true, phase: "write", fn: ({ state }) => { state.styles.popper.zIndex = 2000 } }
+        ]}
         onMouseEnter={() => clearTimeout(timer)}
         onMouseLeave={handleLeave}
       >
-        <Paper sx={{ p: 1, borderRadius: .5, my: 5 }}>
+        <Paper sx={{ p: 1, borderRadius: .5, my: 2 }}>
           {hoveredItem && (
             <PreviewCard
               item={hoveredItem}
