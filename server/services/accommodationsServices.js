@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Accommodations from "../models/accommodationsModel.js";
 import textFormatter from "../utils/textFormatter.js";
 
@@ -65,9 +66,11 @@ const updateAccommodationById = async (id, updateData) => {
   try {
     const { isUpdateSameType, ...fieldsToUpdate } = updateData;
 
+    const _isUpdateSameType = isUpdateSameType === "true" ? true : false
+
     let updatedAccommodation;
 
-    if (isUpdateSameType) {
+    if (_isUpdateSameType) {
       const accommodation = await Accommodations.findById(id);
       if (!accommodation) throw new Error("Accommodation not found");
 

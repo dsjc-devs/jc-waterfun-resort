@@ -311,7 +311,7 @@ const AccommodationForm = () => {
                     name='type'
                     value={formik.values.type || ''}
                     onChange={formik.handleChange}
-                    disabled={!!_type}
+                    disabled={!!_type && !isEditMode}
                   >
                     {accomodationTypes?.filter((f) => f.title !== NO_CATEGORY).map((item) => (
                       <MenuItem key={item._id} value={item.slug}>
@@ -438,7 +438,7 @@ const AccommodationForm = () => {
                   <Typography variant='body1'>Notes (Required)</Typography>
                   <MainCard >
                     <Editor
-                      content={{ ...formik.getFieldProps('notes') }}
+                      content={{ ...formik.getFieldProps('notes'), value: data?.notes }}
                       formik={formik.setFieldValue}
                       field='notes'
                     />
@@ -462,7 +462,7 @@ const AccommodationForm = () => {
             }}
           >
             <AnimateButton>
-              <Button onClick={() => navigate("/portal/dashboard")}>Back</Button>
+              <Button onClick={() => navigate(`/portal/accommodations?type=${_type}`)}>Back</Button>
             </AnimateButton>
 
             <AnimateButton>
