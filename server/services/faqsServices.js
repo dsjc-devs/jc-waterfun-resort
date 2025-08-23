@@ -1,16 +1,17 @@
 import Faq from "../models/faqsModels.js";
 
 const createFaq = async (faqData) => {
-  const { title, answer, status } = faqData || {};
+  const { title, answer, status, category } = faqData || {};
 
   try {
-    if (!title || !answer || title.trim() === "" || answer.trim() === "") {
-      throw new Error("Title and answer are required and cannot be empty");
+    if (!title || !answer || !category || title.trim() === "" || answer.trim() === "" || category.trim() === "") {
+      throw new Error("Title, answer, and category are required and cannot be empty");
     }
 
     const payload = {
       title,
       answer,
+      category,
       status: status || "POSTED",
     };
 
@@ -70,7 +71,7 @@ const getSingleFaqById = async (faqId) => {
 
 const updateFaqById = async (faqId, faqData) => {
   try {
-    const { title, answer, status } = faqData || {};
+    const { title, answer, status, category } = faqData || {};
 
     const existingFaq = await getSingleFaqById(faqId);
 
@@ -86,6 +87,12 @@ const updateFaqById = async (faqId, faqData) => {
         throw new Error("Answer cannot be empty");
       }
       updateData.answer = answer;
+    }
+    if (category !== undefined) {
+      if (category.trim() === "") {
+        throw new Error("Category cannot be empty");
+      }
+      updateData.category = category;
     }
     if (status !== undefined) updateData.status = status;
 

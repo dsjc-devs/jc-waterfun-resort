@@ -15,6 +15,10 @@ const faqSchema = new mongoose.Schema(
       enum: ["POSTED", "UNPUBLISHED", "ARCHIVED"],
       default: "POSTED",
     },
+    category: {
+      type: String,
+      required: true,
+    }
   },
   {
     timestamps: true,
