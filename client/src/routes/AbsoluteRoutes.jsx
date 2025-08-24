@@ -5,13 +5,14 @@ import Loadable from 'components/Loadable';
 import PageWrapper from '../layout/Wrapper'
 
 // render - absolute pages
-const Home = Loadable(lazy(() => import('pages/home/index')));
-const AboutUs = Loadable(lazy(() => import('pages/about-us/index')));
-const ContactUs = Loadable(lazy(() => import('pages/contact-us/index')));
-const BookNow = Loadable(lazy(() => import('pages/book-now/index')));
-const Admission = Loadable(lazy(() => import('pages/addmission/index')));
-const Media = Loadable(lazy(() => import('pages/media/index')));
-const FAQs = Loadable(lazy(() => import('pages/faqs/index')));
+const Home = Loadable(lazy(() => import('pages/home')));
+const AboutUs = Loadable(lazy(() => import('pages/about-us')));
+const ContactUs = Loadable(lazy(() => import('pages/contact-us')));
+const BookNow = Loadable(lazy(() => import('pages/book-now')));
+const FAQs = Loadable(lazy(() => import('pages/faqs')));
+
+// accommodations 
+const Accommodations = Loadable(lazy(() => import('pages/accommodations')));
 
 const NotFoundPage = Loadable(lazy(() => import('pages/maintenance/404')));
 
@@ -37,21 +38,24 @@ const AbsoluteRoutes = {
       element: <PageWrapper children={<BookNow />} />
     },
     {
-      path: '/admission',
-      element: <PageWrapper children={<Admission />} />
+      path: '/faqs',
+      element: <PageWrapper children={<FAQs />} />
     },
+
+    // accommodations
     {
-      path: '/media',
-      element: <PageWrapper children={<Media />} />
+      path: '/accommodations',
+      children: [
+        {
+          index: true,
+          element: <PageWrapper children={<Accommodations />} />
+        },
+      ]
     },
     {
       path: '*',
       element: <NotFoundPage />
-    },
-    {
-      path: '/faqs',
-      element: <PageWrapper children={<FAQs />} />
-    },
+    }
   ]
 
 };
