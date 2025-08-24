@@ -11,18 +11,21 @@ const Banner = ({ image = '', title = '', subtitle = '' }) => {
         width: '100%',
         height: '50dvh',
         overflow: 'hidden',
-      }}
-    >
-      <Box
-        component="img"
-        src={image}
-        alt={title}
-        sx={{
+        backgroundImage: `url(${image})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
           width: '100%',
           height: '100%',
-          objectFit: 'cover',
-        }}
-      />
+          backgroundColor: 'rgba(0, 0, 0, 0.35)',
+          zIndex: 1,
+        },
+      }}
+    >
       <Container
         sx={{
           position: 'absolute',
@@ -30,6 +33,7 @@ const Banner = ({ image = '', title = '', subtitle = '' }) => {
           left: 0,
           right: 0,
           color: '#fff',
+          zIndex: 2,
         }}
       >
         <Box
@@ -37,10 +41,18 @@ const Banner = ({ image = '', title = '', subtitle = '' }) => {
             textAlign: isMobile ? 'center' : 'left',
           }}
         >
-          <Typography variant="h2" fontFamily="Cinzel" sx={{ fontWeight: 300, fontSize: '3em' }}>
+          <Typography
+            variant="h2"
+            fontFamily="Cinzel"
+            sx={{ fontWeight: 300, fontSize: '3em' }}
+          >
             {title}
           </Typography>
-          <Typography variant="h5"  fontFamily="Cinzel" sx={{ opacity: 0.75 }}>
+          <Typography
+            variant="h5"
+            fontFamily="Cinzel"
+            sx={{ opacity: 0.75 }}
+          >
             {subtitle}
           </Typography>
         </Box>
