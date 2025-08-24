@@ -9,10 +9,10 @@ const TitleTag = ({ title, subtitle, icon }) => {
         <Box>
           {icon}
         </Box>
-        <Typography variant="h4" color="secondary">
+        <Typography variant="h4" color="secondary" fontFamily="Cinzel">
           {subtitle || COMPANY_NAME}
         </Typography>
-        <Typography variant="h2">
+        <Typography variant="h2" fontFamily="Cinzel" >
           {title}
         </Typography>
       </Box>

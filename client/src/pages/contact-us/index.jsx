@@ -49,7 +49,7 @@ const ContactUs = () => {
         <Container sx={{ my: 5 }}>
           <Grid container spacing={4} justifyContent="center" alignItems="center">
             <Grid item xs={12} md={7}>
-              <Typography variant="h2">
+              <Typography variant="h2" fontFamily="Cinzel">
                 If you have any questions, feel free to reach out to us!
               </Typography>
               <Typography variant="body1" sx={{ mt: 2 }}>
@@ -136,7 +136,7 @@ const ContactUs = () => {
                   height: "100%"
                 }}
               >
-                <Typography variant="h4" textAlign='center' gutterBottom>Contact Information</Typography>
+                <Typography variant="h4" textAlign='center' fontFamily="Cinzel" gutterBottom>Contact Information</Typography>
                 <Box>
                   <Stack direction="row" alignItems="center" spacing={2} mb={1} >
                     <EnvironmentFilled style={{ color: theme.palette.error.main }} />
