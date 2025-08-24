@@ -49,10 +49,6 @@ const AbsoluteRoutes = {
       element: <NotFoundPage />
     },
     {
-      path: '*',
-      element: <NotFoundPage />
-    },
-    {
       path: '/faqs',
       element: <PageWrapper children={<FAQs />} />
     },
