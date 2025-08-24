@@ -308,11 +308,13 @@ const ReusableTable = ({
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage="Rows:"
           sx={{
+            paddingRight: "2rem !important",
             backgroundColor: theme.palette.background.default,
             borderTop: `1px solid ${theme.palette.divider}`,
             "& .MuiTablePagination-actions button": {
               borderRadius: "12px",
               transition: "all 0.25s ease",
+              marginRight: "0.5rem",
               backgroundColor: theme.palette.action.hover,
               color: theme.palette.primary.dark,
               "&:hover": {

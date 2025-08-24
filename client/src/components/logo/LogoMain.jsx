@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGetResortDetails } from 'api/resort-details';
-import logoFallback from 'assets/images/logo/logo.png';
+import logoFallback from 'assets/images/logo/logo-main.png';
 
 // ==============================|| LOGO SVG ||============================== //
 
