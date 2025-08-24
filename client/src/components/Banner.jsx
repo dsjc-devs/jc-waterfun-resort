@@ -37,10 +37,10 @@ const Banner = ({ image = '', title = '', subtitle = '' }) => {
             textAlign: isMobile ? 'center' : 'left',
           }}
         >
-          <Typography variant="h2" sx={{ fontWeight: 300, fontSize: '3em' }}>
+          <Typography variant="h2" fontFamily="Cinzel" sx={{ fontWeight: 300, fontSize: '3em' }}>
             {title}
           </Typography>
-          <Typography variant="h5" sx={{ opacity: 0.75 }}>
+          <Typography variant="h5"  fontFamily="Cinzel" sx={{ opacity: 0.75 }}>
             {subtitle}
           </Typography>
         </Box>
