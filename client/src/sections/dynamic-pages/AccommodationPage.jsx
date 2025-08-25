@@ -26,9 +26,13 @@ import LabeledValue from 'components/LabeledValue';
 import formatPeso from 'utils/formatPrice';
 import MainCard from 'components/MainCard';
 import { PESO_SIGN } from 'constants/constants';
+import useAuth from 'hooks/useAuth';
+import LoginModal from 'components/LoginModal';
 
 const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth()
+
   const {
     name,
     _id,
@@ -52,6 +56,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(null);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [openLogin, setOpenLogin] = useState(false)
 
   const handleEdit = (id) => {
     navigate(`/portal/accommodations/form?id=${id}&isEditMode=true&type=${type}`);
@@ -251,6 +256,43 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                 <Box dangerouslySetInnerHTML={{ __html: notes }} />
               </Box>
             )}
+
+            {(!isOnPortal && isLoggedIn) && (
+              <Box marginBlock={15} id="book_reservation_section">
+                <Typography variant='h2' sx={{ borderLeft: theme => `5px solid ${theme.palette.primary.light}`, pl: 2, mb: 2 }}>
+                  Book a Reservation
+                </Typography>
+
+                <Box sx={{ background: '#f5f5f5', borderRadius: "12px", p: 2 }}>
+                  <Typography variant='h3' gutterBottom> Select Options </Typography>
+
+                  <Box marginBlockEnd={5}>
+                    <Typography variant='body1' color='secondary' gutterBottom> Package Type </Typography>
+                    <Chip
+                      variant='light'
+                      color='primary'
+                      label={<Typography variant='subtitle1'> Entrance + Swim </Typography>}
+                    />
+                  </Box>
+
+                  <Box marginBlockEnd={5}>
+                    <Typography variant='body1' color='secondary' gutterBottom> Quantity </Typography>
+
+                    <Box sx={{ backgroundColor: "#fff", p: 2, borderRadius: '8px', my: 2 }}>
+                      <Typography variant='h5' fontWeight={700}> Adult </Typography>
+                    </Box>
+
+                    <Box sx={{ backgroundColor: "#fff", p: 2, borderRadius: '8px', my: 2 }}>
+                      <Typography variant='h5' fontWeight={700}> Child </Typography>
+                    </Box>
+
+                    <Box sx={{ backgroundColor: "#fff", p: 2, borderRadius: '8px', my: 2 }}>
+                      <Typography variant='h5' fontWeight={700}> PWD/Senior </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            )}
           </Grid>
 
           {!isOnPortal && (
@@ -261,7 +303,25 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                   top: 80,
                 }}
               >
-                Reservation Section
+                <MainCard>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    sx={{ borderRadius: 2 }}
+                    onClick={() => {
+                      if (isLoggedIn) {
+                        const element = document.getElementById("book_reservation_section");
+                        if (element) {
+                          element.scrollIntoView({ behavior: "smooth" });
+                        }
+                      } else {
+                        setOpenLogin(true)
+                      }
+                    }}
+                  >
+                    Book a Reservation
+                  </Button>
+                </MainCard>
               </Box>
             </Grid>
           )}
@@ -326,6 +386,8 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
         open={isDeleteOpen}
         handleClose={() => setIsDeleteOpen(false)}
       />
+
+      <LoginModal open={openLogin} handleClose={() => setOpenLogin(false)} message="You need to be logged in to continue." />
     </React.Fragment>
   );
 };

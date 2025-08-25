@@ -30,7 +30,7 @@ import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 
 // ============================|| JWT - LOGIN ||============================ //
 
-export default function AuthLogin() {
+export default function AuthLogin({ handleLogin, isNavigateToPortal = true }) {
   const { login, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = React.useState(false);
@@ -39,7 +39,7 @@ export default function AuthLogin() {
   const handleMouseDownPassword = (event) => event.preventDefault();
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn && isNavigateToPortal) {
       navigate('/portal/dashboard');
     }
   }, [isLoggedIn]);
@@ -60,7 +60,12 @@ export default function AuthLogin() {
             await login(values.emailAddress, values.password);
             setStatus({ success: true });
             setSubmitting(false);
-            navigate('/portal/dashboard');
+
+            if (isNavigateToPortal) {
+              navigate('/portal/dashboard');
+            } else {
+              handleLogin();
+            }
           } catch (error) {
             setStatus({ success: false });
             setSubmitting(false);
@@ -125,14 +130,6 @@ export default function AuthLogin() {
                     {errors.password}
                   </FormHelperText>
                 )}
-              </Grid>
-
-              <Grid item xs={12} sx={{ mt: -1 }}>
-                <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
-                  <Link variant="h6" component={RouterLink} color="text.primary" to="/forgot-password">
-                    Forgot Password?
-                  </Link>
-                </Stack>
               </Grid>
 
               <Grid item xs={12}>
