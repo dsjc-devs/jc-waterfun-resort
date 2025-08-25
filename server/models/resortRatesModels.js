@@ -11,6 +11,10 @@ const resortRatesSchema = new mongoose.Schema(
         day: { type: Number, required: true, default: 100 },
         night: { type: Number, required: true, default: 150 },
       },
+      pwdSenior: {
+        day: { type: Number, required: true, default: 100 },
+        night: { type: Number, required: true, default: 120 },
+      },
     },
   },
   {
@@ -27,6 +31,7 @@ export async function seedResortRates() {
       entranceFee: {
         adult: { day: 150, night: 200 },
         child: { day: 100, night: 150 },
+        pwdSenior: { day: 100, night: 120 },
       },
     });
     console.log("Default resort rates inserted");
