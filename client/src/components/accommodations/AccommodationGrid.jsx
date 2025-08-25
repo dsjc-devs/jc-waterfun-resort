@@ -118,18 +118,12 @@ const AccommodationGrid = ({ accomData = {}, index = 0 }) => {
             </Grid>
 
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems='center' marginBlock={4}>
-              <AnimateButton>
-                <Button variant='contained' size='small'>
-                  Book Now
-                </Button>
-              </AnimateButton>
-
               <Box
                 component={Link}
                 to={`/accommodations/details/${_id}`}
                 sx={{
+                  color: theme => theme.palette.secondary.dark,
                   marginBlock: "1em",
-                  color: "#333",
                   textDecoration: "none",
                   transition: ".3s all ease",
                   "&:hover": {
