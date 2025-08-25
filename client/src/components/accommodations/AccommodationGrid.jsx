@@ -7,6 +7,7 @@ import React from 'react'
 import Carousel from 'react-material-ui-carousel'
 import { Link } from 'react-router-dom'
 import formatPeso from 'utils/formatPrice'
+import textFormatter from 'utils/textFormatter'
 
 const AccommodationGrid = ({ accomData = {}, index = 0 }) => {
   const isOdd = index % 2 !== 0
@@ -18,8 +19,11 @@ const AccommodationGrid = ({ accomData = {}, index = 0 }) => {
     price,
     capacity,
     maxStayDuration,
-    pictures = []
+    pictures = [],
+    type
   } = accomData || {}
+
+  const _type = textFormatter.fromSlug(type)
 
   return (
     <Box sx={{ py: 20, bgcolor: isOdd ? '#f2f4f3' : '#fff' }}>
@@ -34,19 +38,35 @@ const AccommodationGrid = ({ accomData = {}, index = 0 }) => {
               indicators={false}
             >
               {[thumbnail, ...pictures].map((item, i) => (
-                <Box
-                  key={i}
-                  component="img"
-                  src={item.image || item}
-                  alt={name}
-                  sx={{
-                    width: '100%',
-                    height: 500,
-                    objectFit: 'cover',
-                    borderRadius: 2,
-                    boxShadow: 2,
-                  }}
-                />
+                <Box position='relative'>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: 0,
+                      zIndex: 1
+                    }}
+                  >
+                    <Chip
+                      color="primary"
+                      label={_type}
+                      sx={{ width: '150px' }}
+                      size='small'
+                    />
+                  </Box>
+                  <Box
+                    key={i}
+                    component="img"
+                    src={item.image || item}
+                    alt={name}
+                    sx={{
+                      width: '100%',
+                      height: 500,
+                      objectFit: 'cover',
+                      borderRadius: 2,
+                      boxShadow: 2,
+                    }}
+                  />
+                </Box>
               ))}
             </Carousel>
           </Grid>
