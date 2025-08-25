@@ -22,6 +22,9 @@ const updateResortRates = async (payload) => {
     if (payload?.entranceFee?.children?.day !== undefined) {
       updateData["entranceFee.children.night"] = payload.entranceFee.children.night;
     }
+    if (payload?.entranceFee?.pwdSenior?.day !== undefined) {
+      updateData["entranceFee.pwdSenior.night"] = payload.entranceFee.pwdSenior.night;
+    }
 
     const updated = await ResortRates.findOneAndUpdate(
       {},
