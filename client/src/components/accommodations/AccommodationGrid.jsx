@@ -28,7 +28,7 @@ const AccommodationGrid = ({ accomData = {}, index = 0 }) => {
   const _type = textFormatter.fromSlug(type)
 
   return (
-    <Box sx={{ py: 20, bgcolor: isOdd ? '#f2f4f3' : '#fff' }}>
+    <Box sx={{ py: 10, bgcolor: isOdd ? '#f2f4f3' : '#fff' }}>
       <Container>
         <Grid container alignItems="center" spacing={{ sm: 0, md: 2 }}>
           <Grid item xs={12} md={6} order={{ xs: 1, md: isOdd ? 2 : 1 }}>
