@@ -1,16 +1,10 @@
 import { useMemo } from "react";
 import axiosServices, { fetcher } from 'utils/axios'
 import useSWR from "swr";
+import { OPTIONS } from "constants/constants";
 
 export const endpoints = {
   key: `${import.meta.env.VITE_API_KEY_}/${import.meta.env.VITE_API_VER}/users`,
-};
-
-const options = {
-  revalidateIfStale: true,
-  revalidateOnFocus: true,
-  revalidateOnReconnect: true,
-  onSuccess: (data, key, config) => data
 };
 
 export const useGetUsers = ({ queryObj = {} }) => {
@@ -33,7 +27,7 @@ export const useGetSingleUser = (userId) => {
   const { data, isLoading, error, mutate } = useSWR(
     userId ? `/${endpoints.key}/${userId}` : null,
     fetcher,
-    options
+    OPTIONS
   );
 
   const memoizedValue = useMemo(

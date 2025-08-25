@@ -33,6 +33,13 @@ const NO_CATEGORY = "No Category"
 
 const PESO_SIGN = "₱"
 
+const OPTIONS = {
+  revalidateIfStale: true,
+  revalidateOnFocus: true,
+  revalidateOnReconnect: true,
+  onSuccess: (data, key, config) => data
+};
+
 export {
   COMPANY_NAME,
   USER_TYPES,
@@ -40,5 +47,6 @@ export {
   USER_ROLES,
   USER_STATUSSES,
   NO_CATEGORY,
-  PESO_SIGN
+  PESO_SIGN,
+  OPTIONS
 }

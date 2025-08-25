@@ -1,3 +1,4 @@
+import { OPTIONS } from "constants/constants";
 import { useMemo } from "react";
 import useSWR from "swr";
 import { fetcher } from "utils/axios";
@@ -7,7 +8,7 @@ const endpoints = {
 };
 
 export const useGetResortRates = () => {
-  const { data, isLoading, error, mutate } = useSWR(`/${endpoints.key}`, fetcher, options);
+  const { data, isLoading, error, mutate } = useSWR(`/${endpoints.key}`, fetcher, OPTIONS);
 
   const memoizedValue = useMemo(() => ({
     resortRates: data,

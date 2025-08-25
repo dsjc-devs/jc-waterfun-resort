@@ -1,23 +1,17 @@
 import { useMemo } from "react";
 import axiosServices, { fetcher } from 'utils/axios'
 import useSWR from "swr";
+import { OPTIONS } from "constants/constants";
 
 export const endpoints = {
   key: `${import.meta.env.VITE_API_KEY_}/${import.meta.env.VITE_API_VER}/accommodations`,
-};
-
-const options = {
-  revalidateIfStale: true,
-  revalidateOnFocus: true,
-  revalidateOnReconnect: true,
-  onSuccess: (data, key, config) => data
 };
 
 export const useGetAccommodations = (queryObj = {}) => {
   const queryParams = new URLSearchParams(queryObj).toString();
   const apiUrl = `/${endpoints.key}?${queryParams}`;
 
-  const { data, isLoading, error, mutate } = useSWR(apiUrl, fetcher, options);
+  const { data, isLoading, error, mutate } = useSWR(apiUrl, fetcher, OPTIONS);
 
   const memoizedValue = useMemo(() => ({
     data,
@@ -32,7 +26,7 @@ export const useGetAccommodations = (queryObj = {}) => {
 export const useGetSingleAccommodation = (id) => {
   const apiUrl = `/${endpoints.key}/${id}`;
 
-  const { data, isLoading, error, mutate } = useSWR(id && apiUrl, fetcher, options);
+  const { data, isLoading, error, mutate } = useSWR(id && apiUrl, fetcher, OPTIONS);
 
   const memoizedValue = useMemo(() => ({
     data,

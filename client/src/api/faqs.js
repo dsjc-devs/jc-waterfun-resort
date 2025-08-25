@@ -1,19 +1,15 @@
 import { useMemo } from "react";
 import axiosServices, { fetcher } from 'utils/axios'
 import useSWR from "swr";
+import { OPTIONS } from "constants/constants";
 
 export const endpoints = {
   key: `${import.meta.env.VITE_API_KEY_}/${import.meta.env.VITE_API_VER}/faqs`,
 };
-const options = {
-  revalidateIfStale: true,
-  revalidateOnFocus: true,
-  revalidateOnReconnect: true,
-  onSuccess: (data,) => data
-};
+
 export const useGetFAQS = (queryObj = {}) => {
   const key = `/${endpoints.key}?${new URLSearchParams(queryObj).toString()}`;
-  const { data, isLoading, error, mutate } = useSWR(key, fetcher, options) ;
+  const { data, isLoading, error, mutate } = useSWR(key, fetcher, OPTIONS);
   const memoizedValue = useMemo(() => ({
     data,
     isLoading,
@@ -23,7 +19,7 @@ export const useGetFAQS = (queryObj = {}) => {
   return memoizedValue;
 };
 const FAQS = {
-   addFAQ: async (payload) => {
+  addFAQ: async (payload) => {
     try {
       const response = await axiosServices.post(`/${endpoints.key}`, payload)
       return response
