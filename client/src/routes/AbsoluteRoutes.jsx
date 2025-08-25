@@ -13,6 +13,7 @@ const FAQs = Loadable(lazy(() => import('pages/faqs')));
 
 // accommodations 
 const Accommodations = Loadable(lazy(() => import('pages/accommodations')));
+const AccommodationDetails = Loadable(lazy(() => import('pages/accommodations/details')));
 
 const NotFoundPage = Loadable(lazy(() => import('pages/maintenance/404')));
 
@@ -49,6 +50,10 @@ const AbsoluteRoutes = {
         {
           index: true,
           element: <PageWrapper children={<Accommodations />} />
+        },
+        {
+          path: 'details/:id',
+          element: <PageWrapper children={<AccommodationDetails />} />
         },
       ]
     },
