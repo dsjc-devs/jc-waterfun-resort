@@ -1,11 +1,12 @@
-import { ClockCircleOutlined, MoneyCollectOutlined, UserOutlined } from '@ant-design/icons'
+import { ClockCircleOutlined } from '@ant-design/icons'
 import { Box, Grid, Typography, Chip, Stack, Button, Container } from '@mui/material'
+import { Link } from 'react-router-dom'
+import { icons } from 'menu-items/modules'
+
 import AnimateButton from 'components/@extended/AnimateButton'
 import LabeledValue from 'components/LabeledValue'
-import { icons } from 'menu-items/modules'
 import React from 'react'
 import Carousel from 'react-material-ui-carousel'
-import { Link } from 'react-router-dom'
 import formatPeso from 'utils/formatPrice'
 import textFormatter from 'utils/textFormatter'
 
@@ -13,6 +14,7 @@ const AccommodationGrid = ({ accomData = {}, index = 0 }) => {
   const isOdd = index % 2 !== 0
 
   const {
+    _id,
     name,
     description,
     thumbnail,
@@ -124,7 +126,7 @@ const AccommodationGrid = ({ accomData = {}, index = 0 }) => {
 
               <Box
                 component={Link}
-                to="/"
+                to={`/accommodations/details/${_id}`}
                 sx={{
                   marginBlock: "1em",
                   color: "#333",
