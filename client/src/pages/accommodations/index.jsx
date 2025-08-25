@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router'
+import { Box, Container, Pagination, Stack, Typography } from '@mui/material'
+import { useGetAccommodations } from 'api/accommodations'
 
 import PageTitle from 'components/PageTitle'
 import textFormatter from 'utils/textFormatter'
 import Banner from 'components/Banner'
-
-import banner from 'assets/images/upload/banner.jpg'
-import { Box, Container, Divider, Grid, Pagination, Skeleton, Stack, Typography } from '@mui/material'
-import { useGetAccommodations } from 'api/accommodations'
 import EmptyUserCard from 'components/cards/skeleton/EmptyUserCard'
 import AccommodationGrid from 'components/accommodations/AccommodationGrid'
 import EmptyLongCard from 'components/cards/skeleton/EmptyLongCard'
+
+import banner from 'assets/images/upload/banner.jpg'
 
 const Accommodations = () => {
   const location = useLocation()
