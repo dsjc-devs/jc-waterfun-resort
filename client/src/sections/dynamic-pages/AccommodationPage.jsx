@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckOutlined, ClockCircleOutlined, CloseOutlined, DeleteOutlined, DollarOutlined, EditOutlined, MenuOutlined, MoneyCollectOutlined, PayCircleOutlined, UserOutlined } from '@ant-design/icons';
+import { CheckOutlined, ClockCircleOutlined, CloseOutlined, DeleteOutlined, EditOutlined, EyeOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
 import {
   Box,
   Button,
@@ -25,6 +25,7 @@ import IconButton from 'components/@extended/IconButton';
 import LabeledValue from 'components/LabeledValue';
 import formatPeso from 'utils/formatPrice';
 import MainCard from 'components/MainCard';
+import { PESO_SIGN } from 'constants/constants';
 
 const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const [galleryOpen, setGalleryOpen] = useState(false);
 
   const handleEdit = (id) => {
-    navigate(`/portal/accommodations/form?id=${id}&isEditMode=true`);
+    navigate(`/portal/accommodations/form?id=${id}&isEditMode=true&type=${type}`);
   };
 
   const handleDelete = async (id) => {
@@ -89,7 +90,18 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
       )}
 
       {isOnPortal && (
-        <Stack direction='row' justifyContent='flex-end' spacing={2} marginBlock={1}>
+        <Stack direction='row' justifyContent='flex-end' spacing={2} marginBlock={2}>
+          <AnimateButton>
+            <Button
+              variant='contained'
+              color='primary'
+              startIcon={<EyeOutlined />}
+              onClick={() => window.open(`/accommodations/details/${_id}`)}
+            >
+              Public view
+            </Button>
+          </AnimateButton>
+
           <AnimateButton>
             <Button
               variant='contained'
@@ -100,6 +112,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
               Edit
             </Button>
           </AnimateButton>
+
           <AnimateButton>
             <Button
               variant='contained'
@@ -113,8 +126,8 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
         </Stack>
       )}
 
-      <Box>
-        <Box sx={{ position: 'relative' }}>
+      <Box marginBlock={2}>
+        <Box sx={{ position: 'relative', my: 2 }}>
           <ImageList
             sx={{ width: '100%', height: "100%" }}
             variant="quilted"
@@ -163,95 +176,95 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
           </Stack>
         </Box>
 
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={8}>
+        <Grid container spacing={2} marginBlock={2}>
+          <Grid item xs={12} md={isOnPortal ? 12 : 8} marginBlockEnd={2}>
             <Box marginBlockEnd={2}>
-              <Typography variant='h2'>{name}</Typography>
+              {isOnPortal && <Typography variant='h2'>{name}</Typography>}
               <Typography variant='body1' color='secondary'>{description}</Typography>
             </Box>
 
-            <MainCard title="Details">
-              <Grid container spacing={3} marginBlock={2}>
-                {isOnPortal && (
-                  <Grid item xs={12} sm={6} md={4}>
-                    <LabeledValue
-                      title="Status"
-                      subTitle={
-                        <Chip
-                          label={status}
-                          color={{
-                            POSTED: "success",
-                            ARCHIVED: "error",
-                          }[status]}
-                          size="small"
-                        />
-                      }
-                      icon={<CheckOutlined style={{ fontSize: 20 }} />}
-                    />
-                  </Grid>
-                )}
-
+            <Grid container spacing={3} marginBlock={2}>
+              {isOnPortal && (
                 <Grid item xs={12} sm={6} md={4}>
                   <LabeledValue
-                    title="Capacity"
-                    subTitle={`${capacity} Guests`}
-                    icon={<UserOutlined style={{ fontSize: 20 }} />}
+                    title="Status"
+                    subTitle={
+                      <Chip
+                        label={status}
+                        color={{
+                          POSTED: "success",
+                          ARCHIVED: "error",
+                        }[status]}
+                        size="small"
+                      />
+                    }
+                    icon={<CheckOutlined style={{ fontSize: 20 }} />}
                   />
                 </Grid>
+              )}
 
-                <Grid item xs={12} sm={6} md={4}>
-                  <LabeledValue
-                    title="Day Price"
-                    subTitle={formatPeso(price?.day)}
-                    icon={<PayCircleOutlined style={{ fontSize: 20 }} />}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={4}>
-                  <LabeledValue
-                    title="Night Price"
-                    subTitle={formatPeso(price?.night)}
-                    icon={<PayCircleOutlined style={{ fontSize: 20 }} />}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={4}>
-                  <LabeledValue
-                    title="Extra Person Fee"
-                    subTitle={formatPeso(extraPersonFee)}
-                    icon={<DollarOutlined style={{ fontSize: 20 }} />}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={4}>
-                  <LabeledValue
-                    title="Max Stay"
-                    subTitle={`${maxStayDuration} Hours`}
-                    icon={<ClockCircleOutlined style={{ fontSize: 20 }} />}
-                  />
-                </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <LabeledValue
+                  title="Capacity"
+                  subTitle={`${capacity} Guests`}
+                  icon={<UserOutlined style={{ fontSize: 20 }} />}
+                />
               </Grid>
-            </MainCard>
+
+              <Grid item xs={12} sm={6} md={4}>
+                <LabeledValue
+                  title="Day Price"
+                  subTitle={formatPeso(price?.day)}
+                  icon={<Typography fontSize={24}>{PESO_SIGN}</Typography>}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={4}>
+                <LabeledValue
+                  title="Night Price"
+                  subTitle={formatPeso(price?.night)}
+                  icon={<Typography fontSize={24}>{PESO_SIGN}</Typography>}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={4}>
+                <LabeledValue
+                  title="Extra Person Fee"
+                  subTitle={formatPeso(extraPersonFee)}
+                  icon={<Typography fontSize={24}>{PESO_SIGN}</Typography>}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={4}>
+                <LabeledValue
+                  title="Max Stay"
+                  subTitle={`${maxStayDuration} Hours`}
+                  icon={<ClockCircleOutlined style={{ fontSize: 20 }} />}
+                />
+              </Grid>
+            </Grid>
 
             <Divider sx={{ mb: 2 }} />
 
             {notes && (
-              <MainCard title="Notes">
-                {<Box dangerouslySetInnerHTML={{ __html: notes }} />}
-              </MainCard>
+              <Box marginBlock={5}>
+                <Box dangerouslySetInnerHTML={{ __html: notes }} />
+              </Box>
             )}
           </Grid>
 
-          <Grid item xs={12} md={4}>
-            <Box
-              sx={{
-                position: 'sticky',
-                top: 80,
-              }}
-            >
-              Reservation Section
-            </Box>
-          </Grid>
+          {!isOnPortal && (
+            <Grid item xs={12} md={4}>
+              <Box
+                sx={{
+                  position: 'sticky',
+                  top: 80,
+                }}
+              >
+                Reservation Section
+              </Box>
+            </Grid>
+          )}
         </Grid>
       </Box>
 

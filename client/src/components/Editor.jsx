@@ -41,6 +41,19 @@ const Editor = ({ content, formik, readonly, field = 'description', forceUpdate 
       wrapperClassName="wrapperClassName"
       editorClassName="editorClassName"
       onEditorStateChange={onEditorStateChange}
+      toolbar={{
+        options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign', 'history'],
+        fontFamily: {
+          options: [
+            'Public Sans',
+            'Cinzel',
+            'Istok Web',
+            'Inter',
+            'Poppins',
+            'Roboto'
+          ],
+        },
+      }}
     />
   );
 };

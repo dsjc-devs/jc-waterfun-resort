@@ -31,11 +31,14 @@ const BLANK_VALUE = "-"
 
 const NO_CATEGORY = "No Category"
 
+const PESO_SIGN = "₱"
+
 export {
   COMPANY_NAME,
   USER_TYPES,
   BLANK_VALUE,
   USER_ROLES,
   USER_STATUSSES,
-  NO_CATEGORY
+  NO_CATEGORY,
+  PESO_SIGN
 }
