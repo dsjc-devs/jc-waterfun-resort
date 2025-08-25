@@ -33,7 +33,8 @@ async function seedAccomodations() {
     await AccommodationType.insertMany([
       { title: "Room" },
       { title: "Event Hall" },
-      { title: "Cottage" }
+      { title: "Cottage" },
+      { title: "Guest House" },
     ]);
     console.log("Default accommodation types inserted");
   }

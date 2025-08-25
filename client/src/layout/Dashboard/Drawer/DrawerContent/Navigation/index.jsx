@@ -36,6 +36,9 @@ export default function Navigation() {
       case 'cottage':
         icon = icons.CottageIcon;
         break;
+      case 'guest_house':
+        icon = icons.HomeFilled;
+        break;
       case 'no_category':
         icon = icons.QuestionCircleOutlined;
         break;
