@@ -11,8 +11,6 @@ const AccommodationTypeDrawer = ({ open, handleClose, mutate, typeData }) => {
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
   const [loading, setLoading] = useState(false);
 
-  console.log(`typeData: `, typeData);
-
   const isEditMode = !!typeData?._id
 
   const previousTitle = typeData?.title

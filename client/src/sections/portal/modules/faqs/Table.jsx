@@ -70,7 +70,6 @@ const FAQsTable = () => {
         return;
       }
       if (modalState.editingFaq) {
-        console.log('Updating FAQ:', modalState.editingFaq._id, formState);
         await agent.FAQS.editFAQ(modalState.editingFaq._id, formState)
         toast.success('FAQ updated');
       } else {
