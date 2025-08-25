@@ -6,7 +6,7 @@ import { useGetAccommodations } from 'api/accommodations';
 
 import MainCard from 'components/MainCard';
 import NoContentFound from './NoContentFound';
-import RoomCard from 'components/RoomCard';
+import RoomCard from 'components/accommodations/RoomCard';
 import AnimateButton from 'components/@extended/AnimateButton';
 import textFormatter from 'utils/textFormatter';
 import ProductPlaceholder from 'components/cards/skeleton/ProductPlaceholder';
@@ -40,7 +40,8 @@ const AccommodationGroup = ({ type = '' }) => {
     type,
     page,
     limit: 6,
-    search: searchTerm
+    search: searchTerm,
+    sort: "name"
   });
 
   const accommodations = data?.accommodations ?? [];

@@ -22,7 +22,7 @@ const NavbarMobile = ({ handleDrawerToggle, drawerOpen }) => {
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
-              zIndex: 1,
+              zIndex: 999,
               paddingInline: 2,
               backgroundColor: 'rgba(0, 0, 0, 0.5)'
             }}

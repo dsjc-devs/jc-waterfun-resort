@@ -11,7 +11,7 @@ const PreviewCard = ({ sublinks = [], backgroundImage = "", isLoading = false })
         position: "relative",
         p: 0.5,
         width: 500,
-        height: 300,
+        minHeight: 300,
         borderRadius: 1,
         overflow: "hidden",
         color: (theme) => theme.palette.secondary.contrastText,

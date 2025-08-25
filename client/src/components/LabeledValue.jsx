@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Tooltip, Box, Typography } from '@mui/material';
 import 'styles/main.css';
 import classNames from 'classnames';
@@ -31,7 +32,7 @@ const LabeledValue = (props) => {
           <React.Fragment>
             <Box className="icon">{props.icon}</Box>
             <Box className="caption">
-              <Typography variant="h5">{props.title}</Typography>
+              <Typography variant="h5" fontFamily="Cinzel">{props.title}</Typography>
               {props.ellipsis && props.subTitle ? (
                 <Tooltip
                   title={<Typography variant="span">{props.subTitle}</Typography>}
@@ -65,7 +66,20 @@ const LabeledValue = (props) => {
 
 LabeledValue.defaultProps = {
   isVisible: true,
-  variant: 'light'
+  variant: 'light',
+  ellipsis: false,
+  title: '',
+  subTitle: '',
+  icon: null
+};
+
+LabeledValue.propTypes = {
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  subTitle: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  isVisible: PropTypes.bool,
+  variant: PropTypes.oneOf(['bold', 'light']),
+  icon: PropTypes.node,
+  ellipsis: PropTypes.bool
 };
 
 export default LabeledValue;

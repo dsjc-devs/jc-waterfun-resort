@@ -25,15 +25,20 @@ const getAccommodationsByQuery = async (queryObject) => {
     const limit = parseInt(queryObject.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const { page: _page, limit: _limit, search, ...filters } = queryObject;
+    const { page: _page, limit: _limit, search, sort, ...filters } = queryObject;
 
     const query = { ...filters };
     if (search) {
-      query.name = { $regex: search, $options: 'i' };
+      query.name = { $regex: search, $options: "i" };
+    }
+
+    let sortOption = { createdAt: -1 };
+    if (sort) {
+      sortOption = { [sort.replace("-", "")]: sort.startsWith("-") ? -1 : 1 };
     }
 
     const accommodations = await Accommodations.find(query)
-      .sort({ createdAt: -1 })
+      .sort(sortOption)
       .skip(skip)
       .limit(limit);
 

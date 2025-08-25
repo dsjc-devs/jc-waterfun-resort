@@ -157,7 +157,7 @@ const NavbarDesktop = () => {
           width: '100%',
           py: 2,
           minHeight: "57px !important",
-          zIndex: 999,
+          zIndex: 20,
           backgroundColor: 'rgba(0, 0, 0, 0.15)',
         }}
       >

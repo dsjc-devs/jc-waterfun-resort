@@ -51,7 +51,7 @@ const Banner = ({ image = '', title = '', subtitle = '' }) => {
           <Typography
             variant="h5"
             fontFamily="Cinzel"
-            sx={{ opacity: 0.75 }}
+            sx={{ opacity: 0.9 }}
           >
             {subtitle}
           </Typography>

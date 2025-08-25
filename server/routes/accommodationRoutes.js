@@ -26,9 +26,9 @@ router.post(
   }),
   createAccommodation
 );
-router.get("/", protect, getAccommodationsByQuery);
+router.get("/", getAccommodationsByQuery);
 
-router.get("/:id", protect, getAccommodationById);
+router.get("/:id", getAccommodationById);
 router.patch(
   "/:id",
   protect,
