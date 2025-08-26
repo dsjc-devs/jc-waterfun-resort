@@ -15,6 +15,9 @@ const FAQs = Loadable(lazy(() => import('pages/faqs')));
 const Accommodations = Loadable(lazy(() => import('pages/accommodations')));
 const AccommodationDetails = Loadable(lazy(() => import('pages/accommodations/details')));
 
+// book reservation 
+const BookReservation = Loadable(lazy(() => import('pages/book-reservation')));
+
 const NotFoundPage = Loadable(lazy(() => import('pages/maintenance/404')));
 
 // ==============================|| AUTH ROUTING ||============================== //
@@ -57,6 +60,13 @@ const AbsoluteRoutes = {
         },
       ]
     },
+
+    // book reservations
+    {
+      path: '/book-a-reservation',
+      element: <PageWrapper hasBanner={false} children={<BookReservation />} />
+    },
+
     {
       path: '*',
       element: <NotFoundPage />
