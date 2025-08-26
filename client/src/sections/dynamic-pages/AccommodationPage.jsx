@@ -164,7 +164,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
           </ImageList>
 
           <Stack
-            sx={{ position: 'absolute', bottom: 20, right: 20, zIndex: 99 }}
+            sx={{ position: 'absolute', bottom: 20, right: 20, zIndex: 1 }}
           >
             <Button
               sx={{
@@ -183,8 +183,8 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
 
         <Grid container spacing={2} marginBlock={2}>
           <Grid item xs={12} md={isOnPortal ? 12 : 8} marginBlockEnd={2}>
-            <Box marginBlockEnd={2}>
-              {isOnPortal && <Typography variant='h2'>{name}</Typography>}
+            <Box marginBlock={2}>
+              <Typography variant='h2' gutterBottom>{name}</Typography>
               <Typography variant='body1' color='secondary'>{description}</Typography>
             </Box>
 
