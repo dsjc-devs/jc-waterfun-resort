@@ -158,7 +158,7 @@ const NavbarDesktop = ({ hasBanner = true }) => {
           py: 2,
           minHeight: "57px !important",
           zIndex: 20,
-          backgroundColor: hasBanner ? 'rgba(0, 0, 0, 0.15)' : `rgba(19,145,195, .4)`,
+          backgroundColor: hasBanner ? 'rgba(0, 0, 0, 0.15)' : `rgba(19,145,195, .6)`,
         }}
       >
         <Container>
