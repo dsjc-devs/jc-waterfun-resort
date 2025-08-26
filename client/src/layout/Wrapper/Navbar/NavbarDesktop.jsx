@@ -110,7 +110,7 @@ const NavbarDesktop = () => {
       >
         <Container>
           <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
-            <LogoSection />
+            <LogoSection to='/' />
             <Stack direction="row" alignItems='center' spacing={5}>
               {navItems.map((item) => {
                 const isActive = location.pathname === item.link
