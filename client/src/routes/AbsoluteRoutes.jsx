@@ -53,7 +53,7 @@ const AbsoluteRoutes = {
         },
         {
           path: 'details/:id',
-          element: <PageWrapper children={<AccommodationDetails />} />
+          element: <PageWrapper hasBanner={false} children={<AccommodationDetails />} />
         },
       ]
     },

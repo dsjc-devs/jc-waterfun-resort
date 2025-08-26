@@ -5,7 +5,7 @@ import { useLocation } from 'react-router'
 import Navbar from './Navbar'
 import Footer from './Footer'
 
-const Wrapper = ({ children }) => {
+const Wrapper = ({ children, hasBanner }) => {
   const location = useLocation()
 
   useEffect(() => {
@@ -17,7 +17,7 @@ const Wrapper = ({ children }) => {
 
   return (
     <React.Fragment>
-      <Navbar />
+      <Navbar hasBanner={hasBanner} />
       <Box sx={{ minHeight: '80dvh' }} >{children}</Box>
       <Footer />
     </React.Fragment>

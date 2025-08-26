@@ -22,12 +22,6 @@ const AccommodationDetails = () => {
     <React.Fragment>
       <PageTitle isOnportal={false} title={name} />
 
-      <Banner
-        image={thumbnail}
-        title={name}
-        subtitle={textFormatter.fromSlug(type)}
-      />
-
       <Container>
         <AccommodationPage
           data={data}

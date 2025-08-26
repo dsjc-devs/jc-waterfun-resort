@@ -3,7 +3,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import NavbarDesktop from './NavbarDesktop'
 import NavbarMobile from './NavbarMobile'
 
-const Navbar = () => {
+const Navbar = ({ hasBanner = true }) => {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
 
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -14,7 +14,7 @@ const Navbar = () => {
 
 
   if (!isMobile) {
-    return <NavbarDesktop />
+    return <NavbarDesktop hasBanner={hasBanner} />
   } else {
     return <NavbarMobile drawerOpen={drawerOpen} handleDrawerToggle={handleDrawerToggle} />
   }

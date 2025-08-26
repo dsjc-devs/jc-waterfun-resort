@@ -16,7 +16,7 @@ import accom2 from 'assets/images/upload/accom2.jpg'
 import accom3 from 'assets/images/upload/accom3.jpg'
 import accom4 from 'assets/images/upload/accom4.jpg'
 
-const NavbarDesktop = () => {
+const NavbarDesktop = ({ hasBanner = true }) => {
   const { accomodationTypes, isLoading } = useGetAccommodationTypes()
 
   const { isLoggedIn } = useAuth()
@@ -97,15 +97,15 @@ const NavbarDesktop = () => {
   ]
 
   return (
-    <Box sx={{ position: "absolute", width: "100%" }}>
+    <Box sx={{ position: hasBanner ? 'absolute' : 'relative', width: '100%' }}>
       <Box
         sx={{
           position: scrolled ? 'fixed' : 'relative',
-          top: !scrolled ? 20 : 0,
+          top: hasBanner && !scrolled ? 20 : 0,
           width: '100%',
           minHeight: '80px',
           zIndex: 20,
-          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          backgroundColor: hasBanner ? 'rgba(0, 0, 0, 0.4)' : `rgb(19,145,195)`,
         }}
       >
         <Container>
@@ -153,12 +153,12 @@ const NavbarDesktop = () => {
       <Box
         sx={{
           position: 'relative',
-          top: 20,
+          top: hasBanner ? 20 : 0,
           width: '100%',
           py: 2,
           minHeight: "57px !important",
           zIndex: 20,
-          backgroundColor: 'rgba(0, 0, 0, 0.15)',
+          backgroundColor: hasBanner ? 'rgba(0, 0, 0, 0.15)' : `rgba(19,145,195, .4)`,
         }}
       >
         <Container>
