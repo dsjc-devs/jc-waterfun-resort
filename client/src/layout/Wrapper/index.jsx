@@ -18,7 +18,7 @@ const Wrapper = ({ children, hasBanner }) => {
   return (
     <React.Fragment>
       <Navbar hasBanner={hasBanner} />
-      <Box sx={{ minHeight: '80dvh' }} >{children}</Box>
+      <Box sx={{ minHeight: '80dvh', backgroundColor: '#f5f5f5' }} >{children}</Box>
       <Footer />
     </React.Fragment>
   )
