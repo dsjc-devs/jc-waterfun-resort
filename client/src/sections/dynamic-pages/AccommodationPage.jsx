@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { CheckOutlined, ClockCircleOutlined, CloseOutlined, DeleteOutlined, EditOutlined, EyeOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
+import { CheckOutlined, ClockCircleOutlined, CloseOutlined, DeleteOutlined, EditOutlined, EyeOutlined, MenuOutlined, MoonOutlined, SunOutlined, UserOutlined } from '@ant-design/icons';
 import {
   Box,
   Button,
@@ -11,10 +11,17 @@ import {
   ImageList,
   ImageListItem,
   Stack,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography
 } from '@mui/material';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router';
+import { PESO_SIGN } from 'constants/constants';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { addHours } from 'date-fns';
+import { DatePicker, DateTimePicker } from '@mui/x-date-pickers';
 
 import agent from 'api';
 import AnimateButton from 'components/@extended/AnimateButton';
@@ -25,9 +32,19 @@ import IconButton from 'components/@extended/IconButton';
 import LabeledValue from 'components/LabeledValue';
 import formatPeso from 'utils/formatPrice';
 import MainCard from 'components/MainCard';
-import { PESO_SIGN } from 'constants/constants';
 import useAuth from 'hooks/useAuth';
 import LoginModal from 'components/LoginModal';
+
+const bookedRanges = [
+  {
+    start: new Date("2025-08-27T07:00:00"), // day 7 AM
+    end: new Date("2025-08-27T17:00:00"),   // day 5 PM
+  },
+  // {
+  //   start: new Date("2025-08-27T17:00:00"), // night 5 PM
+  //   end: new Date("2025-08-28T07:00:00"),   // night 7 AM next day
+  // },
+];
 
 const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const navigate = useNavigate();
@@ -57,6 +74,112 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const [currentImage, setCurrentImage] = useState(null);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [openLogin, setOpenLogin] = useState(false)
+  const [mode, setMode] = useState('day');
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [manualMode, setManualMode] = useState(false);
+
+  const applyModeStartTime = (dateLike, mode) => {
+    if (!dateLike) return null;
+    const d = new Date(dateLike);
+    if (mode === "day") {
+      d.setHours(7, 0, 0, 0);
+    } else {
+      d.setHours(17, 0, 0, 0);
+    }
+    return d;
+  };
+
+  const computeModeEnd = (start, mode) => {
+    if (!start) return null;
+    const e = new Date(start);
+    if (mode === "day") {
+      e.setHours(17, 0, 0, 0);
+    } else {
+      e.setDate(e.getDate() + 1);
+      e.setHours(7, 0, 0, 0);
+    }
+    return e;
+  };
+
+  const isNightStay = (date) => {
+    if (!date) return false;
+    const endHour = date.getHours();
+    return endHour > 17 || endHour < 6;
+  };
+
+  const isDateBlocked = (date, mode) => {
+    return bookedRanges.some((range) => {
+      if (mode === "day") {
+        const dayStart = new Date(date);
+        dayStart.setHours(7, 0, 0, 0);
+        const dayEnd = new Date(date);
+        dayEnd.setHours(17, 0, 0, 0);
+
+        return range.start < dayEnd && range.end > dayStart;
+      }
+
+      if (mode === "night") {
+        const nightStart = new Date(date);
+        nightStart.setHours(17, 0, 0, 0);
+        const nightEnd = new Date(date);
+        nightEnd.setDate(nightEnd.getDate() + 1);
+        nightEnd.setHours(7, 0, 0, 0);
+
+        return range.start < nightEnd && range.end > nightStart;
+      }
+
+      return false;
+    });
+  };
+
+  const isDateBlockedGuestHouse = (start, end) => {
+    if (!start || !end) return false;
+
+    return bookedRanges.some(range =>
+      (start < range.end && end > range.start)
+    );
+  };
+
+  const isTimeBlocked = (date) => {
+    return bookedRanges.some(
+      (range) => date >= range.start && date < range.end
+    );
+  };
+
+  useEffect(() => {
+    if (!selectedDate) return;
+
+    const computedEnd = addHours(selectedDate, maxStayDuration);
+    setEndDate(computedEnd);
+
+    if (!manualMode && type === "guest_house") {
+      setMode(isNightStay(computedEnd) ? "night" : "day");
+    }
+  }, [selectedDate, maxStayDuration, type, manualMode]);
+
+  useEffect(() => {
+    setManualMode(false);
+  }, [selectedDate]);
+
+  const handleModeChange = (event, newMode) => {
+    if (!newMode) return;
+    setMode(newMode);
+    setManualMode(true);
+
+    if (selectedDate) {
+      const newStart = applyModeStartTime(selectedDate, newMode);
+      const newEnd = computeModeEnd(newStart, newMode);
+
+      if (isDateBlockedGuestHouse(newStart, newEnd) || isTimeBlocked(newStart) || isDateBlocked(newStart, newMode)) {
+        toast.error("This date/time isn't available for the selected mode.");
+        return;
+      }
+
+      setSelectedDate(newStart);
+      setEndDate(newEnd);
+    }
+  };
 
   const handleEdit = (id) => {
     navigate(`/portal/accommodations/form?id=${id}&isEditMode=true&type=${type}`);
@@ -183,7 +306,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
 
         <Grid container spacing={2} marginBlock={2}>
           <Grid item xs={12} md={isOnPortal ? 12 : 8} marginBlockEnd={2}>
-            <Box marginBlock={2}>
+            <Box marginBlockEnd={2}>
               <Typography variant='h2' gutterBottom>{name}</Typography>
               <Typography variant='body1' color='secondary'>{description}</Typography>
             </Box>
@@ -259,36 +382,145 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
 
             {(!isOnPortal && isLoggedIn) && (
               <Box marginBlock={15} id="book_reservation_section">
-                <Typography variant='h2' sx={{ borderLeft: theme => `5px solid ${theme.palette.primary.light}`, pl: 2, mb: 2 }}>
+                <Typography
+                  variant='h2'
+                  sx={{ borderLeft: theme => `5px solid ${theme.palette.primary.light}`, pl: 2, mb: 2 }}
+                >
                   Book a Reservation
                 </Typography>
 
                 <Box sx={{ background: '#f5f5f5', borderRadius: "12px", p: 2 }}>
-                  <Typography variant='h3' gutterBottom> Select Options </Typography>
+                  {type !== "guest_house" && (
+                    <Box marginBlockEnd={2}>
+                      <Typography variant='body1' color='secondary' gutterBottom> Time of Day </Typography>
 
-                  <Box marginBlockEnd={5}>
-                    <Typography variant='body1' color='secondary' gutterBottom> Package Type </Typography>
-                    <Chip
-                      variant='light'
-                      color='primary'
-                      label={<Typography variant='subtitle1'> Entrance + Swim </Typography>}
-                    />
+                      <ToggleButtonGroup
+                        value={mode}
+                        exclusive
+                        onChange={handleModeChange}
+                        aria-label="time of day selection"
+                        color="primary"
+                      >
+                        <ToggleButton
+                          value="day"
+                          aria-label="day mode"
+                          disabled={selectedDate && isDateBlocked(selectedDate, "day")}
+                        >
+                          <SunOutlined style={{ marginRight: 6 }} /> Day Tour (7 AM - 5 PM)
+                        </ToggleButton>
+
+                        <ToggleButton
+                          value="night"
+                          aria-label="night mode"
+                          disabled={selectedDate && isDateBlocked(selectedDate, "night")}
+                        >
+                          <MoonOutlined style={{ marginRight: 6 }} /> Night Tour (5 PM - 7 AM)
+                        </ToggleButton>
+                      </ToggleButtonGroup>
+
+                      {selectedDate && (
+                        <Typography
+                          variant="body2"
+                          color="warning.main"
+                          sx={{ mt: 1, fontStyle: "italic" }}
+                        >
+                          {isDateBlocked(selectedDate, "day") && !isDateBlocked(selectedDate, "night") &&
+                            "Only Night Tour is available for this date."}
+                          {!isDateBlocked(selectedDate, "day") && isDateBlocked(selectedDate, "night") &&
+                            "Only Day Tour is available for this date."}
+                          {isDateBlocked(selectedDate, "day") && isDateBlocked(selectedDate, "night") &&
+                            "No tours are available for this date."}
+                        </Typography>
+                      )}
+                    </Box>
+                  )}
+
+                  <Box marginBlock={2}>
+                    <Typography variant="h4" gutterBottom>
+                      Select Date
+                    </Typography>
+
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      {type === "guest_house" ? (
+                        <DateTimePicker
+                          value={selectedDate}
+                          onChange={(newValue) => {
+                            if (!newValue) return;
+
+                            const computedEnd = addHours(newValue, maxStayDuration);
+                            const blocked = isDateBlockedGuestHouse(newValue, computedEnd) || isTimeBlocked(newValue);
+
+                            if (blocked) {
+                              toast.error("This date/time is not available.", { position: "top-right" });
+                              return;
+                            }
+
+                            setSelectedDate(newValue);
+                            setEndDate(computedEnd);
+
+                            setMode(isNightStay(computedEnd) ? "night" : "day");
+                          }}
+                          disablePast
+                          ampm
+                          views={["year", "month", "day", "hours"]}
+                          shouldDisableTime={(timeValue, clockType) => {
+                            if (!selectedDate) return false;
+                            const testDate = new Date(selectedDate);
+                            if (clockType === "hours") testDate.setHours(timeValue);
+                            return isTimeBlocked(testDate);
+                          }}
+                          slotProps={{ textField: { fullWidth: true } }}
+                        />
+                      ) : (
+                        <DatePicker
+                          value={selectedDate}
+                          onChange={(newValue) => {
+                            if (!newValue) return;
+
+                            const start = applyModeStartTime(newValue, mode);
+                            const computedEnd = computeModeEnd(start, mode);
+
+                            if (isDateBlockedGuestHouse(start, computedEnd) || isTimeBlocked(start) || isDateBlocked(start, mode)) {
+                              toast.error("This date/time is not available.");
+                              return;
+                            }
+
+                            setSelectedDate(start);
+                            setEndDate(computedEnd);
+                          }}
+                          disablePast
+                          shouldDisableDate={(date) => isDateBlocked(date, mode)}
+                          slotProps={{ textField: { fullWidth: true } }}
+                        />
+
+                      )}
+                    </LocalizationProvider>
                   </Box>
 
-                  <Box marginBlockEnd={5}>
-                    <Typography variant='body1' color='secondary' gutterBottom> Quantity </Typography>
-
-                    <Box sx={{ backgroundColor: "#fff", p: 2, borderRadius: '8px', my: 2 }}>
-                      <Typography variant='h5' fontWeight={700}> Adult </Typography>
-                    </Box>
-
-                    <Box sx={{ backgroundColor: "#fff", p: 2, borderRadius: '8px', my: 2 }}>
-                      <Typography variant='h5' fontWeight={700}> Child </Typography>
-                    </Box>
-
-                    <Box sx={{ backgroundColor: "#fff", p: 2, borderRadius: '8px', my: 2 }}>
-                      <Typography variant='h5' fontWeight={700}> PWD/Senior </Typography>
-                    </Box>
+                  <Box marginBlock={2}>
+                    <Stack direction='row' justifyContent='flex-end' alignItems='center'>
+                      <AnimateButton>
+                        <Button
+                          variant='contained'
+                          sx={{ borderRadius: 2 }}
+                          disabled={
+                            !selectedDate ||
+                            isDateBlockedGuestHouse(selectedDate) ||
+                            isTimeBlocked(selectedDate)
+                          }
+                          onClick={() =>
+                            navigate(
+                              `/book-a-reservation?accommodationId=${_id}` +
+                              `&selectedDate=${selectedDate.toISOString()}` +
+                              `&endDate=${endDate.toISOString()}` +
+                              `&mode=${mode}`
+                            )
+                          }
+                        >
+                          Book Now
+                        </Button>
+                      </AnimateButton>
+                    </Stack>
                   </Box>
                 </Box>
               </Box>
@@ -387,8 +619,12 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
         handleClose={() => setIsDeleteOpen(false)}
       />
 
-      <LoginModal open={openLogin} handleClose={() => setOpenLogin(false)} message="You need to be logged in to continue." />
-    </React.Fragment>
+      <LoginModal
+        open={openLogin}
+        handleClose={() => setOpenLogin(false)}
+        message="You need to be logged in to continue."
+      />
+    </React.Fragment >
   );
 };
 
