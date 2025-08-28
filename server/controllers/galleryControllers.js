@@ -4,13 +4,19 @@ import galleryServices from "../services/galleryServices.js";
 const createGalleryImage = expressAsync(async (req, res) => {
   try {
     const image = req.files && req.files['image'] ? req.files['image'][0].path : "";
+    const { category } = req.body;
     
     if (!image) {
       return res.status(400).json({ message: "Image file is required" });
     }
 
+    if (!category) {
+      return res.status(400).json({ message: "Category is required" });
+    }
+
     const payload = {
       image,
+      category,
     };
 
     const response = await galleryServices.createGalleryImage(payload);
@@ -44,15 +50,16 @@ const getSingleGalleryImageById = expressAsync(async (req, res) => {
 const updateGalleryImageById = expressAsync(async (req, res) => {
   try {
     const imageFile = req.files && req.files['image'] ? req.files['image'][0] : null;
-    const image = imageFile ? imageFile.path : req.body.image || "";
+    const image = imageFile ? imageFile.path : req.body.image;
+    const { category } = req.body;
 
-    if (!image) {
-      return res.status(400).json({ message: "Image is required" });
+    const payload = {};
+    if (image) {
+      payload.image = image;
     }
-
-    const payload = {
-      image,
-    };
+    if (category !== undefined) {
+      payload.category = category;
+    }
 
     const response = await galleryServices.updateGalleryImageById(req.params.galleryId, payload);
     res.json(response);

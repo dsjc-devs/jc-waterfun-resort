@@ -1,15 +1,20 @@
 import Gallery from "../models/galleryModels.js";
 
 const createGalleryImage = async (galleryData) => {
-  const { image } = galleryData || {};
+  const { image, category } = galleryData || {};
 
   try {
     if (!image || image.trim() === "") {
       throw new Error("Image is required and cannot be empty");
     }
 
+    if (!category || category.trim() === "") {
+      throw new Error("Category is required and cannot be empty");
+    }
+
     const payload = {
       image,
+      category,
     };
 
     const galleryImage = await Gallery.create(payload);
@@ -68,16 +73,26 @@ const getSingleGalleryImageById = async (galleryId) => {
 
 const updateGalleryImageById = async (galleryId, galleryData) => {
   try {
-    const { image } = galleryData || {};
+    const { image, category } = galleryData || {};
 
     const existingGalleryImage = await getSingleGalleryImageById(galleryId);
 
     const updateData = {};
-    if (image !== undefined) {
+    if (image !== undefined && image !== null) {
       if (image.trim() === "") {
         throw new Error("Image cannot be empty");
       }
       updateData.image = image;
+    }
+    if (category !== undefined) {
+      if (category.trim() === "") {
+        throw new Error("Category cannot be empty");
+      }
+      updateData.category = category;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      throw new Error("At least one field must be provided for update");
     }
 
     const updatedGalleryImage = await Gallery.findOneAndUpdate(
