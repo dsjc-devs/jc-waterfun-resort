@@ -1,136 +1,194 @@
-import { FacebookOutlined } from '@ant-design/icons'
-import React from 'react'
+import { Box, Container, Typography, Link, Skeleton, Grid } from "@mui/material";
+import { useGetResortDetails } from "api/resort-details";
+import React from "react";
 
-const index = () => {
+const Footer = () => {
+  const { resortDetails, isLoading } = useGetResortDetails();
+
+  const {
+    name,
+    address,
+    phoneNumber,
+    emailAddress,
+  } = resortDetails?.companyInfo || {};
+
+  const {
+    streetAddress,
+    city,
+    province,
+    country,
+  } = address || {};
+
   return (
-     <footer
-  style={{
-    backgroundColor: "#004b80",
-    color: "#fff",
-    fontFamily: "Arial, sans-serif",
-    padding: "16px 0", 
-    
-  }}
->
-  <div
-    style={{
-      maxWidth: "1500px",
-      maxHeight: "110px",
-      margin: "auto",
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(180px,1fr))",
-      gap: "15px", 
-      padding: "0 2px",
-    }}
-  >
-    {/* Discover */}
-    <div>
-      <h4
-        style={{
-          color: "#ffdd00",
-          margin: "0 0 4px 0", 
-          borderBottom: "1px solid #ffdd00",
-          display: "inline-block",
-          fontSize: "20px",
-          fontFamily: "Cinzel",
-        }}
-      >
-        Discover
-      </h4>
-      <ul style={{ listStyle: "none", padding: 0, margin: 0, lineHeight: 1.4, fontSize: "14px", fontFamily: "Cinzel"}}>
-        <li>
-          <a href="#" style={{ color: "#fff", textDecoration: "none" }}>
-            #WatermazingExperience
-          </a>
-        </li>
-      </ul>
-    </div>
+    <Box
+      component="footer"
+      sx={{
+        backgroundColor: "#004b80",
+        color: "#fff",
+        fontFamily: "Istok Web, sans-serif",
+        py: 4,
+      }}
+    >
+      <Container>
+        <Grid container spacing={4}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: "#ffdd00",
+                mb: 1,
+                borderBottom: "1px solid #ffdd00",
+                display: "inline-block",
+                fontSize: "20px",
+                fontFamily: "Cinzel, serif",
+              }}
+            >
+              Discover
+            </Typography>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              <li>
+                <Typography fontSize="14px" fontFamily="Istok Web, sans-serif">
+                  #WatermazingExperience
+                </Typography>
+              </li>
+            </ul>
+          </Grid>
 
-    {/* Resort Info */}
-    <div>
-      <h4
-        style={{
-          color: "#ffdd00",
-          margin: "0 0 4px 0",
+          <Grid item xs={12} sm={6} md={3}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: "#ffdd00",
+                mb: 1,
+                borderBottom: "1px solid #ffdd00",
+                display: "inline-block",
+                fontSize: "20px",
+                fontFamily: "Cinzel, serif",
+              }}
+            >
+              Resort Info
+            </Typography>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              {["Rules & Regulations", "Amenities", "Shops"].map((item) => (
+                <li key={item} style={{ lineHeight: 1.8 }}>
+                  <Link
+                    href="#"
+                    sx={{
+                      color: "#fff",
+                      fontSize: "14px",
+                      fontFamily: "Istok Web, sans-serif",
+                      textDecoration: "none",
+                      "&:hover": { textDecoration: "underline" },
+                    }}
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Grid>
 
-          borderBottom: "1px solid #ffdd00",
-          display: "inline-block",
-          fontSize: "20px",
-          fontFamily: "Cinzel",
-        }}
-      >
-        Resort Info
-      </h4>
-      <ul style={{ listStyle: "none", padding: 0, margin: 0, lineHeight: 1.4, fontSize: "14px", fontFamily: "Cinzel"}}>
-        <li><a href="#" style={{ color: "#fff", textDecoration: "none" }}>Rules & Regulations</a></li>
-        <li><a href="#" style={{ color: "#fff", textDecoration: "none" }}>Amenities</a></li>
-        <li><a href="#" style={{ color: "#fff", textDecoration: "none" }}>Shops</a></li>
-      </ul>
-    </div>
+          <Grid item xs={12} sm={6} md={3}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: "#ffdd00",
+                mb: 1,
+                borderBottom: "1px solid #ffdd00",
+                display: "inline-block",
+                fontSize: "20px",
+                fontFamily: "Cinzel, serif",
+              }}
+            >
+              About Us
+            </Typography>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              {["Contact Us", "Media", "FAQs", "Privacy Policy"].map((item) => (
+                <li key={item} style={{ lineHeight: 1.8 }}>
+                  <Link
+                    href="#"
+                    sx={{
+                      color: "#fff",
+                      fontSize: "14px",
+                      fontFamily: "Istok Web, sans-serif",
+                      textDecoration: "none",
+                      "&:hover": { textDecoration: "underline" },
+                    }}
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Grid>
 
-    {/* About Us */}
-    <div>
-      <h4
-        style={{
-          color: "#ffdd00",
-          margin: "0 0 4px 0",
-          borderBottom: "1px solid #ffdd00",
-          display: "inline-block",
-          fontSize: "20px",
-          fontFamily: "Cinzel",
-        }}
-      >
-        About Us
-      </h4>
-      <ul style={{ listStyle: "none", padding: 0, margin: 0, lineHeight: 1.4, fontSize: "14px", fontFamily: "Cinzel"}}>
-        <li><a href="#" style={{ color: "#fff", textDecoration: "none" }}>Contact Us</a></li>
-        <li><a href="#" style={{ color: "#fff", textDecoration: "none" }}>Media</a></li>
-        <li><a href="#" style={{ color: "#fff", textDecoration: "none" }}>FAQs</a></li>
-        <li><a href="#" style={{ color: "#fff", textDecoration: "none" }}>Privacy Policy</a></li>
-      </ul>
-    </div>
+          <Grid item xs={12} sm={6} md={3}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: "#ffdd00",
+                mb: 1,
+                borderBottom: "1px solid #ffdd00",
+                display: "inline-block",
+                fontSize: "20px",
+                fontFamily: "Cinzel, serif",
+              }}
+            >
+              Contact Information
+            </Typography>
 
-    {/* Contact Info */}
-    <div>
-      <h4
-        style={{
-          color: "#ffdd00",
-          margin: "0 0 4px 0",
-          borderBottom: "1px solid #ffdd00",
-          display: "inline-block",
-          fontSize: "20px",
-          fontFamily: "Cinzel",
-        }}
-      >
-        Contact Information
-      </h4>
-      <p style={{ margin: "4px 0", lineHeight: 1.4, fontSize: "14px", fontFamily: "Cinzel"}}>
-        📍 Address: R5 Brgy. Langkaan II, Dasmarinas Cavite <br />
-        ☎ 0917-123-4567 <br />
-        ✉ info@johncezarresort.com
-      </p>
-    </div>
-  </div>
+            {isLoading ? (
+              <Box>
+                <Skeleton width="80%" height={20} sx={{ bgcolor: "grey.700" }} />
+                <Skeleton width="60%" height={20} sx={{ bgcolor: "grey.700" }} />
+                <Skeleton width="70%" height={20} sx={{ bgcolor: "grey.700" }} />
+              </Box>
+            ) : (
+              <Typography
+                sx={{
+                  mt: 1,
+                  lineHeight: 1.8,
+                  fontSize: "14px",
+                  fontFamily: "Istok Web, sans-serif",
+                }}
+              >
+                📍 {[streetAddress, city, province, country].filter(Boolean).join(", ")} <br />
+                ☎ {phoneNumber} <br />
+                ✉ {emailAddress}
+              </Typography>
+            )}
+          </Grid>
+        </Grid>
 
-  {/* Bottom Bar */}
-  <div
-    style={{
-      textAlign: "center",
-      padding: "1px 1px 0 1px", 
-      borderTop: "1px solid #000000ff",
-      marginTop: "15px",
-    }}
-  >
-    <p style={{ margin: "2px 0", fontSize: "12px", fontFamily: "Cinzel"}}>© Copyrights JohnCezar Waterfun Resort. All rights reserved.</p>
-    <div style={{ marginTop: "4px" }}>
-      <span style={{ fontWeight: "bold", fontSize: "13px", fontFamily: "Cinzel", }}>GET SOCIAL</span>
-      <br />
-      <a href="#" style={{ color: "#fff", margin: "0 6px", fontSize: "16px" }}><FacebookOutlined /></a>
-      
-    </div>
-  </div>
-</footer>
-  )
-}
+        <Box
+          sx={{
+            textAlign: "center",
+            borderTop: "1px solid #333",
+            mt: 4,
+            pt: 2,
+          }}
+        >
+          {isLoading ? (
+            <Skeleton
+              width="50%"
+              height={16}
+              sx={{ bgcolor: "grey.700", mx: "auto" }}
+            />
+          ) : (
+            <Typography
+              sx={{
+                m: "2px 0",
+                fontSize: "12px",
+                fontFamily: "Istok Web, sans-serif",
+              }}
+            >
+              © {name}. All rights reserved.
+            </Typography>
+          )}
+        </Box>
+      </Container>
+    </Box>
+  );
+};
 
-export default index
+export default Footer;
