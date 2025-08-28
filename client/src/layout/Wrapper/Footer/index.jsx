@@ -1,103 +1,136 @@
-import { useTheme } from '@mui/material/styles'
-import { useNavigate } from 'react-router-dom'
-import { Grid, Typography, Stack, Box, } from '@mui/material'
-import { useGetResortDetails } from 'api/resort-details';
-import { EnvironmentFilled, MailFilled, PhoneFilled } from '@ant-design/icons';
+import { FacebookOutlined } from '@ant-design/icons'
+import React from 'react'
 
-import React from 'react';
-import quickLinks from 'layout/Wrapper/Footer/footer-items/quickLinks'
-
-const Footer = () => {
-  const theme = useTheme();
-  const date = new Date();
-  const currentYear = date.getFullYear();
-  const navigate = useNavigate();
-
-  const { resortDetails } = useGetResortDetails()
-  const { companyInfo } = resortDetails || {}
-  const {
-    address,
-    name: COMPANY_NAME,
-    emailAddress,
-    phoneNumber
-  } = companyInfo || {}
-
-  const {
-    streetAddress,
-    city,
-    province,
-    country
-  } = address || {}
-
+const index = () => {
   return (
-    <React.Fragment>
-      <Grid
-        container
-        sx={{
-          backgroundColor: theme.palette.primary.main,
-          p: 3
+     <footer
+  style={{
+    backgroundColor: "#004b80",
+    color: "#fff",
+    fontFamily: "Arial, sans-serif",
+    padding: "16px 0", 
+    
+  }}
+>
+  <div
+    style={{
+      maxWidth: "1500px",
+      maxHeight: "110px",
+      margin: "auto",
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(180px,1fr))",
+      gap: "15px", 
+      padding: "0 2px",
+    }}
+  >
+    {/* Discover */}
+    <div>
+      <h4
+        style={{
+          color: "#ffdd00",
+          margin: "0 0 4px 0", 
+          borderBottom: "1px solid #ffdd00",
+          display: "inline-block",
+          fontSize: "20px",
+          fontFamily: "Cinzel",
         }}
       >
-        <Grid item md={4} sm={12}>
-          <Typography mb={2} variant="h4" color="#ffffff">
-            Contact Information
-          </Typography>
-          <Box>
-            <Stack direction="row" alignItems="center" spacing={2} mb={1} >
-              <EnvironmentFilled style={{ color: theme.palette.error.main }} />
-              <Typography variant='body' color='#fff'> {streetAddress}, {city} {province}, {country} </Typography>
-            </Stack>
-            <Stack direction="row" alignItems="center" spacing={2} mb={1} >
-              <PhoneFilled style={{ color: theme.palette.primary.light }} />
-              <Typography variant='body' color='#fff'> {phoneNumber} </Typography>
-            </Stack>
-            <Stack direction="row" alignItems="center" spacing={2} mb={1} >
-              <MailFilled style={{ color: "#fff" }} />
-              <Typography variant='body' color='#fff'> {emailAddress} </Typography>
-            </Stack>
-          </Box>
-        </Grid>
-        <Grid item md={4} sm={12}>
-          <Typography mb={2} variant="h4" color="#ffffff">
-            Quick Links
-          </Typography>
-          {quickLinks.map((ql) => (
-            <Stack key={ql.name} onClick={() => navigate(ql.link)} sx={{ cursor: 'pointer', ":hover": { textDecoration: 'underline #fff' } }} direction="row" alignItems="center" spacing={2} mb={1.5} >
-              {React.createElement(ql.icon, { style: { color: ql.color, fontSize: 18 } })}
-              <Typography variant="subtitle2" color="#ffffff">
-                {ql.name}
-              </Typography>
-            </Stack>
-          ))}
-        </Grid>
+        Discover
+      </h4>
+      <ul style={{ listStyle: "none", padding: 0, margin: 0, lineHeight: 1.4, fontSize: "14px", fontFamily: "Cinzel"}}>
+        <li>
+          <a href="#" style={{ color: "#fff", textDecoration: "none" }}>
+            #WatermazingExperience
+          </a>
+        </li>
+      </ul>
+    </div>
 
-        <Grid item md={4} sm={12}>
-          <Typography mb={2} variant="h4" color="#ffffff">
-            Book Your Reservation Today!
-          </Typography>
-          <Typography mb={1} variant="subtitle2" color="#ffffff">
-            Come and enjoy a relaxing stay at {COMPANY_NAME}, where the ocean views are stunning, and the atmosphere is peaceful.Whether you want to unwind or have fun by the beach, we have everything you need for a perfect getaway.Book your reservation today and make memories that will last a lifetime!
-          </Typography >
-        </Grid >
-      </Grid >
-      <Stack gap={1}
-        sx={{
-          backgroundColor: 'rgba(0, 0, 0, .4)',
-          bottom: 0,
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'row',
-          padding: 1.5,
-        }}>
+    {/* Resort Info */}
+    <div>
+      <h4
+        style={{
+          color: "#ffdd00",
+          margin: "0 0 4px 0",
 
-        <Typography variant='h6' color="#ffff">©</Typography>
-        <Typography variant='h6' color="#ffff" sx={{ cursor: 'pointer', ":hover": { textDecoration: 'underline' } }}>{COMPANY_NAME}, All Rights Reserved {currentYear} </Typography>
+          borderBottom: "1px solid #ffdd00",
+          display: "inline-block",
+          fontSize: "20px",
+          fontFamily: "Cinzel",
+        }}
+      >
+        Resort Info
+      </h4>
+      <ul style={{ listStyle: "none", padding: 0, margin: 0, lineHeight: 1.4, fontSize: "14px", fontFamily: "Cinzel"}}>
+        <li><a href="#" style={{ color: "#fff", textDecoration: "none" }}>Rules & Regulations</a></li>
+        <li><a href="#" style={{ color: "#fff", textDecoration: "none" }}>Amenities</a></li>
+        <li><a href="#" style={{ color: "#fff", textDecoration: "none" }}>Shops</a></li>
+      </ul>
+    </div>
 
-      </Stack>
+    {/* About Us */}
+    <div>
+      <h4
+        style={{
+          color: "#ffdd00",
+          margin: "0 0 4px 0",
+          borderBottom: "1px solid #ffdd00",
+          display: "inline-block",
+          fontSize: "20px",
+          fontFamily: "Cinzel",
+        }}
+      >
+        About Us
+      </h4>
+      <ul style={{ listStyle: "none", padding: 0, margin: 0, lineHeight: 1.4, fontSize: "14px", fontFamily: "Cinzel"}}>
+        <li><a href="#" style={{ color: "#fff", textDecoration: "none" }}>Contact Us</a></li>
+        <li><a href="#" style={{ color: "#fff", textDecoration: "none" }}>Media</a></li>
+        <li><a href="#" style={{ color: "#fff", textDecoration: "none" }}>FAQs</a></li>
+        <li><a href="#" style={{ color: "#fff", textDecoration: "none" }}>Privacy Policy</a></li>
+      </ul>
+    </div>
 
-    </React.Fragment>
+    {/* Contact Info */}
+    <div>
+      <h4
+        style={{
+          color: "#ffdd00",
+          margin: "0 0 4px 0",
+          borderBottom: "1px solid #ffdd00",
+          display: "inline-block",
+          fontSize: "20px",
+          fontFamily: "Cinzel",
+        }}
+      >
+        Contact Information
+      </h4>
+      <p style={{ margin: "4px 0", lineHeight: 1.4, fontSize: "14px", fontFamily: "Cinzel"}}>
+        📍 Address: R5 Brgy. Langkaan II, Dasmarinas Cavite <br />
+        ☎ 0917-123-4567 <br />
+        ✉ info@johncezarresort.com
+      </p>
+    </div>
+  </div>
 
+  {/* Bottom Bar */}
+  <div
+    style={{
+      textAlign: "center",
+      padding: "1px 1px 0 1px", 
+      borderTop: "1px solid #000000ff",
+      marginTop: "15px",
+    }}
+  >
+    <p style={{ margin: "2px 0", fontSize: "12px", fontFamily: "Cinzel"}}>© Copyrights JohnCezar Waterfun Resort. All rights reserved.</p>
+    <div style={{ marginTop: "4px" }}>
+      <span style={{ fontWeight: "bold", fontSize: "13px", fontFamily: "Cinzel", }}>GET SOCIAL</span>
+      <br />
+      <a href="#" style={{ color: "#fff", margin: "0 6px", fontSize: "16px" }}><FacebookOutlined /></a>
+      
+    </div>
+  </div>
+</footer>
   )
 }
 
-export default Footer
+export default index
