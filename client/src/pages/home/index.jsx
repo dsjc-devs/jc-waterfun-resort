@@ -25,29 +25,41 @@ const Home = () => {
   return (
     <React.Fragment>
       <Carousel
-        indicators={false}
         navButtonsAlwaysVisible
+        stopAutoPlayOnHover={false}
+        indicators={false}
         height="100dvh"
         duration={1000}
-        interval={4000}
+        interval={5000}
       >
         {
           items.map((item) => (
-            <Box>
+            <Box sx={{ position: "relative", height: "100dvh" }}>
               <Box
                 component="img"
                 src={item}
                 sx={{
-                  width: '100%',
-                  objectFit: 'cover',
-                  height: '100dvh'
+                  width: "100%",
+                  height: "100dvh",
+                  objectFit: "cover",
+                }}
+              />
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: "rgba(0, 0, 0, 0.2)",
                 }}
               />
             </Box>
+
           ))
         }
       </Carousel>
-    </React.Fragment>
+    </React.Fragment >
   )
 }
 
