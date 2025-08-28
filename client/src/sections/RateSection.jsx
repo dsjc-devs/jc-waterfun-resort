@@ -137,7 +137,7 @@ const RateSection = () => {
                 fontFamily="Poppins"
                 textAlign="center"
               >
-                Senior Citizens / PWD - {mode === 'day' ? 'Day' : 'Night'}:{' '}
+                Senior Citizens / PWD -
                 {pwdSeniorRate !== undefined ? `₱${pwdSeniorRate}` : 'No data'}
               </Typography>
             )}
