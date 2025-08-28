@@ -2,6 +2,7 @@ import { Box } from '@mui/material'
 
 import React from 'react'
 import Carousel from 'react-material-ui-carousel'
+import RateSection from 'sections/RateSection'
 
 import banner from 'assets/images/upload/banner.jpg'
 import banner2 from 'assets/images/upload/banner2.jpg'
@@ -59,7 +60,9 @@ const Home = () => {
           ))
         }
       </Carousel>
-    </React.Fragment >
+
+      <RateSection />
+    </React.Fragment>
   )
 }
 
