@@ -365,7 +365,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
 
               <Grid item xs={12} sm={6} md={4}>
                 <LabeledValue
-                  title="Max Stay"
+                  title="Stay Duration"
                   subTitle={`${maxStayDuration} Hours`}
                   icon={<ClockCircleOutlined style={{ fontSize: 20 }} />}
                 />

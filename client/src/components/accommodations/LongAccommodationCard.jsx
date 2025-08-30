@@ -54,7 +54,7 @@ const LongAccommodationCard = ({ data }) => {
 
           <Grid item xs={6} md={4}>
             <Typography variant="subtitle2" color="textSecondary">
-              Max Hours:
+              Stay Duration:
             </Typography>
             <Typography variant="body1">
               {data?.maxStayDuration || 0} hours
