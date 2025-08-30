@@ -11,7 +11,7 @@ export const useGetUsers = ({ queryObj = {} }) => {
   const queryParams = new URLSearchParams(queryObj).toString();
   const key = `/${endpoints.key}?${queryParams}`;
 
-  const { data, isLoading, error, mutate } = useSWR(key, fetcher, options);
+  const { data, isLoading, error, mutate } = useSWR(key, fetcher, OPTIONS);
 
   const memoizedValue = useMemo(() => ({
     data,
