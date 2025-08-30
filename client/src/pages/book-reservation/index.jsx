@@ -1,4 +1,3 @@
-import useAuth from "hooks/useAuth";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import {
@@ -11,13 +10,17 @@ import {
   Container,
   Grid,
 } from "@mui/material";
+import { toast } from "react-toastify";
 import { useGetSingleAccommodation } from "api/accommodations";
 
+import useAuth from "hooks/useAuth";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import CircleIcon from "@mui/icons-material/Circle";
 import BookingInfo from "sections/landing-pages/book-reservation/BookingInfo";
 import Summary from "sections/landing-pages/book-reservation/Summary";
+import AnimateButton from "components/@extended/AnimateButton";
+import LoadingButton from "components/@extended/LoadingButton";
 
 const steps = ["Choose Booking", "Enter Info", "Summary"];
 
@@ -35,13 +38,23 @@ const BookReservation = () => {
   const [activeStep, setActiveStep] = useState(1);
 
   const [bookingData, setBookingData] = useState({
-    accommodationId: "",
+    accommodationData: {},
     selectedDate: "",
     endDate: "",
     mode: "day",
     quantities: { adult: 0, child: 0, pwdSenior: 0 },
     includeEntranceFee: false,
   });
+
+  const [amount, setAmount] = useState({
+    accommodationTotal: 0,
+    entranceTotal: 0,
+    adult: 0,
+    child: 0,
+    pwdSenior: 0,
+    minimumPayable: 0,
+    total: 0
+  })
 
   const queryParams = new URLSearchParams(location.search);
   const accommodationId = queryParams.get("accommodationId");
@@ -50,17 +63,19 @@ const BookReservation = () => {
   const mode = queryParams.get("mode") || "day";
   const isDayMode = mode === "day";
 
-  const { data = {}, isLoading } = useGetSingleAccommodation(accommodationId);
+  const { data = {} } = useGetSingleAccommodation(accommodationId);
 
   useEffect(() => {
     setBookingData((prev) => ({
       ...prev,
-      accommodationId,
+      amount,
+      accommodationData: data,
       selectedDate,
       endDate,
       mode,
     }));
-  }, [accommodationId, selectedDate, endDate, mode]);
+
+  }, [selectedDate, endDate, mode, data, amount, activeStep]);
 
   const saveBookingData = (data) => {
     sessionStorage.setItem("bookingData", JSON.stringify(data));
@@ -68,9 +83,7 @@ const BookReservation = () => {
   };
 
   const handleNext = () => {
-    if (activeStep === 1) {
-      saveBookingData(bookingData);
-    }
+    saveBookingData(bookingData);
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
@@ -100,6 +113,11 @@ const BookReservation = () => {
     }
   }, []);
 
+  console.log({
+    bookingData,
+    activeStep
+  });
+
   return (
     <Container>
       <Box sx={{ width: "100%", p: 3 }}>
@@ -128,6 +146,7 @@ const BookReservation = () => {
             onIncludeEntranceChange={(value) =>
               saveBookingData({ ...bookingData, includeEntranceFee: value })
             }
+            onSetAmount={setAmount}
           />
         )}
 
@@ -135,38 +154,50 @@ const BookReservation = () => {
           <Summary
             bookingInfo={bookingData}
             onBack={handleBack}
-            onConfirm={() => alert(`tanginamo`)}
+            onConfirm={() => alert(`test`)}
           />
         )}
 
-        {activeStep !== 2 && (
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={8}>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent:
-                    activeStep === 1 ? "flex-end" : "space-between",
-                  mt: 3,
-                }}
-              >
-                {(activeStep !== 1) && (
-                  <Button onClick={handleBack} variant="outlined">
-                    Back
-                  </Button>
-                )}
-
-                <Button
-                  onClick={handleNext}
-                  variant="contained"
-                  disabled={activeStep === steps.length - 1}
-                >
-                  {activeStep === steps.length - 1 ? "Finish" : "Next"}
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={8}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent:
+                  activeStep === 1 ? "flex-end" : "space-between",
+                mt: 3,
+              }}
+            >
+              {(activeStep !== 1) && (
+                <Button onClick={handleBack} variant="outlined">
+                  Back
                 </Button>
-              </Box>
-            </Grid>
+              )}
+
+              <AnimateButton>
+                <LoadingButton
+                  onClick={() => {
+                    if (activeStep !== steps.length - 1) {
+                      handleNext()
+                    } else {
+                      toast.success(`tanginaka`)
+                    }
+                  }}
+                  variant="contained"
+                  loading={false}
+                  disableElevation
+                  disabled={false}
+                  loadingPosition="start"
+                  fullWidth
+                  color="primary"
+                  sx={{ width: "200px" }}
+                >
+                  {activeStep === steps.length - 1 ? "Confirm Booking" : "Next"}
+                </LoadingButton>
+              </AnimateButton>
+            </Box>
           </Grid>
-        )}
+        </Grid>
       </Box>
     </Container>
   );
