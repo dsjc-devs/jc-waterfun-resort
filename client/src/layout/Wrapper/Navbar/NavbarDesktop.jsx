@@ -142,7 +142,7 @@ const NavbarDesktop = ({ hasBanner = true }) => {
                   size='small'
                   onClick={() => navigate('/login')}
                 >
-                  {isLoggedIn ? "Go to Portal" : "Login"}
+                  {isLoggedIn ? "Portal" : "Login"}
                 </Button>
               </AnimateButton>
             </Stack>
