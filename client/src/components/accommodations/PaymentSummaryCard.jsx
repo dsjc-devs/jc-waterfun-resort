@@ -65,7 +65,7 @@ const PaymentSummaryCard = ({ data }) => {
           )}
 
           <Stack direction="row" justifyContent="space-between" mb={1}>
-            <Typography variant="h5">Entrance Subtotal</Typography>
+            <Typography variant="h5" fontWeight={600}>Entrance Subtotal</Typography>
             <Typography variant="h5" fontWeight={600}>
               {formatPeso(entranceTotal)}
             </Typography>
@@ -76,8 +76,8 @@ const PaymentSummaryCard = ({ data }) => {
       <Box sx={{ borderTop: "1px dashed #ddd", my: 2 }} />
 
       <Stack direction="row" justifyContent="space-between" mb={1}>
-        <Typography variant="h6">Total</Typography>
-        <Typography variant="h6">{formatPeso(total)}</Typography>
+        <Typography variant="h5" fontWeight={600}>Total</Typography>
+        <Typography variant="h5" fontWeight={600}>{formatPeso(total)}</Typography>
       </Stack>
 
       <Stack direction="row" justifyContent="space-between">
