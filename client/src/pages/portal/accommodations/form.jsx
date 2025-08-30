@@ -216,18 +216,20 @@ const AccommodationForm = () => {
               <Grid container spacing={2}>
                 {isEditMode && (
                   <React.Fragment>
-                    <Grid item xs={12} md={12}>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={formik.values.isUpdateSameType}
-                            onChange={(e) => formik.setFieldValue("isUpdateSameType", e.target.checked)}
-                            name="isUpdateSameType"
-                          />
-                        }
-                        label="Update all accommodations in this group"
-                      />
-                    </Grid>
+                    {data?.groupKey && (
+                      <Grid item xs={12} md={12}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={formik.values.isUpdateSameType}
+                              onChange={(e) => formik.setFieldValue("isUpdateSameType", e.target.checked)}
+                              name="isUpdateSameType"
+                            />
+                          }
+                          label="Update all accommodations in this group"
+                        />
+                      </Grid>
+                    )}
 
                     <Grid item xs={6}>
                       <Typography variant='body1'>Status (Required)</Typography>
