@@ -1,5 +1,4 @@
-import { Box, Typography, Stack } from "@mui/material";
-
+import { Box, Typography, Stack, Alert } from "@mui/material";
 import React from "react";
 import MainCard from "components/MainCard";
 import formatPeso from "utils/formatPrice";
@@ -65,7 +64,9 @@ const PaymentSummaryCard = ({ data }) => {
           )}
 
           <Stack direction="row" justifyContent="space-between" mb={1}>
-            <Typography variant="h5" fontWeight={600}>Entrance Subtotal</Typography>
+            <Typography variant="h5" fontWeight={600}>
+              Entrance Subtotal
+            </Typography>
             <Typography variant="h5" fontWeight={600}>
               {formatPeso(entranceTotal)}
             </Typography>
@@ -76,11 +77,15 @@ const PaymentSummaryCard = ({ data }) => {
       <Box sx={{ borderTop: "1px dashed #ddd", my: 2 }} />
 
       <Stack direction="row" justifyContent="space-between" mb={1}>
-        <Typography variant="h5" fontWeight={600}>Total</Typography>
-        <Typography variant="h5" fontWeight={600}>{formatPeso(total)}</Typography>
+        <Typography variant="h5" fontWeight={600}>
+          Total
+        </Typography>
+        <Typography variant="h5" fontWeight={600}>
+          {formatPeso(total)}
+        </Typography>
       </Stack>
 
-      <Stack direction="row" justifyContent="space-between">
+      <Stack direction="row" justifyContent="space-between" mb={1}>
         <Typography variant="h5" fontWeight={700}>
           Minimum Payable Now
         </Typography>
@@ -88,6 +93,18 @@ const PaymentSummaryCard = ({ data }) => {
           {formatPeso(minimumPayable)}
         </Typography>
       </Stack>
+
+      <Alert
+        variant="standard"
+        color="warning"
+        severity="info"
+        sx={{ display: 'flex', alignItems: 'center' }}
+      >
+        <Typography variant="body2" color="text.primary">
+          You may pay exactly the <strong>{formatPeso(minimumPayable)} (Minimum Payable Now)</strong>, a higher amount,
+          or even the full amount when confirming your booking.
+        </Typography>
+      </Alert>
     </MainCard>
   );
 };
