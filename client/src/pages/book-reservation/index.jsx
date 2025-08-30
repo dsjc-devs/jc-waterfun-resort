@@ -19,7 +19,7 @@ import CircleIcon from "@mui/icons-material/Circle";
 import BookingInfo from "sections/landing-pages/book-reservation/BookingInfo";
 import Summary from "sections/landing-pages/book-reservation/Summary";
 
-const steps = ["Choose Booking", "Enter Info", "Pay"];
+const steps = ["Choose Booking", "Enter Info", "Summary"];
 
 const StepIcon = ({ active, completed }) => {
   if (completed) return <CheckCircleIcon color="success" />;
