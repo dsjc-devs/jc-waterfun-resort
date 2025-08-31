@@ -68,6 +68,8 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const transformedPictures = pictures?.map((pic) => pic?.image) || [];
   const _pictures = [thumbnail, ...transformedPictures];
 
+  const isGuestHouse = type === "guest_house"
+
   const [loading, setLoading] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -153,7 +155,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
     const computedEnd = addHours(selectedDate, maxStayDuration);
     setEndDate(computedEnd);
 
-    if (!manualMode && type === "guest_house") {
+    if (!manualMode && isGuestHouse) {
       setMode(isNightStay(computedEnd) ? "night" : "day");
     }
   }, [selectedDate, maxStayDuration, type, manualMode]);
@@ -390,7 +392,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                 </Typography>
 
                 <Box sx={{ background: '#f5f5f5', borderRadius: "12px", p: 2 }}>
-                  {type !== "guest_house" && (
+                  {!isGuestHouse && (
                     <Box marginBlockEnd={2}>
                       <Typography variant='body1' color='secondary' gutterBottom> Time of Day </Typography>
 
@@ -441,7 +443,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                     </Typography>
 
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
-                      {type === "guest_house" ? (
+                      {isGuestHouse ? (
                         <DateTimePicker
                           value={selectedDate}
                           onChange={(newValue) => {
