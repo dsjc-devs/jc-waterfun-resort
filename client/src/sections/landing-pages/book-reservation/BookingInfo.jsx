@@ -5,6 +5,7 @@ import {
   Grid,
   Stack,
   TextField,
+  Alert,
 } from "@mui/material";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useGetResortRates } from "api/resortRates";
@@ -211,10 +212,6 @@ const BookingInfo = ({
                 Pool Entrance Tickets
               </Typography>
 
-              <Typography variant="subtitle2" color="warning.main">
-                Capacity: {data.capacity} | Selected: {totalQuantity}
-              </Typography>
-
               <MainCard>
                 <Box marginBlockEnd={5}>
                   <Stack
@@ -253,6 +250,16 @@ const BookingInfo = ({
                                   ? "Children"
                                   : "PWD/Senior"}
                             </Typography>
+
+                            {(type === "pwdSenior" && quantities.pwdSenior > 0) && (
+                              <Typography
+                                variant="caption"
+                                color="error"
+                                sx={{ fontStyle: "italic" }}
+                              >
+                                *Valid ID must be presented upon entry
+                              </Typography>
+                            )}
                           </Grid>
 
                           <Grid
@@ -261,20 +268,12 @@ const BookingInfo = ({
                             md={6}
                             sx={{ display: "flex", justifyContent: "flex-end" }}
                           >
-                            <Stack
-                              direction="row"
-                              spacing={2}
-                              alignItems="center"
-                            >
+                            <Stack direction="row" spacing={2} alignItems="center">
                               <Typography variant="h4">
                                 {formatPeso(getPrice(type))}
                               </Typography>
 
-                              <Stack
-                                direction="row"
-                                spacing={1}
-                                alignItems="center"
-                              >
+                              <Stack direction="row" spacing={1} alignItems="center">
                                 <IconButton
                                   variant="outlined"
                                   onClick={() => handleDecrease(type)}
@@ -291,10 +290,7 @@ const BookingInfo = ({
                                     handleQuantityChange(type, e.target.value)
                                   }
                                   inputProps={{
-                                    style: {
-                                      textAlign: "center",
-                                      width: 40,
-                                    },
+                                    style: { textAlign: "center", width: 40 },
                                   }}
                                 />
 
@@ -312,6 +308,15 @@ const BookingInfo = ({
                       </MainCard>
                     </Box>
                   ))}
+
+                  {data?.capacity === totalQuantity && (
+                    <Alert
+                      severity="info"
+                    >
+                      Maximum capacity reached ({totalQuantity}/{data.capacity})
+                    </Alert>
+                  )}
+
                 </Box>
               </MainCard>
             </Box>
