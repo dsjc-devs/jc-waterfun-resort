@@ -1,5 +1,4 @@
-import mongoose from "mongoose";
-import Accommodations from "../models/accommodationsModel.js";
+import Accommodations from "../models/accommodationsModels.js";
 import textFormatter from "../utils/textFormatter.js";
 
 const createAccommodation = async (accomData) => {

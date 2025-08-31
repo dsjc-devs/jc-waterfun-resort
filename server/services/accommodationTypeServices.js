@@ -1,6 +1,6 @@
 import { NO_CATEGORY } from "../constants/constants.js";
 import AccommodationType from "../models/accommodationTypeModels.js";
-import Accommodations from "../models/accommodationsModel.js";
+import Accommodations from "../models/accommodationsModels.js";
 import textFormatter from "../utils/textFormatter.js";
 
 const createAccommodationType = async (accomData) => {
