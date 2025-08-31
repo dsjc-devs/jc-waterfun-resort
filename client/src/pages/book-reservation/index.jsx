@@ -21,6 +21,7 @@ import BookingInfo from "sections/landing-pages/book-reservation/BookingInfo";
 import Summary from "sections/landing-pages/book-reservation/Summary";
 import AnimateButton from "components/@extended/AnimateButton";
 import LoadingButton from "components/@extended/LoadingButton";
+import PageTitle from "components/PageTitle";
 
 const steps = ["Choose Booking", "Enter Info", "Summary"];
 
@@ -119,87 +120,91 @@ const BookReservation = () => {
   });
 
   return (
-    <Container>
-      <Box sx={{ width: "100%", p: 3 }}>
-        <Stepper activeStep={activeStep}>
-          {steps.map((label, index) => (
-            <Step key={index}>
-              <StepLabel StepIconComponent={StepIcon}>
-                <Typography variant="subtitle1">{label}</Typography>
-              </StepLabel>
-            </Step>
-          ))}
-        </Stepper>
+    <React.Fragment>
+      <PageTitle title={`Book a Reservation | ${bookingData?.accommodationData?.name}`} isOnportal={false} />
 
-        {activeStep === 1 && (
-          <BookingInfo
-            data={data}
-            startDate={bookingData.startDate}
-            endDate={bookingData.endDate}
-            isDayMode={isDayMode}
-            mode={bookingData.mode}
-            quantities={bookingData.quantities}
-            includeEntrance={bookingData.includeEntranceFee}
-            onQuantitiesChange={(newQuantities) =>
-              saveBookingData({ ...bookingData, quantities: newQuantities })
-            }
-            onIncludeEntranceChange={(value) =>
-              saveBookingData({ ...bookingData, includeEntranceFee: value })
-            }
-            onSetAmount={setAmount}
-          />
-        )}
+      <Container>
+        <Box sx={{ width: "100%", p: 3 }}>
+          <Stepper activeStep={activeStep}>
+            {steps.map((label, index) => (
+              <Step key={index}>
+                <StepLabel StepIconComponent={StepIcon}>
+                  <Typography variant="subtitle1">{label}</Typography>
+                </StepLabel>
+              </Step>
+            ))}
+          </Stepper>
 
-        {activeStep === 2 && (
-          <Summary
-            bookingInfo={bookingData}
-            onBack={handleBack}
-            onConfirm={() => alert(`test`)}
-          />
-        )}
+          {activeStep === 1 && (
+            <BookingInfo
+              data={data}
+              startDate={bookingData.startDate}
+              endDate={bookingData.endDate}
+              isDayMode={isDayMode}
+              mode={bookingData.mode}
+              quantities={bookingData.quantities}
+              includeEntrance={bookingData.includeEntranceFee}
+              onQuantitiesChange={(newQuantities) =>
+                saveBookingData({ ...bookingData, quantities: newQuantities })
+              }
+              onIncludeEntranceChange={(value) =>
+                saveBookingData({ ...bookingData, includeEntranceFee: value })
+              }
+              onSetAmount={setAmount}
+            />
+          )}
 
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={8}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent:
-                  activeStep === 1 ? "flex-end" : "space-between",
-                mt: 3,
-              }}
-            >
-              {(activeStep !== 1) && (
-                <Button onClick={handleBack} variant="outlined">
-                  Back
-                </Button>
-              )}
+          {activeStep === 2 && (
+            <Summary
+              bookingInfo={bookingData}
+              onBack={handleBack}
+              onConfirm={() => alert(`test`)}
+            />
+          )}
 
-              <AnimateButton>
-                <LoadingButton
-                  onClick={() => {
-                    if (activeStep !== steps.length - 1) {
-                      handleNext()
-                    } else {
-                      toast.success(`tanginaka`)
-                    }
-                  }}
-                  variant="contained"
-                  loading={false}
-                  disableElevation
-                  disabled={false}
-                  loadingPosition="start"
-                  fullWidth
-                  color="primary"
-                  sx={{ width: "200px" }}
-                >
-                  {activeStep === steps.length - 1 ? "Confirm Booking" : "Next"}
-                </LoadingButton>
-              </AnimateButton>
-            </Box>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={8}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent:
+                    activeStep === 1 ? "flex-end" : "space-between",
+                  mt: 3,
+                }}
+              >
+                {(activeStep !== 1) && (
+                  <Button onClick={handleBack} variant="outlined">
+                    Back
+                  </Button>
+                )}
+
+                <AnimateButton>
+                  <LoadingButton
+                    onClick={() => {
+                      if (activeStep !== steps.length - 1) {
+                        handleNext()
+                      } else {
+                        toast.success(`tanginaka`)
+                      }
+                    }}
+                    variant="contained"
+                    loading={false}
+                    disableElevation
+                    disabled={false}
+                    loadingPosition="start"
+                    fullWidth
+                    color="primary"
+                    sx={{ width: "200px" }}
+                  >
+                    {activeStep === steps.length - 1 ? "Confirm Booking" : "Next"}
+                  </LoadingButton>
+                </AnimateButton>
+              </Box>
+            </Grid>
           </Grid>
-        </Grid>
-      </Box>
-    </Container>
+        </Box>
+      </Container>
+    </React.Fragment>
   );
 };
 
