@@ -4,8 +4,7 @@ import { Box, Button, Chip, Stack, Tooltip, Typography } from '@mui/material';
 import { useGetAccommodationTypes } from 'api/accomodationsType';
 import { useMemo } from 'react';
 
-import AnimateButton from 'components/@extended/AnimateButton';
-import Table from 'components/Table'
+import ReusableTable from 'components/ReusableTable'
 import { useNavigate } from 'react-router';
 import IconButton from 'components/@extended/IconButton';
 import AccommodationTypeDrawer from './Drawer';
@@ -129,7 +128,7 @@ const AccommodationTypeTable = () => {
 
   return (
     <React.Fragment>
-      <Table
+      <ReusableTable
         searchableColumns={['title']}
         itemsPerPage={1}
         columns={columns}

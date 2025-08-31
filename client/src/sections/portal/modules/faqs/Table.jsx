@@ -21,7 +21,7 @@ import {
 import { useGetFAQS } from 'api/faqs';
 import { toast } from 'react-toastify';
 import agent from 'api';
-import Table from 'components/Table';
+import ReusableTable from 'components/ReusableTable';
 import ConfirmationDialog from 'components/ConfirmationDialog';
 import IconButton from 'components/@extended/IconButton';
 import ConvertDate from 'components/ConvertDate';
@@ -161,7 +161,7 @@ const FAQsTable = () => {
   );
   return (
     <React.Fragment>
-      <Table
+      <ReusableTable
         searchableColumns={['title', 'answer', 'status']}
         itemsPerPage={1}
         columns={columns}

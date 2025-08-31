@@ -33,7 +33,7 @@ import ConvertDate from 'components/ConvertDate'
 import useAuth from 'hooks/useAuth'
 import StaffDetails from './Details'
 import ConfirmationDialog from 'components/ConfirmationDialog'
-import Table from 'components/Table'
+import ReusableTable from 'components/ReusableTable'
 import RegistrationModal from 'components/RegistrationModal'
 import MainCard from 'components/MainCard'
 import SimpleUserCard from 'components/SimpleUserCard'
@@ -263,7 +263,7 @@ const StaffsTable = ({ queryObj = {} }) => {
   return (
     <React.Fragment>
       {viewMode === 'list' && (
-        <Table
+        <ReusableTable
           searchableColumns={['emailAddress', 'firstName', 'lastName', 'userId']}
           itemsPerPage={1}
           columns={columns}

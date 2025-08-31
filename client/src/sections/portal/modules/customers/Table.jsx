@@ -29,7 +29,7 @@ import Avatar from 'components/@extended/Avatar';
 import IconButton from 'components/@extended/IconButton';
 import ConvertDate from 'components/ConvertDate';
 import ConfirmationDialog from 'components/ConfirmationDialog';
-import Table from 'components/Table';
+import ReusableTable from 'components/ReusableTable';
 import RegistrationModal from 'components/RegistrationModal';
 import SimpleUserCard from 'components/SimpleUserCard';
 import { toast } from 'react-toastify';
@@ -251,7 +251,7 @@ const CustomersTable = ({ queryObj = {} }) => {
   return (
     <>
       {viewMode === 'list' && (
-        <Table
+        <ReusableTable
           searchableColumns={['emailAddress', 'firstName', 'lastName', 'userId']}
           itemsPerPage={1}
           columns={columns}
