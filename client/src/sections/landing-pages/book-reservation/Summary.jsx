@@ -156,7 +156,7 @@ const Summary = ({ bookingInfo }) => {
               data={{
                 accomName: accommodationData?.name,
                 accomPrice: amount?.accommodationTotal,
-                includeEntrance: includeEntranceFee,
+                includeEntrance: includeEntranceFee || accommodationData?.hasPoolAccess,
                 quantities: quantities,
                 entranceTotal: amount?.entranceTotal,
                 minimumPayable: amount?.minimumPayable,

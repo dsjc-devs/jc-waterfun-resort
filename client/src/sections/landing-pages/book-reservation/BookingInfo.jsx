@@ -33,6 +33,7 @@ const BookingInfo = ({
   const {
     name,
     price: accomPrice,
+    hasPoolAccess
   } = data || {};
 
   const price = mode === "day" ? accomPrice?.day : accomPrice?.night;
@@ -51,7 +52,7 @@ const BookingInfo = ({
   }
 
   const entranceTotal = useMemo(() => {
-    if (!resortRates || !includeEntrance) return 0;
+    if (!resortRates) return 0;
     return (
       entranceAmounts.adult +
       entranceAmounts.child +
@@ -68,12 +69,17 @@ const BookingInfo = ({
     return accomDownPayment;
   }, [price]);
 
+  const totalQuantity = quantities.adult + quantities.child + quantities.pwdSenior;
+
   const handleClearAll = () => {
     onQuantitiesChange({ adult: 0, child: 0, pwdSenior: 0 });
   };
 
   const handleIncrease = (type) => {
-    onQuantitiesChange({ ...quantities, [type]: quantities[type] + 1 });
+    const totalQuantity = quantities.adult + quantities.child + quantities.pwdSenior;
+    if (totalQuantity < data.capacity) {
+      onQuantitiesChange({ ...quantities, [type]: quantities[type] + 1 });
+    }
   };
 
   const handleDecrease = (type) => {
@@ -86,7 +92,14 @@ const BookingInfo = ({
   const handleQuantityChange = (type, value) => {
     const numericValue = parseInt(value, 10);
     if (!isNaN(numericValue) && numericValue >= 0) {
-      onQuantitiesChange({ ...quantities, [type]: numericValue });
+      const otherTypes = Object.keys(quantities).filter((t) => t !== type);
+      const otherSum = otherTypes.reduce((sum, t) => sum + quantities[t], 0);
+
+      if (numericValue + otherSum <= data.capacity) {
+        onQuantitiesChange({ ...quantities, [type]: numericValue });
+      } else {
+        onQuantitiesChange({ ...quantities, [type]: data.capacity - otherSum });
+      }
     } else if (value === "") {
       onQuantitiesChange({ ...quantities, [type]: 0 });
     }
@@ -141,7 +154,7 @@ const BookingInfo = ({
                 endDate
               }} />
 
-              {!includeEntrance && (
+              {!hasPoolAccess && (
                 <Box mt={2}>
                   <Typography
                     variant="body2"
@@ -156,33 +169,35 @@ const BookingInfo = ({
               )}
             </MainCard>
 
-            <Box mt={2}>
-              <Stack alignItems="center" marginBlock={4}>
-                {!includeEntrance ? (
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    startIcon={<PlusOutlined />}
-                    onClick={() => onIncludeEntranceChange(true)}
-                  >
-                    Buy Pool Entrance Tickets
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    size="small"
-                    startIcon={<MinusOutlined />}
-                    onClick={() => onIncludeEntranceChange(false)}
-                  >
-                    Cancel Pool Entrance Tickets
-                  </Button>
-                )}
-              </Stack>
-            </Box>
+            {!hasPoolAccess && (
+              <Box mt={2}>
+                <Stack alignItems="center" marginBlock={4}>
+                  {!includeEntrance ? (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<PlusOutlined />}
+                      onClick={() => onIncludeEntranceChange(true)}
+                    >
+                      Buy Pool Entrance Tickets
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      startIcon={<MinusOutlined />}
+                      onClick={() => onIncludeEntranceChange(false)}
+                    >
+                      Cancel Pool Entrance Tickets
+                    </Button>
+                  )}
+                </Stack>
+              </Box>
+            )}
           </Box>
 
-          {includeEntrance && (
+          {(includeEntrance || hasPoolAccess) && (
             <Box sx={{ borderBottom: "1px solid #eee", p: 2, mt: 2 }}>
               <Typography
                 variant="h4"
@@ -194,6 +209,10 @@ const BookingInfo = ({
                 }}
               >
                 Pool Entrance Tickets
+              </Typography>
+
+              <Typography variant="subtitle2" color="warning.main">
+                Capacity: {data.capacity} | Selected: {totalQuantity}
               </Typography>
 
               <MainCard>
@@ -306,7 +325,7 @@ const BookingInfo = ({
             data={{
               accomName: name,
               accomPrice: price,
-              includeEntrance,
+              includeEntrance: includeEntrance || hasPoolAccess,
               quantities,
               entranceTotal,
               minimumPayable,
