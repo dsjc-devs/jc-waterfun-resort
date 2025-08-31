@@ -20,6 +20,9 @@ const Accommodations = Loadable(lazy(() => import('pages/portal/accommodations')
 const AccommodationDetails = Loadable(lazy(() => import('pages/portal/accommodations/details')));
 const AccommodationForm = Loadable(lazy(() => import('pages/portal/accommodations/form')));
 
+// reservations
+const Reservations = Loadable(lazy(() => import('pages/portal/reservations')));
+
 // profile
 const ViewProfile = Loadable(lazy(() => import('pages/portal/profile/view')));
 const EditProfile = Loadable(lazy(() => import('pages/portal/profile/edit')));
@@ -84,7 +87,12 @@ const MainRoutes = {
         },
         {
           path: 'reservations',
-          element: <UnderConstruction />
+          children: [
+            {
+              index: true,
+              element: <Reservations />
+            },
+          ]
         },
         {
           path: 'calendar',
