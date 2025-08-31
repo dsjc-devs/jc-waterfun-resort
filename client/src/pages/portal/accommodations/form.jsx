@@ -114,6 +114,7 @@ const AccommodationForm = () => {
       isMultiple: false,
       count: 1,
       isUpdateSameType: false,
+      hasPoolAccess: data?.hasPoolAccess || false,
     },
     validationSchema,
     enableReinitialize: true,
@@ -138,6 +139,7 @@ const AccommodationForm = () => {
         formData.append('capacity', values.capacity);
         formData.append('maxStayDuration', values.maxStayDuration);
         formData.append('notes', values.notes);
+        formData.append("hasPoolAccess", values.hasPoolAccess);
 
         if (values.thumbnail instanceof File) {
           formData.append('thumbnail', values.thumbnail);
@@ -295,6 +297,26 @@ const AccommodationForm = () => {
                     )}
                   </React.Fragment>
                 )}
+
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formik.values.hasPoolAccess}
+                        onChange={(e) => formik.setFieldValue("hasPoolAccess", e.target.checked)}
+                        name="hasPoolAccess"
+                      />
+                    }
+                    label={
+                      <Box>
+                        Pool Access Available
+                        <Typography variant="caption" color="textSecondary" display="block">
+                          Check this if this accommodation includes access to the swimming pool.
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                </Grid>
 
                 <Grid item xs={12}>
                   <Typography variant='body1'>Name (Required)</Typography>

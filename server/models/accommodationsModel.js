@@ -87,7 +87,11 @@ const accommodationsSchema = new mongoose.Schema(
     },
     groupKey: {
       type: String
-    }
+    },
+    hasPoolAccess: {
+      type: Boolean,
+      required: true,
+    },
   },
   {
     timestamps: true
