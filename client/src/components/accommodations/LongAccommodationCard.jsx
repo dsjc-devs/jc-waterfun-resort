@@ -23,15 +23,17 @@ const LongAccommodationCard = ({ data }) => {
       <Grid item xs={12} md={9}>
         <Typography variant="h5">{data?.name}</Typography>
 
-        <Typography
-          variant="body2"
-          sx={{
-            fontWeight: 500,
-            color: data?.isDayMode ? "warning.main" : "primary.dark",
-          }}
-        >
-          {data?.isDayMode ? "Day Tour" : "Night Tour"}
-        </Typography>
+        {data?.type !== "guest_house" && (
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 500,
+              color: data?.isDayMode ? "warning.main" : "primary.dark",
+            }}
+          >
+            {data?.isDayMode ? "Day Tour" : "Night Tour"}
+          </Typography>
+        )}
 
         <Grid container spacing={2} mt={1} alignItems="center">
           <Grid item xs={6} md={4}>
