@@ -20,7 +20,7 @@ import titleCase from "utils/titleCaseFormatter";
 const Summary = ({ bookingInfo }) => {
   const { user } = useAuth();
 
-  const { accommodationData, amount, quantities, selectedDate, endDate, includeEntranceFee, mode } = bookingInfo || {};
+  const { accommodationData, amount, quantities, startDate, endDate, includeEntranceFee, mode } = bookingInfo || {};
   const { firstName, lastName, emailAddress, phoneNumber, userId } = user || {};
 
   const customer_name = `${firstName || ""} ${lastName || ""}`;
@@ -104,7 +104,7 @@ const Summary = ({ bookingInfo }) => {
                     ...accommodationData,
                     price: amount.accommodationTotal,
                     isDayMode: mode === 'day',
-                    selectedDate,
+                    startDate,
                     endDate
                   }}
                 />

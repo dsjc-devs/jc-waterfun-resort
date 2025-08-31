@@ -77,7 +77,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [openLogin, setOpenLogin] = useState(false)
   const [mode, setMode] = useState('day');
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [manualMode, setManualMode] = useState(false);
 
@@ -150,27 +150,27 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   };
 
   useEffect(() => {
-    if (!selectedDate) return;
+    if (!startDate) return;
 
-    const computedEnd = addHours(selectedDate, maxStayDuration);
+    const computedEnd = addHours(startDate, maxStayDuration);
     setEndDate(computedEnd);
 
     if (!manualMode && isGuestHouse) {
       setMode(isNightStay(computedEnd) ? "night" : "day");
     }
-  }, [selectedDate, maxStayDuration, type, manualMode]);
+  }, [startDate, maxStayDuration, type, manualMode]);
 
   useEffect(() => {
     setManualMode(false);
-  }, [selectedDate]);
+  }, [startDate]);
 
   const handleModeChange = (event, newMode) => {
     if (!newMode) return;
     setMode(newMode);
     setManualMode(true);
 
-    if (selectedDate) {
-      const newStart = applyModeStartTime(selectedDate, newMode);
+    if (startDate) {
+      const newStart = applyModeStartTime(startDate, newMode);
       const newEnd = computeModeEnd(newStart, newMode);
 
       if (isDateBlockedGuestHouse(newStart, newEnd) || isTimeBlocked(newStart) || isDateBlocked(newStart, newMode)) {
@@ -178,7 +178,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
         return;
       }
 
-      setSelectedDate(newStart);
+      setStartDate(newStart);
       setEndDate(newEnd);
     }
   };
@@ -406,7 +406,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                         <ToggleButton
                           value="day"
                           aria-label="day mode"
-                          disabled={selectedDate && isDateBlocked(selectedDate, "day")}
+                          disabled={startDate && isDateBlocked(startDate, "day")}
                         >
                           <SunOutlined style={{ marginRight: 6 }} /> Day Tour (7 AM - 5 PM)
                         </ToggleButton>
@@ -414,23 +414,23 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                         <ToggleButton
                           value="night"
                           aria-label="night mode"
-                          disabled={selectedDate && isDateBlocked(selectedDate, "night")}
+                          disabled={startDate && isDateBlocked(startDate, "night")}
                         >
                           <MoonOutlined style={{ marginRight: 6 }} /> Night Tour (5 PM - 7 AM)
                         </ToggleButton>
                       </ToggleButtonGroup>
 
-                      {selectedDate && (
+                      {startDate && (
                         <Typography
                           variant="body2"
                           color="warning.main"
                           sx={{ mt: 1, fontStyle: "italic" }}
                         >
-                          {isDateBlocked(selectedDate, "day") && !isDateBlocked(selectedDate, "night") &&
+                          {isDateBlocked(startDate, "day") && !isDateBlocked(startDate, "night") &&
                             "Only Night Tour is available for this date."}
-                          {!isDateBlocked(selectedDate, "day") && isDateBlocked(selectedDate, "night") &&
+                          {!isDateBlocked(startDate, "day") && isDateBlocked(startDate, "night") &&
                             "Only Day Tour is available for this date."}
-                          {isDateBlocked(selectedDate, "day") && isDateBlocked(selectedDate, "night") &&
+                          {isDateBlocked(startDate, "day") && isDateBlocked(startDate, "night") &&
                             "No tours are available for this date."}
                         </Typography>
                       )}
@@ -445,7 +445,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                       {isGuestHouse ? (
                         <DateTimePicker
-                          value={selectedDate}
+                          value={startDate}
                           onChange={(newValue) => {
                             if (!newValue) return;
 
@@ -457,7 +457,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                               return;
                             }
 
-                            setSelectedDate(newValue);
+                            setStartDate(newValue);
                             setEndDate(computedEnd);
 
                             setMode(isNightStay(computedEnd) ? "night" : "day");
@@ -466,8 +466,8 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                           ampm
                           views={["year", "month", "day", "hours"]}
                           shouldDisableTime={(timeValue, clockType) => {
-                            if (!selectedDate) return false;
-                            const testDate = new Date(selectedDate);
+                            if (!startDate) return false;
+                            const testDate = new Date(startDate);
                             if (clockType === "hours") testDate.setHours(timeValue);
                             return isTimeBlocked(testDate);
                           }}
@@ -475,7 +475,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                         />
                       ) : (
                         <DatePicker
-                          value={selectedDate}
+                          value={startDate}
                           onChange={(newValue) => {
                             if (!newValue) return;
 
@@ -487,7 +487,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                               return;
                             }
 
-                            setSelectedDate(start);
+                            setStartDate(start);
                             setEndDate(computedEnd);
                           }}
                           disablePast
@@ -506,14 +506,14 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                           variant='contained'
                           sx={{ borderRadius: 2 }}
                           disabled={
-                            !selectedDate ||
-                            isDateBlockedGuestHouse(selectedDate) ||
-                            isTimeBlocked(selectedDate)
+                            !startDate ||
+                            isDateBlockedGuestHouse(startDate) ||
+                            isTimeBlocked(startDate)
                           }
                           onClick={() =>
                             navigate(
                               `/book-a-reservation?accommodationId=${_id}` +
-                              `&selectedDate=${selectedDate.toISOString()}` +
+                              `&startDate=${startDate.toISOString()}` +
                               `&endDate=${endDate.toISOString()}` +
                               `&mode=${mode}`
                             )

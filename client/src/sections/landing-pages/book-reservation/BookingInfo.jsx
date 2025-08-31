@@ -20,7 +20,7 @@ import PaymentSummaryCard from "components/accommodations/PaymentSummaryCard";
 const BookingInfo = ({
   data,
   isDayMode,
-  selectedDate,
+  startDate,
   endDate,
   mode,
   quantities,
@@ -151,7 +151,7 @@ const BookingInfo = ({
                 ...data,
                 price,
                 isDayMode,
-                selectedDate,
+                startDate,
                 endDate
               }} />
 

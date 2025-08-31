@@ -39,7 +39,7 @@ const BookReservation = () => {
 
   const [bookingData, setBookingData] = useState({
     accommodationData: {},
-    selectedDate: "",
+    startDate: "",
     endDate: "",
     mode: "day",
     quantities: { adult: 0, child: 0, pwdSenior: 0 },
@@ -58,7 +58,7 @@ const BookReservation = () => {
 
   const queryParams = new URLSearchParams(location.search);
   const accommodationId = queryParams.get("accommodationId");
-  const selectedDate = queryParams.get("selectedDate");
+  const startDate = queryParams.get("startDate");
   const endDate = queryParams.get("endDate");
   const mode = queryParams.get("mode") || "day";
   const isDayMode = mode === "day";
@@ -70,12 +70,12 @@ const BookReservation = () => {
       ...prev,
       amount,
       accommodationData: data,
-      selectedDate,
+      startDate,
       endDate,
       mode,
     }));
 
-  }, [selectedDate, endDate, mode, data, amount, activeStep]);
+  }, [startDate, endDate, mode, data, amount, activeStep]);
 
   const saveBookingData = (data) => {
     sessionStorage.setItem("bookingData", JSON.stringify(data));
@@ -134,7 +134,7 @@ const BookReservation = () => {
         {activeStep === 1 && (
           <BookingInfo
             data={data}
-            selectedDate={bookingData.selectedDate}
+            startDate={bookingData.startDate}
             endDate={bookingData.endDate}
             isDayMode={isDayMode}
             mode={bookingData.mode}

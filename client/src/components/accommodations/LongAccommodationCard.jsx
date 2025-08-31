@@ -62,13 +62,13 @@ const LongAccommodationCard = ({ data }) => {
           </Grid>
         </Grid>
 
-        {data?.selectedDate && data?.endDate && (
+        {data?.startDate && data?.endDate && (
           <Box mt={2}>
             <Typography variant="subtitle2" color="textSecondary">
               Booking Dates:
             </Typography>
             <Typography variant="body1">
-              <ConvertDate dateString={data?.selectedDate} time /> →{" "}
+              <ConvertDate dateString={data?.startDate} time /> →{" "}
               <ConvertDate dateString={data?.endDate} time />
             </Typography>
           </Box>
