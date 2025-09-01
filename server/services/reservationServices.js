@@ -89,24 +89,35 @@ const getReservationsByQuery = async (queryObject = {}) => {
 
 const getSingleReservationById = async (reservationId) => {
   try {
-    const reservation = await Reservation.findOne({
-      _id: reservationId,
-    }).populate('accommodationId')
+    const reservation = await Reservation.findOne({ reservationId })
+      .populate("accommodationId")
+      .populate({
+        path: "userId",
+        model: "Users",
+        localField: "userId",
+        foreignField: "userId",
+        select: "firstName lastName emailAddress",
+      });
 
     if (!reservation) {
       throw new Error("Reservation not found");
     }
 
-    return reservation;
+    const { userId, ...rest } = reservation.toObject();
+
+    return {
+      userData: userId,
+      ...rest,
+    };
   } catch (error) {
     console.error("Error fetching reservation:", error);
-    throw new Error(error);
+    throw new Error(error.message);
   }
-}
+};
 
 const updateReservationById = async (reservationId, updateData) => {
   try {
-    const currentReservation = await Reservation.findById(reservationId);
+    const currentReservation = await Reservation.findOne({ reservationId });
     if (!currentReservation) {
       throw new Error("Reservation not found");
     }
@@ -125,14 +136,13 @@ const updateReservationById = async (reservationId, updateData) => {
 
 const deleteReservationById = async (reservationId) => {
   try {
-    const deletedReservation = await Reservation.findByIdAndDelete(reservationId);
+    const deletedReservation = await Reservation.findOneAndDelete({ reservationId });
     return deletedReservation;
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error deleting reservation:", error.message);
     throw new Error(error);
   }
-}
+};
 
 export default {
   hasDateConflict,
