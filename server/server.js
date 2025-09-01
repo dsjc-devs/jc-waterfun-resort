@@ -28,6 +28,7 @@ import galleryRoutes from './routes/galleryRoutes.js';
 import amenitiesTypeRoutes from './routes/amenitiesTypeRoutes.js';
 import amenitiesRoutes from './routes/amenitiesRoutes.js';
 import resortRatesRoutes from './routes/resortRatesRoutes.js';
+import reservationRoutes from './routes/reservationRoutes.js';
 
 const app = express();
 const __dirname = path.resolve();
@@ -67,6 +68,7 @@ app.use(`/api/${API_VERSION}/gallery`, galleryRoutes);
 app.use(`/api/${API_VERSION}/resort-rates`, resortRatesRoutes);
 app.use(`/api/${API_VERSION}/amenities-type`, amenitiesTypeRoutes);
 app.use(`/api/${API_VERSION}/amenities`, amenitiesRoutes);
+app.use(`/api/${API_VERSION}/reservations`, reservationRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'client', 'build')));
