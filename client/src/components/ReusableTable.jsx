@@ -85,10 +85,15 @@ const ReusableTable = ({
     return stabilizedThis.map((el) => el[0]);
   };
 
+  const getNestedValue = (obj, path) => {
+    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+  };
+
   const filteredRows = rows.filter((row) =>
-    searchableColumns.some((col) =>
-      row[col]?.toString().toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    searchableColumns.some((col) => {
+      const value = getNestedValue(row, col);
+      return value?.toString().toLowerCase().includes(searchQuery.toLowerCase());
+    })
   );
 
   const sortedRows = stableSort(filteredRows, getComparator(order, orderBy));
@@ -187,7 +192,10 @@ const ReusableTable = ({
           borderRadius: "12px",
         }}
       >
-        <Table aria-labelledby="tableTitle">
+        <Table
+          aria-labelledby="tableTitle"
+          sx={{ minWidth: columns.length * 250 }}
+        >
           <TableHead>
             <TableRow
               sx={{
