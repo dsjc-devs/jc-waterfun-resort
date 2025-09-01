@@ -53,15 +53,30 @@ const getReservationsByQuery = async (queryObject = {}) => {
     const { page: _page, limit: _limit, ...filters } = queryObject;
 
     const reservations = await Reservation.find(filters)
-      .populate('accommodationId')
+      .populate("accommodationId")
+      .populate({
+        path: "userId",
+        model: "Users",
+        localField: "userId",
+        foreignField: "userId",
+        select: "firstName lastName emailAddress",
+      })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
+    const transformed = reservations.map((reservation) => {
+      const { userId, ...rest } = reservation.toObject();
+      return {
+        ...rest,
+        userData: userId,
+      };
+    });
+
     const totalCount = await Reservation.countDocuments(filters);
 
     return {
-      reservations,
+      reservations: transformed,
       totalPages: Math.ceil(totalCount / limit),
       currentPage: page,
       totalReservations: totalCount,
@@ -70,7 +85,7 @@ const getReservationsByQuery = async (queryObject = {}) => {
     console.error("Error fetching reservations:", error);
     throw new Error(error);
   }
-}
+};
 
 const getSingleReservationById = async (reservationId) => {
   try {
