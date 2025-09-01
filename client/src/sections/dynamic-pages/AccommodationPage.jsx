@@ -306,7 +306,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
           </Stack>
         </Box>
 
-        <Grid container spacing={2} marginBlock={2}>
+        <Grid container spacing={2} marginBlock={2} direction={{ xs: 'column-reverse', md: 'row' }}>
           <Grid item xs={12} md={isOnPortal ? 12 : 8} marginBlockEnd={2}>
             <Box marginBlockEnd={2}>
               <Typography variant='h2' gutterBottom>{name}</Typography>
@@ -546,10 +546,12 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                       if (isLoggedIn) {
                         const element = document.getElementById("book_reservation_section");
                         if (element) {
-                          element.scrollIntoView({ behavior: "smooth" });
+                          const yOffset = -200;
+                          const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+                          window.scrollTo({ top: y, behavior: "smooth" });
                         }
                       } else {
-                        setOpenLogin(true)
+                        setOpenLogin(true);
                       }
                     }}
                   >
