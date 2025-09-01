@@ -3,13 +3,15 @@ import ResortDetails from "./resort-details"
 import Accommodations from "./accommodations"
 import FAQS from "./faqs"
 import AccommodationType from "./accomodationsType"
+import Reservations from "./reservations"
 
 const agent = {
   ...Users,
   ...ResortDetails,
   ...Accommodations,
   ...FAQS,
-  ...AccommodationType
+  ...AccommodationType,
+  ...Reservations
 }
 
 export default agent
