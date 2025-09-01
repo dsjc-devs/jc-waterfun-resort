@@ -40,7 +40,7 @@ export const useGetSingleReservation = (reservationId) => {
 };
 
 const Reservations = {
-  createRervation: async (payload) => {
+  createReservation: async (payload) => {
     try {
       const response = await axiosServices.post(`/${endpoints.key}`, payload)
       return response
