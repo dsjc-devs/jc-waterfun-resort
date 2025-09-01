@@ -6,15 +6,16 @@ import {
   deleteReservationById
 } from '../controllers/reservationControllers.js';
 import { createReservationValidator } from '../middleware/validations/reservationValidator.js';
+import { protect } from '../middleware/authMiddleware.js'
 
 import express from 'express';
 
 const router = express.Router();
 
-router.post('/', createReservationValidator, createReservation);
-router.get('/', getReservationsByQuery);
-router.get('/:id', getSingleReservationById);
-router.patch('/:id', updateReservationById);
-router.delete('/:id', deleteReservationById);
+router.post('/', protect, createReservationValidator, createReservation);
+router.get('/', protect, getReservationsByQuery);
+router.get('/:id', protect, getSingleReservationById);
+router.patch('/:id', protect, updateReservationById);
+router.delete('/:id', protect, deleteReservationById);
 
 export default router;
