@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, CircularProgress } from '@mui/material';
+import { Box } from '@mui/material';
+import EmptyUserCard from 'components/cards/skeleton/EmptyUserCard';
 
 // ==============================|| AUTH GUARD ||============================== //
 
@@ -30,16 +31,7 @@ const AuthGuard = ({ children }) => {
 
   if (checkingAuth) {
     return (
-      <Box
-        sx={{
-          height: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <CircularProgress color="primary" />
-      </Box>
+      <EmptyUserCard title='Loading...' />
     );
   }
 

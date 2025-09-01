@@ -157,14 +157,9 @@ const ReservationsTable = () => {
       label: 'Guests',
       align: 'center',
       renderCell: (row) => {
-        const totalGuests = Object.values(row?.quantities || {}).reduce(
-          (sum, acc) => sum + (acc || 0),
-          0
-        );
-
         return (
           <Typography variant="body2">
-            <UserOutlined /> {totalGuests} Guests
+            <UserOutlined /> {row?.totalGuests} Guests
           </Typography>
         );
       }

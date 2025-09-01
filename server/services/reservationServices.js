@@ -66,11 +66,17 @@ const getReservationsByQuery = async (queryObject = {}) => {
       .limit(limit);
 
     const transformed = reservations.map((reservation) => {
-      const { userId, ...rest } = reservation.toObject();
+      const { userId, quantities, ...rest } = reservation.toObject();
+      const totalGuests = Object.values(quantities || {}).reduce(
+        (sum, acc) => sum + (acc || 0),
+        0
+      );
+
       return {
         ...rest,
         userData: userId,
-      };
+        totalGuests
+      }
     });
 
     const totalCount = await Reservation.countDocuments(filters);
