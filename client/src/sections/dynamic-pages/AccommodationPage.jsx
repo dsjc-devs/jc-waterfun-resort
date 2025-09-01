@@ -160,6 +160,14 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
     }
   }, [startDate, maxStayDuration, type, manualMode]);
 
+  const bookingData = JSON.parse(sessionStorage.getItem("bookingData"))
+
+  useEffect(() => {
+    if (bookingData?.startDate) {
+      setStartDate(new Date(bookingData?.startDate))
+    }
+  }, [bookingData])
+
   useEffect(() => {
     setManualMode(false);
   }, [startDate]);
