@@ -9,6 +9,12 @@ import {
   Typography,
   Container,
   Grid,
+  Dialog,
+  DialogTitle,
+  Divider,
+  DialogContent,
+  TextField,
+  DialogActions,
 } from "@mui/material";
 import { toast } from "react-toastify";
 import { useGetSingleAccommodation } from "api/accommodations";
@@ -22,6 +28,7 @@ import Summary from "sections/landing-pages/book-reservation/Summary";
 import AnimateButton from "components/@extended/AnimateButton";
 import LoadingButton from "components/@extended/LoadingButton";
 import PageTitle from "components/PageTitle";
+import agent from "api";
 
 const steps = ["Choose Booking", "Enter Info", "Summary"];
 
@@ -32,7 +39,7 @@ const StepIcon = ({ active, completed }) => {
 };
 
 const BookReservation = () => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -56,6 +63,11 @@ const BookReservation = () => {
     minimumPayable: 0,
     total: 0
   })
+
+  const [openPayModal, setOpenPayModal] = useState(false)
+  const [totalPaid, setTotalPaid] = useState(0)
+
+  const [loading, setLoading] = useState(false)
 
   const queryParams = new URLSearchParams(location.search);
   const accommodationId = queryParams.get("accommodationId");
@@ -119,6 +131,43 @@ const BookReservation = () => {
     activeStep
   });
 
+  const handleCreateReservation = async () => {
+    setLoading(true)
+    try {
+      const payload = {
+        userId: user?.userId,
+        accommodationId: bookingData.accommodationData?._id,
+        startDate: bookingData.startDate,
+        endDate: bookingData.endDate,
+        status: "CONFIRMED",
+        quantities: {
+          adult: bookingData.quantities.adult,
+          child: bookingData.quantities.child,
+          pwdSenior: bookingData.quantities.pwdSenior
+        },
+        amount: {
+          accommodationTotal: bookingData?.amount?.accommodationTotal,
+          entranceTotal: bookingData?.amount?.entranceTotal,
+          total: bookingData?.amount?.total,
+          minimumPayable: bookingData?.amount?.minimumPayable,
+          totalPaid,
+          adult: bookingData?.amount?.adult,
+          child: bookingData?.amount?.child,
+          pwdSenior: bookingData?.amount?.pwdSenior
+        }
+      }
+
+      await agent.Reservations.createReservation(payload)
+      toast.success('Reservation successfully booked.')
+      setOpenPayModal(false)
+    } catch (error) {
+      console.error(error);
+      toast.error(`Error Occured. Please try again.`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <React.Fragment>
       <PageTitle title={`Book a Reservation | ${bookingData?.accommodationData?.name}`} isOnportal={false} />
@@ -157,8 +206,6 @@ const BookReservation = () => {
           {activeStep === 2 && (
             <Summary
               bookingInfo={bookingData}
-              onBack={handleBack}
-              onConfirm={() => alert(`test`)}
             />
           )}
 
@@ -181,7 +228,7 @@ const BookReservation = () => {
                       if (activeStep !== steps.length - 1) {
                         handleNext()
                       } else {
-                        toast.success(`tanginaka`)
+                        setOpenPayModal(true)
                       }
                     }}
                     variant="contained"
@@ -201,6 +248,58 @@ const BookReservation = () => {
           </Grid>
         </Box>
       </Container>
+
+      <Dialog fullWidth maxWidth="md" open={openPayModal} onClose={() => setOpenPayModal(false)}>
+        <DialogTitle>Payment</DialogTitle>
+        <Divider />
+
+        <DialogContent>
+          <Typography variant="subtitle1" gutterBottom>
+            Complete your reservation payment
+          </Typography>
+
+          <Box mt={2}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <Typography>
+                  Amount
+                </Typography>
+
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  value={totalPaid}
+                  type="number"
+                  onChange={(e) => setTotalPaid(e.target.value)}
+                />
+              </Grid>
+            </Grid>
+          </Box>
+        </DialogContent>
+
+        <Divider />
+
+        <DialogActions>
+          <Button onClick={() => setOpenPayModal(false)} variant="outlined" sx={{ borderRadius: 2 }}>
+            Cancel
+          </Button>
+
+          <LoadingButton
+            onClick={handleCreateReservation}
+            variant="contained"
+            color="primary"
+            sx={{ borderRadius: 2 }}
+            loading={loading}
+            disableElevation
+            disabled={loading || totalPaid === 0 || totalPaid < bookingData?.amount?.minimumPayable}
+            loadingPosition="start"
+            fullWidth
+            style={{ width: '150px' }}
+          >
+            Pay Now
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </React.Fragment>
   );
 };
