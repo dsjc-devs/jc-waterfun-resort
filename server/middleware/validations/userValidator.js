@@ -1,8 +1,5 @@
-import { body, param } from 'express-validator';
+import { body } from 'express-validator';
 import { validate } from '../../utils/expressValidator.js';
-import { USER_TYPES } from '../../constants/constants.js'
-
-const ALLOWED_POSITION_VALUES = USER_TYPES.map((item) => item.value)
 
 const createValid = [
   body('firstName')
