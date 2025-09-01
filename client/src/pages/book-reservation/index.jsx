@@ -167,16 +167,13 @@ const BookReservation = () => {
               <Box
                 sx={{
                   display: "flex",
-                  justifyContent:
-                    activeStep === 1 ? "flex-end" : "space-between",
+                  justifyContent: "space-between",
                   mt: 3,
                 }}
               >
-                {(activeStep !== 1) && (
-                  <Button onClick={handleBack} variant="outlined">
-                    Back
-                  </Button>
-                )}
+                <Button onClick={() => activeStep === 1 ? navigate(`/accommodations/details/${data?._id}`) : handleBack()} variant="outlined">
+                  Back
+                </Button>
 
                 <AnimateButton>
                   <LoadingButton
