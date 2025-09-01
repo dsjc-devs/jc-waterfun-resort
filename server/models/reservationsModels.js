@@ -51,6 +51,11 @@ const reservationSchema = new mongoose.Schema(
       type: String,
       enum: ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED", "RESCHEDULED", "ARCHIVED"],
     },
+    paymentStatus: {
+      type: String,
+      required: true,
+      enum: ["FULLY_PAID", "PARTIALLY_PAID", "UNPAID"],
+    },
     quantities: quantitiesSchema,
     amount: amountSchema,
   },
