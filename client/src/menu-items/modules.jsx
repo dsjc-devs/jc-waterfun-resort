@@ -129,7 +129,7 @@ const getModules = ({ accommodations = [] }) => {
       id: 'reservations',
       title: 'Reservations',
       type: 'group',
-      access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
+      access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value, USER_ROLES.CUSTOMER.value],
       children: [
         {
           id: 'reservation-list',
@@ -138,7 +138,7 @@ const getModules = ({ accommodations = [] }) => {
           url: '/portal/reservations',
           icon: icons.BookIcon,
           breadcrumbs: false,
-          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
+          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value, USER_ROLES.CUSTOMER.value],
         },
         {
           id: 'calendar',
@@ -258,25 +258,6 @@ const getModules = ({ accommodations = [] }) => {
         // }
       ]
     },
-
-    // customers
-    {
-      id: 'customer-profile',
-      title: 'My Account',
-      type: 'group',
-      access: [USER_ROLES.CUSTOMER.value],
-      children: [
-        {
-          id: 'my-reservations',
-          title: 'My Reservations',
-          type: 'item',
-          url: '/portal/my-reservations',
-          icon: icons.BookIcon,
-          breadcrumbs: false,
-          access: [USER_ROLES.CUSTOMER.value],
-        },
-      ]
-    }
   ]
 }
 
