@@ -215,7 +215,7 @@ const ReservationsTable = () => {
                     variant='contained'
                     startIcon={<PlusOutlined />}
                   >
-                    Manually Reserve
+                    Create Reservation
                   </Button>
                 </AnimateButton>
               )}
