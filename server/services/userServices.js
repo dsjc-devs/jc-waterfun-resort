@@ -17,6 +17,10 @@ const authUser = async (data) => {
     throw new Error("Invalid email or password");
   }
 
+  if (user.status !== "ACTIVE") {
+    throw new Error("Account is not active. Please contact support.");
+  }
+
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
     throw new Error("Invalid email or password");
