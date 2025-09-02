@@ -1,3 +1,4 @@
+import cron from "node-cron";
 import Reservation from "../models/reservationsModels.js";
 import generateRandomString from "../utils/generateRandomString.js";
 
@@ -151,11 +152,40 @@ const deleteReservationById = async (reservationId) => {
   }
 };
 
+const checkAndUpdateReservationStatus = async () => {
+  try {
+    const now = new Date();
+
+    const cancelled = await Reservation.updateMany(
+      {
+        status: "PENDING",
+        startDate: { $lt: now },
+      },
+      { $set: { status: "CANCELLED" } }
+    );
+
+    const completed = await Reservation.updateMany(
+      {
+        status: "CONFIRMED",
+        endDate: { $lt: now },
+      },
+      { $set: { status: "COMPLETED" } }
+    );
+
+    console.log(
+      `Updated reservations => Cancelled: ${cancelled.modifiedCount}, Completed: ${completed.modifiedCount}`
+    );
+  } catch (error) {
+    console.error("Error running reservation status check:", error);
+  }
+}
+
 export default {
   hasDateConflict,
   createReservation,
   getReservationsByQuery,
   getSingleReservationById,
   updateReservationById,
-  deleteReservationById
+  deleteReservationById,
+  checkAndUpdateReservationStatus
 }

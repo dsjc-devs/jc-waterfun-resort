@@ -30,6 +30,9 @@ import amenitiesRoutes from './routes/amenitiesRoutes.js';
 import resortRatesRoutes from './routes/resortRatesRoutes.js';
 import reservationRoutes from './routes/reservationRoutes.js';
 
+/*  ========== CRON ========== */
+import { startReservationCron } from './cron/reservationCron.js';
+
 const app = express();
 const __dirname = path.resolve();
 dotenv.config();
@@ -87,9 +90,21 @@ app.use(errorHandler);
 
 const startServer = async () => {
   try {
-    app.listen(PORT, console.log(colours.fg.yellow, `${PROJECT_NAME} API is running in ${process.env.NODE_ENV} mode on port ${PORT}`, colours.reset));
+    await connectDB();
+
+    app.listen(PORT, () =>
+      console.log(
+        colours.fg.yellow,
+        `${PROJECT_NAME} API is running in ${process.env.NODE_ENV} mode on port ${PORT}`,
+        colours.reset
+      )
+    );
+
+    startReservationCron();
+
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    process.exit(1);
   }
 };
 
