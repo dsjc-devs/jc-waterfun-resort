@@ -2,7 +2,8 @@ import React, { useMemo, useState } from 'react'
 import { useGetReservations } from 'api/reservations';
 import { Box, Button, Chip, Divider, Fade, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
 import { EditOutlined, EllipsisOutlined, EyeOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons';
-import { truncate } from "inspreact";
+import { useNavigate } from 'react-router';
+import { truncate } from 'lodash';
 
 import ReusableTable from 'components/ReusableTable'
 import Avatar from 'components/@extended/Avatar';
@@ -22,15 +23,16 @@ const ReservationsTable = () => {
   const { data = {}, isLoading } = useGetReservations(isCustomer ? { userId: user?.userId } : {})
   const { reservations = [] } = data || {}
 
+  const [openMenu, setOpenMenu] = useState({ anchorEl: null, reservationId: '' })
 
-  const [openMenu, setOpenMenu] = useState({ anchorEl: null })
+  const navigate = useNavigate()
 
-  const handleMenuClick = (event) => {
-    setOpenMenu({ anchorEl: event.currentTarget })
+  const handleMenuClick = (event, reservationId) => {
+    setOpenMenu({ anchorEl: event.currentTarget, reservationId })
   }
 
   const handleMenuClose = () => {
-    setOpenMenu({ anchorEl: null })
+    setOpenMenu({ anchorEl: null, reservationId: '' })
   }
 
   const columns = useMemo(() => {
@@ -174,7 +176,7 @@ const ReservationsTable = () => {
 
         return (
           <IconButton
-            onClick={(e) => handleMenuClick(e)}
+            onClick={(e) => handleMenuClick(e, row?.reservationId)}
           >
             <EllipsisOutlined />
           </IconButton>
@@ -232,7 +234,7 @@ const ReservationsTable = () => {
       >
         <MenuItem
           onClick={() => {
-            handleMenuClose()
+            navigate(`/portal/reservations/details/${openMenu.reservationId}`)
           }}
         >
           <EyeOutlined style={{ marginRight: 8 }} />
