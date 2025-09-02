@@ -12,6 +12,9 @@ import banner5 from 'assets/images/upload/accom2.jpg'
 import banner6 from 'assets/images/upload/accom3.jpg'
 import banner7 from 'assets/images/upload/accom4.jpg'
 
+import AboutUs from 'sections/landing-pages/AboutUs'
+import ContactUs from 'sections/landing-pages/ContactUs'
+
 const Home = () => {
   const items = [
     banner,
@@ -62,6 +65,8 @@ const Home = () => {
       </Carousel>
 
       <RateSection />
+      <ContactUs />
+      <AboutUs />
     </React.Fragment>
   )
 }

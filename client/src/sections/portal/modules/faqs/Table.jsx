@@ -36,46 +36,60 @@ const statusColors = {
   UNPUBLISHED: 'warning',
   ARCHIVED: 'error'
 };
+
 const FAQsTable = () => {
   const { data, isLoading, mutate } = useGetFAQS();
   const faqs = data?.faqs || [];
+
   const [modalState, setModalState] = useState({
     open: false,
     editingFaq: null
   });
+
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [formState, setFormState] = useState({ title: '', answer: '', status: 'POSTED' });
-  const [page, setPage] = useState(1);
-  const itemsPerPage = 6;
+
+  const [formState, setFormState] = useState({
+    title: '',
+    answer: '',
+    category: '', 
+    status: 'POSTED'
+  });
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
+
   const openAddModal = () => {
-    setFormState({ title: '', answer: '', status: 'POSTED' });
+    setFormState({ title: '', answer: '', category: '', status: 'POSTED' });
     setModalState({ open: true, editingFaq: null });
   };
+
   const openEditModal = (faq) => {
     setFormState({
       title: faq.title,
       answer: faq.answer,
+      category: faq.category || '', // ← SUPPORT EXISTING FAQ CATEGORY
       status: faq.status
     });
     setModalState({ open: true, editingFaq: faq });
   };
+
   const handleSubmit = async () => {
     try {
       if (!formState.title.trim() || !formState.answer.trim()) {
         toast.error('Title and answer are required');
         return;
       }
+
       if (modalState.editingFaq) {
-        await agent.FAQS.editFAQ(modalState.editingFaq._id, formState)
+        await agent.FAQS.editFAQ(modalState.editingFaq._id, formState);
         toast.success('FAQ updated');
       } else {
-        await agent.FAQS.addFAQ(formState)
+        await agent.FAQS.addFAQ(formState);
         toast.success('FAQ created');
       }
+
       await mutate();
       setModalState({ open: false, editingFaq: null });
     } catch (error) {
@@ -83,6 +97,7 @@ const FAQsTable = () => {
       toast.error('Something went wrong: ' + (error.response?.data?.message || error.message || 'Unknown error'));
     }
   };
+
   const handleDelete = async () => {
     try {
       if (deleteTarget) {
@@ -96,6 +111,7 @@ const FAQsTable = () => {
       toast.error('Failed to delete FAQ');
     }
   };
+
   const columns = useMemo(
     () => [
       {
@@ -137,18 +153,23 @@ const FAQsTable = () => {
         label: 'Actions',
         renderCell: (row) => (
           <Stack direction="row" spacing={1}>
-            <IconButton color="info" onClick={() => openEditModal(row)}>
-              <EditOutlined />
-            </IconButton>
-            <IconButton color="error" onClick={() => setDeleteTarget(row)}>
-              <DeleteOutlined />
-            </IconButton>
+            <Tooltip title="Edit FAQ">
+              <IconButton color="info" onClick={() => openEditModal(row)}>
+                <EditOutlined />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete FAQ">
+              <IconButton color="error" onClick={() => setDeleteTarget(row)}>
+                <DeleteOutlined />
+              </IconButton>
+            </Tooltip>
           </Stack>
         )
       }
     ],
     []
   );
+
   const otherActionButtons = (
     <Button
       variant="contained"
@@ -159,11 +180,12 @@ const FAQsTable = () => {
       Add FAQ
     </Button>
   );
+
   return (
     <React.Fragment>
       <ReusableTable
         searchableColumns={['title', 'answer', 'status']}
-        itemsPerPage={1}
+        itemsPerPage={6}
         columns={columns}
         rows={faqs}
         isLoading={isLoading}
@@ -183,9 +205,9 @@ const FAQsTable = () => {
           <Typography variant="h4">{modalState.editingFaq ? 'Edit FAQ' : 'Add New FAQ'}</Typography>
         </DialogTitle>
         <DialogContent>
-          <Grid container>
-            <Grid item xs={12} >
-              <Typography >Title (Required)</Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography>Title (Required)</Typography>
               <TextField
                 name="title"
                 fullWidth
@@ -193,6 +215,8 @@ const FAQsTable = () => {
                 onChange={handleInputChange}
                 required
               />
+            </Grid>
+            <Grid item xs={12}>
               <Typography mt={2}>Answer (Required)</Typography>
               <TextField
                 name="answer"
@@ -203,6 +227,18 @@ const FAQsTable = () => {
                 onChange={handleInputChange}
                 required
               />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography mt={2}>Category (Required)</Typography>
+              <TextField
+                name="category"
+                fullWidth
+                value={formState.category}
+                onChange={handleInputChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
               <Typography mt={2}>Status</Typography>
               <TextField
                 select
@@ -227,6 +263,7 @@ const FAQsTable = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
       <ConfirmationDialog
         title="Delete FAQ"
         description={`Are you sure you want to delete "${deleteTarget?.title}"?`}
