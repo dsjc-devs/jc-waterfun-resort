@@ -102,29 +102,34 @@ const ReservationsTable = () => {
       id: 'financials',
       label: isCustomer ? 'Payment' : 'Financials',
       align: 'center',
-      renderCell: (row) => (
-        <Stack textAlign='left'>
-          <Chip
-            size='small'
-            label={textFormatter.fromSlug(titleCase(row?.paymentStatus))}
-            color={{
-              FULLY_PAID: 'success',
-              PARTIALLY_PAID: 'primary',
-              UNPAID: 'error'
-            }[row?.paymentStatus] || 'default'}
-          />
-          <Typography variant="body2">Accommodation Total: {formatPeso(row?.amount?.accommodationTotal)}</Typography>
-          <Typography variant="body2">Entrance Total: {formatPeso(row?.amount?.entranceTotal)}</Typography>
-          <Typography variant="body2">Minimum Payable: {formatPeso(row?.amount?.minimumPayable)}</Typography>
-          <Typography variant="body2">Total: {formatPeso(row?.amount?.total)}</Typography>
-          <Divider sx={{ mb: 1 }} />
-          <Typography variant="body2" color="success.dark">Paid: {formatPeso(row?.amount?.totalPaid)}</Typography>
-          <Divider sx={{ mb: 1 }} />
-          <Typography variant="body2" color="error">
-            Balance: {formatPeso(row?.amount?.total - row?.amount?.totalPaid)}
-          </Typography>
-        </Stack>
-      )
+      renderCell: (row) => {
+        const paymentsStatus = row?.amount?.totalPaid >= row?.amount?.total
+        const paymentsStatusLabel = paymentsStatus ? 'FULLY_PAID' : (row?.amount?.totalPaid > 0 ? 'PARTIALLY_PAID' : 'UNPAID')
+
+        return (
+          <Stack textAlign='left'>
+            <Chip
+              size='small'
+              label={textFormatter.fromSlug(titleCase(paymentsStatusLabel))}
+              color={{
+                FULLY_PAID: 'success',
+                PARTIALLY_PAID: 'primary',
+                UNPAID: 'error'
+              }[paymentsStatusLabel] || 'default'}
+            />
+            <Typography variant="body2">Accommodation Total: {formatPeso(row?.amount?.accommodationTotal)}</Typography>
+            <Typography variant="body2">Entrance Total: {formatPeso(row?.amount?.entranceTotal)}</Typography>
+            <Typography variant="body2">Minimum Payable: {formatPeso(row?.amount?.minimumPayable)}</Typography>
+            <Typography variant="body2">Total: {formatPeso(row?.amount?.total)}</Typography>
+            <Divider sx={{ mb: 1 }} />
+            <Typography variant="body2" color="success.dark">Paid: {formatPeso(row?.amount?.totalPaid)}</Typography>
+            <Divider sx={{ mb: 1 }} />
+            <Typography variant="body2" color="error">
+              Balance: {formatPeso(row?.amount?.total - row?.amount?.totalPaid)}
+            </Typography>
+          </Stack>
+        )
+      }
     };
 
     const customerColumn = {
@@ -200,8 +205,7 @@ const ReservationsTable = () => {
           "userData.lastName",
           "userData.emailAddress",
           "accommodationData.name",
-          "status",
-          "paymentStatus"
+          "status"
         ]}
         itemsPerPage={5}
         columns={columns}

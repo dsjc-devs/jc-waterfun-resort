@@ -15,6 +15,8 @@ import LongAccommodationCard from "components/accommodations/LongAccommodationCa
 import titleCase from "utils/titleCaseFormatter";
 import formatPeso from "utils/formatPrice";
 import useGetPosition from "hooks/useGetPosition";
+import ConvertDate from "components/ConvertDate";
+import textFormatter from "utils/textFormatter";
 
 const Details = ({ reservationData = {} }) => {
   const { isCustomer } = useGetPosition()
@@ -31,6 +33,9 @@ const Details = ({ reservationData = {} }) => {
     quantities,
     amount,
   } = reservationData;
+
+  const paymentsStatus = amount?.totalPaid >= amount?.total
+  const paymentsStatusLabel = paymentsStatus ? 'FULLY_PAID' : (amount?.totalPaid > 0 ? 'PARTIALLY_PAID' : 'UNPAID')
 
   return (
     <React.Fragment>
@@ -70,17 +75,15 @@ const Details = ({ reservationData = {} }) => {
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <LabeledValue
-                    ellipsis={true}
                     title="Start Date"
-                    subTitle={new Date(startDate).toLocaleString()}
+                    subTitle={<ConvertDate dateString={startDate} time />}
                     icon={<CalendarOutlined />}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <LabeledValue
-                    ellipsis={true}
                     title="End Date"
-                    subTitle={new Date(endDate).toLocaleString()}
+                    subTitle={<ConvertDate dateString={endDate} time />}
                     icon={<CalendarOutlined />}
                   />
                 </Grid>
@@ -129,6 +132,16 @@ const Details = ({ reservationData = {} }) => {
               title="Payment Information"
               sx={{ marginBottom: 1, flex: 1, display: "flex", flexDirection: "column" }}
             >
+              <Chip
+                size='small'
+                label={textFormatter.fromSlug(titleCase(paymentsStatusLabel))}
+                color={{
+                  FULLY_PAID: 'success',
+                  PARTIALLY_PAID: 'primary',
+                  UNPAID: 'error'
+                }[paymentsStatusLabel] || 'default'}
+              />
+
               <Grid container spacing={2}>
                 <Grid item xs={12} md={4}>
                   <LabeledValue
