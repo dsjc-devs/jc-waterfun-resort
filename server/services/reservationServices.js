@@ -109,10 +109,11 @@ const getSingleReservationById = async (reservationId) => {
       throw new Error("Reservation not found");
     }
 
-    const { userId, ...rest } = reservation.toObject();
+    const { userId, accommodationId, ...rest } = reservation.toObject();
 
     return {
       userData: userId,
+      accommodationData: accommodationId,
       ...rest,
     };
   } catch (error) {
