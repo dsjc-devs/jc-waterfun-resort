@@ -23,7 +23,7 @@ const LongAccommodationCard = ({ data }) => {
       <Grid item xs={12} md={9}>
         <Typography variant="h5">{data?.name}</Typography>
 
-        {data?.type !== "guest_house" && (
+        {(data?.type !== "guest_house" && data?.isDayMode) && (
           <Typography
             variant="body2"
             sx={{
