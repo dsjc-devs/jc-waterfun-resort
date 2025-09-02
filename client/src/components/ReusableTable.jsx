@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -119,6 +119,34 @@ const ReusableTable = ({
     );
   };
 
+
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e) => {
+      if (e.deltaY !== 0) {
+        const atStart = container.scrollLeft === 0;
+        const atEnd =
+          container.scrollLeft + container.clientWidth >= container.scrollWidth;
+
+        if (!(atStart && e.deltaY < 0) && !(atEnd && e.deltaY > 0)) {
+          e.preventDefault();
+          e.stopPropagation();
+          container.scrollLeft += e.deltaY;
+        }
+      }
+    };
+
+    container.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
+
   return (
     <MainCard>
       {/* Search + Actions */}
@@ -186,10 +214,26 @@ const ReusableTable = ({
 
       {/* Table */}
       <TableContainer
+        ref={containerRef}
         sx={{
           width: "100%",
           overflowX: "auto",
           borderRadius: "12px",
+        }}
+        onWheel={(e) => {
+          if (e.deltaY !== 0) {
+            const container = e.currentTarget;
+
+            const atStart = container.scrollLeft === 0;
+            const atEnd =
+              container.scrollLeft + container.clientWidth >= container.scrollWidth;
+
+            if (!(atStart && e.deltaY < 0) && !(atEnd && e.deltaY > 0)) {
+              e.preventDefault();
+              e.stopPropagation();
+              container.scrollLeft += e.deltaY;
+            }
+          }
         }}
       >
         <Table
