@@ -241,7 +241,7 @@ const ReservationsTable = () => {
           View
         </MenuItem>
 
-        {(isAdmin || isMasterAdmin) && (
+        {/* {(isAdmin || isMasterAdmin) && (
           <MenuItem
             onClick={() => {
               handleMenuClose()
@@ -250,7 +250,7 @@ const ReservationsTable = () => {
             <EditOutlined style={{ marginRight: 8 }} />
             Edit
           </MenuItem>
-        )}
+        )} */}
       </Menu>
 
     </React.Fragment>
