@@ -102,7 +102,7 @@ const getSingleReservationById = async (reservationId) => {
         model: "Users",
         localField: "userId",
         foreignField: "userId",
-        select: "firstName lastName emailAddress",
+        select: "firstName lastName emailAddress phoneNumber",
       });
 
     if (!reservation) {
