@@ -127,11 +127,6 @@ const BookReservation = () => {
     }
   }, []);
 
-  console.log({
-    bookingData,
-    activeStep
-  });
-
   const handleCreateReservation = async () => {
     setLoading(true)
     try {
