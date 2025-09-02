@@ -20,6 +20,7 @@ import PaymentSummaryCard from "components/accommodations/PaymentSummaryCard";
 const BookingInfo = ({
   data,
   isDayMode,
+  hasNoQuantities,
   startDate,
   endDate,
   mode,
@@ -237,6 +238,16 @@ const BookingInfo = ({
                       Clear All
                     </Button>
                   </Stack>
+
+                  {hasNoQuantities && (
+                    <Typography
+                      variant="body2"
+                      color="error"
+                      gutterBottom
+                    >
+                      Please select at least one guest and this could be up to {data?.capacity}
+                    </Typography>
+                  )}
 
                   {["adult", "child", "pwdSenior"].map((type) => (
                     <Box key={type} sx={{ my: 2 }}>

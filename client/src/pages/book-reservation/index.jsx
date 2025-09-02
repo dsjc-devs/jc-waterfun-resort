@@ -75,6 +75,7 @@ const BookReservation = () => {
   const endDate = queryParams.get("endDate");
   const mode = queryParams.get("mode") || "day";
   const isDayMode = mode === "day";
+  const hasNoQuantities = bookingData?.accommodationData?.hasPoolAccess && Object.values(bookingData?.quantities || {}).reduce((sum, val) => sum + val, 0) === 0
 
   const { data = {} } = useGetSingleAccommodation(accommodationId);
 
@@ -190,6 +191,7 @@ const BookReservation = () => {
               startDate={bookingData.startDate}
               endDate={bookingData.endDate}
               isDayMode={isDayMode}
+              hasNoQuantities={hasNoQuantities}
               mode={bookingData.mode}
               quantities={bookingData.quantities}
               includeEntrance={bookingData.includeEntranceFee}
@@ -232,9 +234,8 @@ const BookReservation = () => {
                       }
                     }}
                     variant="contained"
-                    loading={false}
                     disableElevation
-                    disabled={false}
+                    disabled={hasNoQuantities}
                     loadingPosition="start"
                     fullWidth
                     color="primary"
