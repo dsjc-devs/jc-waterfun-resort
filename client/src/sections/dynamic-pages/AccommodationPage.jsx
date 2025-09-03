@@ -34,21 +34,19 @@ import formatPeso from 'utils/formatPrice';
 import MainCard from 'components/MainCard';
 import useAuth from 'hooks/useAuth';
 import LoginModal from 'components/LoginModal';
-
-const bookedRanges = [
-  {
-    start: new Date("2025-08-27T07:00:00"), // day 7 AM
-    end: new Date("2025-08-27T17:00:00"),   // day 5 PM
-  },
-  // {
-  //   start: new Date("2025-08-27T17:00:00"), // night 5 PM
-  //   end: new Date("2025-08-28T07:00:00"),   // night 7 AM next day
-  // },
-];
+import { useGetBlockedDates } from 'api/blockedDates';
 
 const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth()
+
+  const { data: blockedDates = [] } = useGetBlockedDates()
+
+  const bookedRanges = blockedDates?.filter((f) => f.accommodationId === data?._id)?.map((d) => ({
+    startDate: new Date(d.startDate),
+    endDate: new Date(d.endDate),
+    accommodationId: d.accommodationId
+  })) || [];
 
   const {
     name,
@@ -92,9 +90,9 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
     return d;
   };
 
-  const computeModeEnd = (start, mode) => {
-    if (!start) return null;
-    const e = new Date(start);
+  const computeModeEnd = (startDate, mode) => {
+    if (!startDate) return null;
+    const e = new Date(startDate);
     if (mode === "day") {
       e.setHours(17, 0, 0, 0);
     } else {
@@ -118,7 +116,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
         const dayEnd = new Date(date);
         dayEnd.setHours(17, 0, 0, 0);
 
-        return range.start < dayEnd && range.end > dayStart;
+        return range.startDate < dayEnd && range.endDate > dayStart;
       }
 
       if (mode === "night") {
@@ -128,24 +126,24 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
         nightEnd.setDate(nightEnd.getDate() + 1);
         nightEnd.setHours(7, 0, 0, 0);
 
-        return range.start < nightEnd && range.end > nightStart;
+        return range.startDate < nightEnd && range.endDate > nightStart;
       }
 
       return false;
     });
   };
 
-  const isDateBlockedGuestHouse = (start, end) => {
-    if (!start || !end) return false;
+  const isDateBlockedGuestHouse = (startDate, endDate) => {
+    if (!startDate || !endDate) return false;
 
     return bookedRanges.some(range =>
-      (start < range.end && end > range.start)
+      (startDate < range.endDate && endDate > range.startDate)
     );
   };
 
   const isTimeBlocked = (date) => {
     return bookedRanges.some(
-      (range) => date >= range.start && date < range.end
+      (range) => date >= range.startDate && date < range.endDate
     );
   };
 
@@ -228,7 +226,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
       )}
 
       {isOnPortal && (
-        <Stack direction='row' justifyContent='flex-end' spacing={2} marginBlock={2}>
+        <Stack direction='row' justifyContent='flex-endDate' spacing={2} marginBlock={2}>
           <AnimateButton>
             <Button
               variant='contained'
@@ -487,15 +485,15 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                           onChange={(newValue) => {
                             if (!newValue) return;
 
-                            const start = applyModeStartTime(newValue, mode);
-                            const computedEnd = computeModeEnd(start, mode);
+                            const startDate = applyModeStartTime(newValue, mode);
+                            const computedEnd = computeModeEnd(startDate, mode);
 
-                            if (isDateBlockedGuestHouse(start, computedEnd) || isTimeBlocked(start) || isDateBlocked(start, mode)) {
+                            if (isDateBlockedGuestHouse(startDate, computedEnd) || isTimeBlocked(startDate) || isDateBlocked(startDate, mode)) {
                               toast.error("This date/time is not available.");
                               return;
                             }
 
-                            setStartDate(start);
+                            setStartDate(startDate);
                             setEndDate(computedEnd);
                           }}
                           disablePast
@@ -508,7 +506,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                   </Box>
 
                   <Box marginBlock={2}>
-                    <Stack direction='row' justifyContent='flex-end' alignItems='center'>
+                    <Stack direction='row' justifyContent='flex-endDate' alignItems='center'>
                       <AnimateButton>
                         <Button
                           variant='contained'
@@ -578,7 +576,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
         maxWidth="md"
         fullWidth
       >
-        <Stack direction='row' justifyContent='flex-end'>
+        <Stack direction='row' justifyContent='flex-endDate'>
           <IconButton onClick={() => setViewerOpen(false)}>
             <CloseOutlined />
           </IconButton>
@@ -601,7 +599,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
         maxWidth="lg"
         scroll="paper"
       >
-        <Stack direction='row' justifyContent='flex-end'>
+        <Stack direction='row' justifyContent='flex-endDate'>
           <IconButton onClick={() => setGalleryOpen(false)}>
             <CloseOutlined />
           </IconButton>
