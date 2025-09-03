@@ -66,17 +66,6 @@ const ReservationsTable = () => {
             <Typography variant='subtitle2' color='success.main'>
               {formatPeso(row?.amount?.accommodationTotal)}
             </Typography>
-            <Chip
-              size='small'
-              label={titleCase(row?.status)}
-              color={{
-                PENDING: 'warning',
-                CONFIRMED: 'primary',
-                COMPLETED: 'success',
-                RESCHEDULED: 'info',
-                ARCHIVED: 'error'
-              }[row?.status] || 'default'}
-            />
           </Box>
         </Stack >
       )
@@ -172,6 +161,27 @@ const ReservationsTable = () => {
       }
     };
 
+    const statusColumn = {
+      id: 'status',
+      label: 'Status',
+      align: 'center',
+      renderCell: (row) => {
+        return (
+          <Chip
+            size='small'
+            label={titleCase(row?.status)}
+            color={{
+              PENDING: 'warning',
+              CONFIRMED: 'primary',
+              COMPLETED: 'success',
+              RESCHEDULED: 'info',
+              ARCHIVED: 'error'
+            }[row?.status] || 'default'}
+          />
+        );
+      }
+    };
+
     const actionsColumn = {
       id: 'actions',
       align: 'center',
@@ -190,9 +200,9 @@ const ReservationsTable = () => {
     }
 
     if (isCustomer) {
-      return [reservationColumn, reservationDatesColumn, guestsColumns, financialsColumn, actionsColumn];
+      return [reservationColumn, reservationDatesColumn, guestsColumns, statusColumn, financialsColumn, actionsColumn];
     } else {
-      return [reservationColumn, customerColumn, reservationDatesColumn, guestsColumns, financialsColumn, actionsColumn];
+      return [reservationColumn, customerColumn, reservationDatesColumn, guestsColumns, statusColumn, financialsColumn, actionsColumn];
     }
   }, [isCustomer]);
 

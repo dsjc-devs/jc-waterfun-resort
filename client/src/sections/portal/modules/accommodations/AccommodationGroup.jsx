@@ -15,8 +15,10 @@ import agent from 'api';
 import { toast } from 'react-toastify';
 import Loader from 'components/Loader';
 import EmptyUserCard from 'components/cards/skeleton/EmptyUserCard';
+import useGetPosition from 'hooks/useGetPosition';
 
 const AccommodationGroup = ({ type = '' }) => {
+  const { isCustomer } = useGetPosition()
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -93,16 +95,18 @@ const AccommodationGroup = ({ type = '' }) => {
           sx={{ width: "300px", borderRadius: "12px" }}
         />
 
-        <AnimateButton>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<PlusOutlined />}
-            onClick={() => navigate(`/portal/accommodations/form?type=${type}`)}
-          >
-            Add {textFormatter.fromSlug(type).replace(/s$/, '')}
-          </Button>
-        </AnimateButton>
+        {!isCustomer && (
+          <AnimateButton>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<PlusOutlined />}
+              onClick={() => navigate(`/portal/accommodations/form?type=${type}`)}
+            >
+              Add {textFormatter.fromSlug(type).replace(/s$/, '')}
+            </Button>
+          </AnimateButton>
+        )}
       </Stack>
 
       <MainCard>

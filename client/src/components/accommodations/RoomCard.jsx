@@ -3,9 +3,11 @@ import { Card, CardMedia, CardContent, Typography, Box, Chip, Stack, Button } fr
 import { UserOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import textFormatter from 'utils/textFormatter';
 import { NO_CATEGORY } from 'constants/constants';
+import useGetPosition from 'hooks/useGetPosition';
 
 const RoomCard = ({ roomData, onView, onEdit, onDelete, isOnPortal = true }) => {
   const { thumbnail, name, description, capacity, price, type, status } = roomData;
+  const { isCustomer } = useGetPosition()
 
   return (
     <Card
@@ -17,7 +19,7 @@ const RoomCard = ({ roomData, onView, onEdit, onDelete, isOnPortal = true }) => 
         position: 'relative'
       }}
     >
-      {isOnPortal && (
+      {(isOnPortal && !isCustomer) && (
         <Box
           sx={{
             position: 'absolute',
@@ -91,26 +93,30 @@ const RoomCard = ({ roomData, onView, onEdit, onDelete, isOnPortal = true }) => 
           >
             View
           </Button>
-          <Button
-            variant="contained"
-            size="small"
-            color="info"
-            fullWidth
-            onClick={onEdit}
-            startIcon={<EditOutlined />}
-          >
-            Edit
-          </Button>
-          <Button
-            variant="contained"
-            size="small"
-            color="error"
-            fullWidth
-            onClick={onDelete}
-            startIcon={<DeleteOutlined />}
-          >
-            Delete
-          </Button>
+          {(!isCustomer && isOnPortal) && (
+            <React.Fragment>
+              <Button
+                variant="contained"
+                size="small"
+                color="info"
+                fullWidth
+                onClick={onEdit}
+                startIcon={<EditOutlined />}
+              >
+                Edit
+              </Button>
+              <Button
+                variant="contained"
+                size="small"
+                color="error"
+                fullWidth
+                onClick={onDelete}
+                startIcon={<DeleteOutlined />}
+              >
+                Delete
+              </Button>
+            </React.Fragment>
+          )}
         </Stack>
       </CardContent>
     </Card>

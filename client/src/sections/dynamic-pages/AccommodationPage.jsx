@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CheckOutlined, ClockCircleOutlined, CloseOutlined, DeleteOutlined, EditOutlined, EyeOutlined, MenuOutlined, MoonOutlined, SunOutlined, UserOutlined } from '@ant-design/icons';
+import { BookOutlined, CheckOutlined, ClockCircleOutlined, CloseOutlined, DeleteOutlined, EditOutlined, EyeOutlined, MenuOutlined, MoonOutlined, SunOutlined, UserOutlined } from '@ant-design/icons';
 import {
   Box,
   Button,
@@ -35,8 +35,10 @@ import MainCard from 'components/MainCard';
 import useAuth from 'hooks/useAuth';
 import LoginModal from 'components/LoginModal';
 import { useGetBlockedDates } from 'api/blockedDates';
+import useGetPosition from 'hooks/useGetPosition';
 
 const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
+  const { isCustomer } = useGetPosition()
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth()
 
@@ -227,38 +229,56 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
 
       {isOnPortal && (
         <Stack direction='row' justifyContent='flex-endDate' spacing={2} marginBlock={2}>
-          <AnimateButton>
-            <Button
-              variant='contained'
-              color='primary'
-              startIcon={<EyeOutlined />}
-              onClick={() => window.open(`/accommodations/details/${_id}`)}
-            >
-              Public view
-            </Button>
-          </AnimateButton>
 
-          <AnimateButton>
-            <Button
-              variant='contained'
-              color='info'
-              startIcon={<EditOutlined />}
-              onClick={() => handleEdit(_id)}
-            >
-              Edit
-            </Button>
-          </AnimateButton>
 
-          <AnimateButton>
-            <Button
-              variant='contained'
-              color='error'
-              startIcon={<DeleteOutlined />}
-              onClick={() => setIsDeleteOpen(true)}
-            >
-              Delete
-            </Button>
-          </AnimateButton>
+          {isCustomer && (
+            <AnimateButton>
+              <Button
+                variant='contained'
+                color='primary'
+                startIcon={<BookOutlined />}
+                onClick={() => navigate(`/accommodations/details/${_id}#book_reservation_section`)}
+              >
+                Book a Reservation
+              </Button>
+            </AnimateButton>
+          )}
+
+          {!isCustomer && (
+            <React.Fragment>
+              <AnimateButton>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  startIcon={<EyeOutlined />}
+                  onClick={() => window.open(`/accommodations/details/${_id}`)}
+                >
+                  Public view
+                </Button>
+              </AnimateButton>
+              <AnimateButton>
+                <Button
+                  variant='contained'
+                  color='info'
+                  startIcon={<EditOutlined />}
+                  onClick={() => handleEdit(_id)}
+                >
+                  Edit
+                </Button>
+              </AnimateButton>
+
+              <AnimateButton>
+                <Button
+                  variant='contained'
+                  color='error'
+                  startIcon={<DeleteOutlined />}
+                  onClick={() => setIsDeleteOpen(true)}
+                >
+                  Delete
+                </Button>
+              </AnimateButton>
+            </React.Fragment>
+          )}
         </Stack>
       )}
 
