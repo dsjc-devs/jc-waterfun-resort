@@ -215,7 +215,7 @@ const ReservationsTable = () => {
           "userData.lastName",
           "userData.emailAddress",
           "accommodationData.name",
-          "status"
+          "status",
         ]}
         itemsPerPage={5}
         columns={columns}
