@@ -38,6 +38,10 @@ const resortDetailsSchema = new mongoose.Schema(
         },
       },
     },
+    companyHashtag: {
+      type: String,
+      default: RESORT_DETAILS.companyHashtag
+    },
   },
   { timestamps: true }
 );

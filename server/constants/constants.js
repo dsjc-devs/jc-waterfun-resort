@@ -76,7 +76,8 @@ const RESORT_DETAILS = {
       province: "Cavite",
       country: "Philippines"
     }
-  }
+  },
+  companyHashtag: "#JCWaterfun"
 }
 
 const NO_CATEGORY = "No Category"

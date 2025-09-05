@@ -1,7 +1,7 @@
 import ResortDetails from '../models/resortDetailsModels.js';
 
 const createResortDetails = async (resortData) => {
-  const { aboutUs, companyInfo } = resortData || {};
+  const { aboutUs, companyInfo, companyHashtag } = resortData || {};
 
   try {
     const existingResort = await ResortDetails.findOne();
@@ -46,6 +46,10 @@ const createResortDetails = async (resortData) => {
       }
     }
 
+    if (companyHashtag) {
+      payload.companyHashtag = companyHashtag;
+    }
+
     const resort = await ResortDetails.create(payload);
 
     return `Resort details with ID ${resort._id} successfully created.`;
@@ -84,6 +88,7 @@ const updateResortDetails = async (updateData) => {
       'aboutUs.mission': updateData.mission,
       'aboutUs.vision': updateData.vision,
       'aboutUs.goals': updateData.goals,
+      'companyHashtag': updateData.companyHashtag,
     };
 
     Object.keys(updatePayload).forEach(key => {
