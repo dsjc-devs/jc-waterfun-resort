@@ -30,6 +30,7 @@ import amenitiesRoutes from './routes/amenitiesRoutes.js';
 import resortRatesRoutes from './routes/resortRatesRoutes.js';
 import reservationRoutes from './routes/reservationRoutes.js';
 import blockedDateRoutes from './routes/blockedDateRoutes.js';
+import carouselRoutes from './routes/carouselRoutes.js';
 
 /*  ========== CRON ========== */
 import { startReservationCron } from './cron/reservationCron.js';
@@ -74,6 +75,7 @@ app.use(`/api/${API_VERSION}/amenities-type`, amenitiesTypeRoutes);
 app.use(`/api/${API_VERSION}/amenities`, amenitiesRoutes);
 app.use(`/api/${API_VERSION}/reservations`, reservationRoutes);
 app.use(`/api/${API_VERSION}/blocked-dates`, blockedDateRoutes);
+app.use(`/api/${API_VERSION}/carousel`, carouselRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'client', 'build')));
