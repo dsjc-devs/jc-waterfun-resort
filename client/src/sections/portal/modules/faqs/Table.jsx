@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Button,
   Chip,
@@ -12,11 +12,14 @@ import {
   TextField,
   Tooltip,
   Typography,
+  Box,
+  Autocomplete
 } from '@mui/material';
 import {
   EditOutlined,
   DeleteOutlined,
-  PlusOutlined
+  PlusOutlined,
+  EyeOutlined
 } from '@ant-design/icons';
 import { useGetFAQS } from 'api/faqs';
 import { toast } from 'react-toastify';
@@ -37,6 +40,11 @@ const statusColors = {
   ARCHIVED: 'error'
 };
 
+
+const categoryColors = {
+  default: 'primary'
+};
+
 const FAQsTable = () => {
   const { data, isLoading, mutate } = useGetFAQS();
   const faqs = data?.faqs || [];
@@ -47,13 +55,22 @@ const FAQsTable = () => {
   });
 
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [viewedFaq, setViewedFaq] = useState(null);
 
   const [formState, setFormState] = useState({
     title: '',
     answer: '',
-    category: '', 
+    category: '',
     status: 'POSTED'
   });
+
+  // Extract unique categories from FAQs for autocomplete options
+  const [categoryOptions, setCategoryOptions] = useState([]);
+
+  useEffect(() => {
+    const categories = [...new Set(faqs.map((f) => f.category).filter(Boolean))];
+    setCategoryOptions(categories);
+  }, [faqs]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -69,7 +86,7 @@ const FAQsTable = () => {
     setFormState({
       title: faq.title,
       answer: faq.answer,
-      category: faq.category || '', // ← SUPPORT EXISTING FAQ CATEGORY
+      category: faq.category || '',
       status: faq.status
     });
     setModalState({ open: true, editingFaq: faq });
@@ -79,6 +96,10 @@ const FAQsTable = () => {
     try {
       if (!formState.title.trim() || !formState.answer.trim()) {
         toast.error('Title and answer are required');
+        return;
+      }
+      if (!formState.category.trim()) {
+        toast.error('Category is required');
         return;
       }
 
@@ -137,10 +158,41 @@ const FAQsTable = () => {
       {
         id: 'status',
         label: 'Status',
+        align: 'center',
         renderCell: (row) => (
-          <Chip sx={{ width: '150px' }} label={statusLabels[row.status]} color={statusColors[row.status]} />
+          <Box display="flex" justifyContent="center">
+            <Chip
+              sx={{ width: '150px' }}
+              label={statusLabels[row.status]}
+              color={statusColors[row.status]}
+            />
+          </Box>
         )
       },
+      {
+        id: 'category',
+        label: 'Category',
+        align: 'center',
+        renderCell: (row) => {
+          const cat = row.category || 'Uncategorized';
+          const chipColor = categoryColors[cat] || categoryColors.default;
+          return (
+            <Box display="flex" justifyContent="center">
+              <Chip
+                variant='light'
+                label={<Typography variant="subtitle2" fontWeight="bold">{cat}</Typography>}
+                color={chipColor}
+                sx={{
+                  width: '150px',
+                  textAlign: 'center',
+                  fontWeight: 'medium'
+                }}
+              />
+            </Box>
+          );
+        }
+      },
+
       {
         id: 'createdAt',
         align: 'left',
@@ -153,6 +205,11 @@ const FAQsTable = () => {
         label: 'Actions',
         renderCell: (row) => (
           <Stack direction="row" spacing={1}>
+            <Tooltip title="View FAQ">
+              <IconButton color="primary" onClick={() => setViewedFaq(row)}>
+                <EyeOutlined />
+              </IconButton>
+            </Tooltip>
             <Tooltip title="Edit FAQ">
               <IconButton color="info" onClick={() => openEditModal(row)}>
                 <EditOutlined />
@@ -195,6 +252,7 @@ const FAQsTable = () => {
         }}
       />
 
+      {/* Add/Edit FAQ Dialog */}
       <Dialog
         open={modalState.open}
         onClose={() => setModalState({ open: false, editingFaq: null })}
@@ -230,12 +288,53 @@ const FAQsTable = () => {
             </Grid>
             <Grid item xs={12}>
               <Typography mt={2}>Category (Required)</Typography>
-              <TextField
-                name="category"
-                fullWidth
-                value={formState.category}
-                onChange={handleInputChange}
-                required
+              <Autocomplete
+                freeSolo
+                options={categoryOptions.map((title) => ({ title }))}
+                value={formState.category ? { title: formState.category } : null}
+                onChange={(event, newValue) => {
+                  let valueToSet = '';
+                  if (typeof newValue === 'string') {
+                    valueToSet = newValue;
+                  } else if (newValue?.inputValue) {
+                    valueToSet = newValue.inputValue;
+                  } else {
+                    valueToSet = newValue?.title || '';
+                  }
+                  setFormState((prev) => ({ ...prev, category: valueToSet }));
+                }}
+                filterOptions={(options, params) => {
+                  const filtered = options.filter((option) =>
+                    option.title.toLowerCase().includes(params.inputValue.toLowerCase())
+                  );
+
+                  const { inputValue } = params;
+                  const isExisting = options.some(
+                    (option) => option.title.toLowerCase() === inputValue.toLowerCase()
+                  );
+
+                  if (inputValue !== '' && !isExisting) {
+                    filtered.push({
+                      inputValue,
+                      title: `Add "${inputValue}"`
+                    });
+                  }
+
+                  return filtered;
+                }}
+                getOptionLabel={(option) =>
+                  typeof option === 'string' ? option : option.inputValue || option.title
+                }
+                renderOption={(props, option) => <li {...props}>{option.title}</li>}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    required
+                    fullWidth
+                    name="category"
+                    placeholder="Select or add category"
+                  />
+                )}
               />
             </Grid>
             <Grid item xs={12}>
@@ -264,6 +363,7 @@ const FAQsTable = () => {
         </DialogActions>
       </Dialog>
 
+      {/* Delete Confirmation Dialog */}
       <ConfirmationDialog
         title="Delete FAQ"
         description={`Are you sure you want to delete "${deleteTarget?.title}"?`}
@@ -271,6 +371,49 @@ const FAQsTable = () => {
         open={Boolean(deleteTarget)}
         handleClose={() => setDeleteTarget(null)}
       />
+
+      {/* View FAQ Dialog */}
+      <Dialog
+        open={Boolean(viewedFaq)}
+        onClose={() => setViewedFaq(null)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>
+          <Typography variant="h4">View FAQ</Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Stack spacing={2}>
+            <Typography><strong>Title:</strong></Typography>
+            <Typography variant="body1">{viewedFaq?.title}</Typography>
+
+            <Typography><strong>Answer:</strong></Typography>
+            <Typography variant="body1">{viewedFaq?.answer}</Typography>
+
+            <Typography><strong>Category:</strong></Typography>
+            <Chip
+              label={statusLabels[viewedFaq?.status]}
+              color={statusColors[viewedFaq?.status]}
+              sx={{ width: '150px' }}
+            />
+
+            <Typography><strong>Status:</strong></Typography>
+            <Chip
+              label={statusLabels[viewedFaq?.status]}
+              color={statusColors[viewedFaq?.status]}
+              sx={{ width: '150px' }}
+            />
+
+            <Typography><strong>Date Created:</strong></Typography>
+            <Typography variant="body1">
+              <ConvertDate dateString={viewedFaq?.createdAt} />
+            </Typography>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setViewedFaq(null)}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </React.Fragment>
   );
 };
