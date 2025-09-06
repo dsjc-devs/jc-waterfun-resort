@@ -6,7 +6,7 @@ import NavGroup from './NavGroup';
 import useAuth from 'hooks/useAuth';
 import getModules, { icons } from 'menu-items/modules';
 import { NO_CATEGORY, USER_ROLES } from 'constants/constants';
-import { useGetAccommodationTypes } from 'api/accomodationsType';
+import { useGetAccommodationTypes } from 'api/accomodation-type';
 
 // ==============================|| DRAWER CONTENT - NAVIGATION ||============================== //
 

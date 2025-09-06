@@ -9,7 +9,7 @@ import {
   Container,
 } from '@mui/material';
 import { MoonOutlined, SunOutlined } from '@ant-design/icons';
-import { useGetResortRates } from 'api/resortRates';
+import { useGetResortRates } from 'api/resort-rates';
 
 import TitleTag2 from 'components/TitleTag2';
 

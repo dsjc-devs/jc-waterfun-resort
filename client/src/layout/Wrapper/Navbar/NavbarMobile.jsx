@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 import { MenuOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router'
-import { useGetAccommodationTypes } from 'api/accomodationsType'
+import { useGetAccommodationTypes } from 'api/accomodation-type'
 import { NO_CATEGORY } from 'constants/constants'
 import React, { useState } from 'react'
 

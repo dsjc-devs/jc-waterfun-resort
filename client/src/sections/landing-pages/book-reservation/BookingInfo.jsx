@@ -8,7 +8,7 @@ import {
   Alert,
 } from "@mui/material";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
-import { useGetResortRates } from "api/resortRates";
+import { useGetResortRates } from "api/resort-rates";
 import React, { useEffect, useMemo } from "react";
 
 import MainCard from "components/MainCard";

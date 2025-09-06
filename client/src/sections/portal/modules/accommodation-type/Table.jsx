@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import { Box, Button, Chip, Stack, Tooltip, Typography } from '@mui/material';
-import { useGetAccommodationTypes } from 'api/accomodationsType';
+import { useGetAccommodationTypes } from 'api/accomodation-type';
 import { useMemo } from 'react';
 
 import ReusableTable from 'components/ReusableTable'

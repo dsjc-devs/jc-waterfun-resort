@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Stack, Container, Box, Link, Button, Typography, Grid, Popper, Paper } from '@mui/material'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useGetAccommodationTypes } from 'api/accomodationsType'
+import { useGetAccommodationTypes } from 'api/accomodation-type'
 import { NO_CATEGORY } from 'constants/constants'
 
 import useAuth from 'hooks/useAuth'

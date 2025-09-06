@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 
 import { UserOutlined } from '@ant-design/icons';
-import { useGetAccommodationTypes } from 'api/accomodationsType';
+import { useGetAccommodationTypes } from 'api/accomodation-type';
 import { FormikProvider, useFormik } from 'formik';
 import { toast } from 'react-toastify';
 import { NO_CATEGORY } from 'constants/constants';

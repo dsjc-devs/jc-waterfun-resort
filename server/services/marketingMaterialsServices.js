@@ -1,11 +1,13 @@
 import MarketingMaterials from "../models/marketingMaterialsModels.js";
 
 const createMarketingMaterial = async (materialData) => {
-  const { title, content, attachments } = materialData || {};
+  const { title, thumbnail, status, content, attachments } = materialData || {};
 
   try {
     const marketingMaterial = await MarketingMaterials.create({
       title,
+      thumbnail,
+      status,
       content,
       attachments,
     });
@@ -63,7 +65,7 @@ const getSingleMarketingMaterialById = async (materialId) => {
 
 const updateMarketingMaterialById = async (materialId, updateData) => {
   try {
-    const allowedFields = ["title", "content", "views", "attachments"];
+    const allowedFields = ["title", "thumbnail", "status", "content", "views", "attachments"];
     const updates = {};
 
     for (const key of allowedFields) {

@@ -22,6 +22,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { addHours } from 'date-fns';
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers';
+import { useGetBlockedDates } from 'api/blocked-dates';
 
 import agent from 'api';
 import AnimateButton from 'components/@extended/AnimateButton';
@@ -34,7 +35,6 @@ import formatPeso from 'utils/formatPrice';
 import MainCard from 'components/MainCard';
 import useAuth from 'hooks/useAuth';
 import LoginModal from 'components/LoginModal';
-import { useGetBlockedDates } from 'api/blockedDates';
 import useGetPosition from 'hooks/useGetPosition';
 
 const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {

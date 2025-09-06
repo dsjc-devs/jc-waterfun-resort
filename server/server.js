@@ -64,7 +64,7 @@ app.use(`/api/${API_VERSION}/api-docs`, swaggerUi.serve, swaggerUi.setup(swagger
 /*  ========== API - Routes ========== */
 app.use(`/api/${API_VERSION}/users`, usersRoutes);
 app.use(`/api/${API_VERSION}/testimonials`, testimonialsRoutes);
-app.use(`/api/${API_VERSION}/marketing-material`, marketingMaterialsRoutes);
+app.use(`/api/${API_VERSION}/marketing-materials`, marketingMaterialsRoutes);
 app.use(`/api/${API_VERSION}/contact`, contactUsRoutes);
 app.use(`/api/${API_VERSION}/resort-details`, resortDetailsRoutes);
 app.use(`/api/${API_VERSION}/accommodation-type`, accommodationTypeRoutes);
