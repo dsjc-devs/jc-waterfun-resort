@@ -46,4 +46,6 @@ const MarketingMaterials = {
   }
 }
 
-export default MarketingMaterials;
+export default {
+  MarketingMaterials
+};

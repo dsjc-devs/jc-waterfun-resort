@@ -4,6 +4,7 @@ import Accommodations from "./accommodations"
 import FAQS from "./faqs"
 import AccommodationType from "./accomodation-type"
 import Reservations from "./reservations"
+import MarketingMaterials from "./marketing-materials"
 
 const agent = {
   ...Users,
@@ -11,7 +12,8 @@ const agent = {
   ...Accommodations,
   ...FAQS,
   ...AccommodationType,
-  ...Reservations
+  ...Reservations,
+  ...MarketingMaterials
 }
 
 export default agent

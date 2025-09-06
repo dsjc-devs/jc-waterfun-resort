@@ -125,7 +125,7 @@ const MainRoutes = {
             },
             {
               path: 'marketing-materials',
-              element: <MarketingMaterials/>
+              element: <MarketingMaterials />
             },
             {
               path: 'about-us',
