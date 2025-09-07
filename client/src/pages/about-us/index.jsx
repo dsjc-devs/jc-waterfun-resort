@@ -7,6 +7,7 @@ import PageTitle from 'components/PageTitle'
 import Banner from 'components/Banner'
 import TitleTag from 'components/TitleTag'
 import { useGetResortDetails } from 'api/resort-details'
+import AboutUS from 'assets/images/upload/about-us-header.jpg'
 
 const AboutUs = () => {
   const theme = useTheme()
@@ -26,7 +27,7 @@ const AboutUs = () => {
 
       <React.Fragment>
         <Banner
-          image="https://www.anvayacove.com/beach-nature-club/wp-content/uploads/2014/09/header_contactus1.jpg"
+          image={AboutUS}
           title="About Us"
           subtitle="Where relaxation and fun meet unforgettable memories"
         />

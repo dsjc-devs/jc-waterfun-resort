@@ -9,7 +9,8 @@ import {
   Typography,
   Container
 } from '@mui/material';
-import Banner from 'components/Banner';
+import Banner from 'components/Banner'; 
+import Faqs from 'assets/images/upload/faqs-header.jpg'
 
 const FAQS = () => {
   const { data, isLoading } = useGetFAQS({ status: 'POSTED' });
@@ -26,7 +27,7 @@ const FAQS = () => {
   return (
     <React.Fragment>
       <Banner
-        image="https://www.anvayacove.com/beach-nature-club/wp-content/uploads/2014/09/header_contactus1.jpg"
+        image={Faqs}
         title="FAQs"
         subtitle="A place to find answers"
       />
