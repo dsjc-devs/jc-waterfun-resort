@@ -15,7 +15,8 @@ import { useTheme } from '@mui/material/styles';
 import PageTitle from 'components/PageTitle';
 import MainCard from 'components/MainCard';
 import Banner from 'components/Banner';
-import Logo from 'components/logo/LogoMain'
+import Logo from 'components/logo/LogoMain';
+import contactUs from 'assets/images/upload/contact-us-header.jpg';
 
 const ContactUs = () => {
   const theme = useTheme()
@@ -42,7 +43,7 @@ const ContactUs = () => {
 
       <Box>
         <Banner
-          image={"https://www.anvayacove.com/beach-nature-club/wp-content/uploads/2014/09/header_contactus1.jpg"}
+          image={contactUs}
           title='Contact Us'
           subtitle='We are always willing to serve'
         />
