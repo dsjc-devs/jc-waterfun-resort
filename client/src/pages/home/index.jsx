@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 
 import React from 'react'
 import Carousel from 'react-material-ui-carousel'
@@ -15,6 +15,7 @@ import banner8 from 'assets/images/upload/banner4.jpg'
 
 import AboutUs from 'sections/landing-pages/AboutUs'
 import ContactUs from 'sections/landing-pages/ContactUs'
+import DiscoverSection from 'sections/landing-pages/DiscoverSection'
 
 const Home = () => {
   const items = [
@@ -69,91 +70,7 @@ const Home = () => {
       <RateSection />
       <ContactUs />
       <AboutUs />
-
-      <Box
-        sx={{
-          width: '100%',
-          minHeight: { xs: '400px', md: '520px' },
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          px: { xs: 2, md: 10 },
-          py: { xs: 4, md: 8 },
-          overflow: 'hidden',
-          backgroundImage: `url(${banner8})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            background: 'rgba(60,120,40,0.45)',
-            zIndex: 1,
-          }}
-        />
-        <Box sx={{ position: 'absolute', left: { xs: 10, md: 80 }, top: { xs: 120, md: 180 }, zIndex: 2, display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
-          <Box
-            component="img"
-            src={banner4}
-            alt="Nature Adventure 1"
-            sx={{
-              width: { xs: '180px', md: '300px' },
-              height: 'auto',
-              boxShadow: 4,
-              borderRadius: 2,
-              transform: 'rotate(-12deg)',
-              border: '6px solid #fff',
-              mb: 0,
-              mr: { xs: 2, md: 8 },
-              position: 'relative',
-              zIndex: 2,
-            }}
-          />
-          <Box
-            component="img"
-            src={banner5}
-            alt="Nature Adventure 2"
-            sx={{
-              width: { xs: '180px', md: '300px' },
-              height: 'auto',
-              boxShadow: 4,
-              borderRadius: 2,
-              transform: 'rotate(7deg)',
-              border: '6px solid #fff',
-              position: 'relative',
-              zIndex: 1,
-            }}
-          />
-        </Box>
-        <Box
-          sx={{
-            ml: { xs: 0, md: 40 },
-            color: '#fff',
-            maxWidth: { xs: '100%', md: '55%' },
-            zIndex: 3,
-            textShadow: '0 2px 8px rgba(0,0,0,0.3)',
-            pl: { xs: 0, md: 8 },
-          }}
-        >
-          <Box sx={{ fontSize: { xs: '1.3rem', md: '2.3rem' }, fontWeight: 300, letterSpacing: 2, mb: 1, fontFamily: 'Cinzel, serif' }}>
-            DISCOVER NATURE AT ITS FINEST
-          </Box>
-          <Box sx={{ fontSize: { xs: '2.2rem', md: '3.2rem' }, fontWeight: 700, mb: 2, fontFamily: 'Cinzel, serif' }}>
-            MAKING IT HAPPEN!
-          </Box>
-          <Box sx={{ fontSize: { xs: '1.1rem', md: '1.3rem' }, mb: 2, fontWeight: 400, lineHeight: 1.7 }}>
-            Wake up the family with a symphony of birdsong ushering in a day of discovery. Discover a multitude of colors and textures with a score of indigenous flowers, plants, and trees.<br />
-            <br />
-            Let your children experience the thrills of adventure in the forest. Their eyes are soon fluent in the vibrant markings of birds and insects. From the cliffs, end your day with the incredible sight of an endless sky of stars. At JC Waterfun Resort, the exhilarating outdoors is preserved for you—as nature intended.
-          </Box>
-        </Box>
-      </Box>
+      <DiscoverSection />
     </React.Fragment>
   )
 }
