@@ -34,6 +34,7 @@ const AboutUs = Loadable(lazy(() => import('pages/portal/content-management/abou
 const CompanyInfo = Loadable(lazy(() => import('pages/portal/content-management/company-info')));
 const Faqs = Loadable(lazy(() => import('pages/portal/content-management/faqs')));
 const MarketingMaterials = Loadable(lazy(() => import('pages/portal/content-management/marketing-materials')));
+const MarketingMaterialDetails = Loadable(lazy(() => import('pages/portal/content-management/marketing-materials/details')));
 
 const MainRoutes = {
   path: '/',
@@ -125,7 +126,16 @@ const MainRoutes = {
             },
             {
               path: 'marketing-materials',
-              element: <MarketingMaterials />
+              children: [
+                {
+                  index: true,
+                  element: <MarketingMaterials />
+                },
+                {
+                  path: 'details/:id',
+                  element: <MarketingMaterialDetails />
+                },
+              ]
             },
             {
               path: 'about-us',

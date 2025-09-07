@@ -23,12 +23,12 @@ import {
   Fade
 } from '@mui/material';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 import ReusableTable from 'components/ReusableTable';
 import ConvertDate from 'components/ConvertDate';
 import Avatar from 'components/@extended/Avatar';
 import ConfirmationDialog from 'components/ConfirmationDialog';
-
 import MarketingMaterialForm from 'sections/portal/modules/marketing-materials/Form';
 import agent from 'api';
 import { useGetMarketingMaterials } from 'api/marketing-materials';
@@ -45,7 +45,7 @@ const statusColors = {
   ARCHIVED: 'error'
 };
 
-const GridCard = ({ material }) => (
+const GridCard = ({ material, navigate }) => (
   <Box
     sx={{
       bgcolor: 'background.paper',
@@ -105,28 +105,15 @@ const GridCard = ({ material }) => (
       <Stack direction="row" spacing={2}>
         <Typography
           component="a"
-          href="#"
           sx={{
             color: 'primary.main',
             cursor: 'pointer',
             textDecoration: 'none',
             '&:hover': { textDecoration: 'underline' }
           }}
-          onClick={() => toast.info(`Share ${material.title}`)}
-        >
-          Share
-        </Typography>
-        <Typography
-          component="a"
-          href={material.articleUrl || '#'}
-          target="_blank"
-          rel="noopener noreferrer"
-          sx={{
-            color: 'primary.main',
-            cursor: 'pointer',
-            textDecoration: 'none',
-            '&:hover': { textDecoration: 'underline' }
-          }}
+          onClick={() =>
+            navigate(`/portal/content-management/marketing-materials/details/${material._id}`)
+          }
         >
           View Article
         </Typography>
@@ -136,6 +123,7 @@ const GridCard = ({ material }) => (
 );
 
 const MarketingMaterialsTable = ({ queryObj = {} }) => {
+  const navigate = useNavigate();
   const { data, isLoading, mutate } = useGetMarketingMaterials(queryObj);
   const marketingMaterials = data?.marketingMaterials || [];
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -196,19 +184,13 @@ const MarketingMaterialsTable = ({ queryObj = {} }) => {
       formData.append("content", values.content);
 
       if (values.existingAttachments && values.existingAttachments.length > 0) {
-        formData.append(
-          "existingAttachments",
-          JSON.stringify(values.existingAttachments)
-        );
+        formData.append("existingAttachments", JSON.stringify(values.existingAttachments));
       } else {
         formData.append("existingAttachments", JSON.stringify([]));
       }
 
       if (values.attachmentsToRemove && values.attachmentsToRemove.length > 0) {
-        formData.append(
-          "attachmentsToRemove",
-          JSON.stringify(values.attachmentsToRemove)
-        );
+        formData.append("attachmentsToRemove", JSON.stringify(values.attachmentsToRemove));
       }
 
       if (values.files && values.files.length > 0) {
@@ -287,10 +269,7 @@ const MarketingMaterialsTable = ({ queryObj = {} }) => {
         label: '',
         renderCell: (row) => (
           <Tooltip title="Actions">
-            <IconButton
-              aria-label="more"
-              onClick={(e) => handleMenuClick(e, row)}
-            >
+            <IconButton aria-label="more" onClick={(e) => handleMenuClick(e, row)}>
               <EllipsisOutlined />
             </IconButton>
           </Tooltip>
@@ -332,7 +311,7 @@ const MarketingMaterialsTable = ({ queryObj = {} }) => {
           {marketingMaterials.length > 0 ? (
             marketingMaterials.map((material) => (
               <Grid key={material._id} item xs={12} sm={6} md={4}>
-                <GridCard material={material} />
+                <GridCard material={material} navigate={navigate} />
               </Grid>
             ))
           ) : (
@@ -363,55 +342,6 @@ const MarketingMaterialsTable = ({ queryObj = {} }) => {
           />
         </Dialog>
 
-        <Menu
-          id={`row-menu-${openMenu.material?._id}`}
-          anchorEl={openMenu.anchorEl}
-          open={Boolean(openMenu.anchorEl)}
-          onClose={handleMenuClose}
-          TransitionComponent={Fade}
-        >
-          <MenuItem>
-            <Tooltip title="View">
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <EyeOutlined />
-                View
-              </Box>
-            </Tooltip>
-          </MenuItem>
-          <MenuItem onClick={() => openEditModal(openMenu.material)}>
-            <Tooltip title="Edit">
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <EditOutlined />
-                Edit
-              </Box>
-            </Tooltip>
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              setDeleteConfigs({ open: true, materialId: openMenu.material?._id });
-              setDeleteTarget(openMenu.material);
-              handleMenuClose();
-            }}
-          >
-            <Tooltip title="Delete">
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <DeleteOutlined />
-                Delete
-              </Box>
-            </Tooltip>
-          </MenuItem>
-        </Menu>
-
-        <ConfirmationDialog
-          title="Delete Marketing Material"
-          description={`Are you sure you want to delete "${deleteTarget?.title}"?`}
-          handleConfirm={handleDelete}
-          open={deleteConfigs.open}
-          handleClose={() => {
-            setDeleteConfigs({ open: false, materialId: '' });
-            setDeleteTarget(null);
-          }}
-        />
       </>
     );
   }
@@ -458,7 +388,11 @@ const MarketingMaterialsTable = ({ queryObj = {} }) => {
         onClose={handleMenuClose}
         TransitionComponent={Fade}
       >
-        <MenuItem>
+        <MenuItem
+          onClick={() =>
+            navigate(`/portal/content-management/marketing-materials/details/${openMenu.material?._id}`)
+          }
+        >
           <Tooltip title="View">
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <EyeOutlined />

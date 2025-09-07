@@ -19,6 +19,21 @@ export const useGetMarketingMaterials = (queryObj = {}) => {
   return memoizedValue;
 };
 
+export const useGetSingleMarketingMaterial = (materialId) => {
+  const apiURL = materialId && `/${endpoints.key}/${materialId}`;
+
+  const { data, isLoading, error, mutate } = useSWR(apiURL, fetcher, OPTIONS);
+
+  const memoizedValue = useMemo(() => ({
+    data,
+    isLoading,
+    mutate,
+    error
+  }), [data, isLoading, mutate, error]);
+
+  return memoizedValue;
+};
+
 const MarketingMaterials = {
   addMarketingMaterial: async (payload) => {
     try {
