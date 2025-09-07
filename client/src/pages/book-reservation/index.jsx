@@ -132,6 +132,9 @@ const BookReservation = () => {
     try {
       const payload = {
         userId: user?.userId,
+        userData: {
+          ...user
+        },
         accommodationId: bookingData.accommodationData?._id,
         startDate: bookingData.startDate,
         endDate: bookingData.endDate,

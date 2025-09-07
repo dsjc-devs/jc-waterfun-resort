@@ -14,7 +14,6 @@ const amountSchema = new mongoose.Schema(
     accommodationTotal: { type: Number, required: true },
     entranceTotal: { type: Number, required: true },
     total: { type: Number, required: true },
-    minimumPayable: { type: Number, required: true },
     totalPaid: { type: Number, required: true },
     adult: { type: Number, default: 0 },
     child: { type: Number, default: 0 },
@@ -22,6 +21,17 @@ const amountSchema = new mongoose.Schema(
   },
   { _id: false }
 );
+
+const userDataSchema = new mongoose.Schema(
+  {
+    userId: { type: String },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    emailAddress: { type: String },
+    phoneNumber: { type: String },
+  },
+  { _id: false }
+)
 
 const reservationSchema = new mongoose.Schema(
   {
@@ -31,7 +41,10 @@ const reservationSchema = new mongoose.Schema(
       unique: true,
     },
     userId: {
-      type: String,
+      type: String
+    },
+    userData: {
+      type: userDataSchema,
       required: true,
     },
     accommodationId: {
@@ -50,11 +63,6 @@ const reservationSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED", "RESCHEDULED", "ARCHIVED"],
-    },
-    paymentStatus: {
-      type: String,
-      required: true,
-      enum: ["FULLY_PAID", "PARTIALLY_PAID", "UNPAID"],
     },
     quantities: quantitiesSchema,
     amount: amountSchema,

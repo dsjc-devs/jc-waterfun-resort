@@ -2,10 +2,6 @@ import { body } from "express-validator";
 import { validate } from "../../utils/expressValidator.js";
 
 const createReservationValid = [
-  body("userId")
-    .notEmpty()
-    .withMessage("userId is required"),
-
   body("accommodationId")
     .notEmpty()
     .withMessage("accommodationId is required"),
@@ -40,11 +36,6 @@ const createReservationValid = [
   body("amount.total")
     .notEmpty()
     .withMessage("amount.total is required")
-    .isNumeric(),
-
-  body("amount.minimumPayable")
-    .notEmpty()
-    .withMessage("amount.minimumPayable is required")
     .isNumeric(),
 
   body("amount.totalPaid")

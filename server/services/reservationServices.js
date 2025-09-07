@@ -55,29 +55,31 @@ const getReservationsByQuery = async (queryObject = {}) => {
 
     const reservations = await Reservation.find(filters)
       .populate("accommodationId")
-      .populate({
-        path: "userId",
-        model: "Users",
-        localField: "userId",
-        foreignField: "userId",
-        select: "firstName lastName emailAddress",
-      })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
     const transformed = reservations.map((reservation) => {
-      const { userId, quantities, ...rest } = reservation.toObject();
+      const { userId, quantities, amount, ...rest } = reservation.toObject();
       const totalGuests = Object.values(quantities || {}).reduce(
         (sum, acc) => sum + (acc || 0),
         0
       );
 
+      const transformedAmount = amount
+        ? {
+          ...amount,
+          minimumPayable: amount.accommodationTotal
+            ? amount.accommodationTotal * 0.5
+            : 0,
+        }
+        : {};
+
       return {
         ...rest,
-        userData: userId,
-        totalGuests
-      }
+        amount: transformedAmount,
+        totalGuests,
+      };
     });
 
     const totalCount = await Reservation.countDocuments(filters);
@@ -98,23 +100,25 @@ const getSingleReservationById = async (reservationId) => {
   try {
     const reservation = await Reservation.findOne({ reservationId })
       .populate("accommodationId")
-      .populate({
-        path: "userId",
-        model: "Users",
-        localField: "userId",
-        foreignField: "userId",
-        select: "firstName lastName emailAddress phoneNumber",
-      });
 
     if (!reservation) {
       throw new Error("Reservation not found");
     }
 
-    const { userId, accommodationId, ...rest } = reservation.toObject();
+    const { userId, accommodationId, amount, ...rest } = reservation.toObject();
+
+    const transformedAmount = amount
+      ? {
+        ...amount,
+        minimumPayable: amount.accommodationTotal
+          ? amount.accommodationTotal * 0.5
+          : 0,
+      }
+      : {};
 
     return {
-      userData: userId,
       accommodationData: accommodationId,
+      amount: transformedAmount,
       ...rest,
     };
   } catch (error) {

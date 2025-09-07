@@ -132,11 +132,13 @@ const ReservationsTable = () => {
             <Avatar size="lg" src={row?.userData?.avatar} />
           </Box>
           <Box>
-            <Tooltip title={`User ID: ${row?.userData?.userId}`}>
-              <Typography variant="subtitle2" color="secondary.600">
-                #{truncate(row?.userData?.userId, 20)}
-              </Typography>
-            </Tooltip>
+            {row?.userData?.userId && (
+              <Tooltip title={`User ID: ${row?.userData?.userId}`}>
+                <Typography variant="subtitle2" color="secondary.600">
+                  #{truncate(row?.userData?.userId, 20)}
+                </Typography>
+              </Tooltip>
+            )}
             <Typography variant="subtitle1">
               {row?.userData?.firstName} {row?.userData?.lastName}
             </Typography>
@@ -230,6 +232,7 @@ const ReservationsTable = () => {
                   <Button
                     variant='contained'
                     startIcon={<PlusOutlined />}
+                    onClick={() => navigate('/portal/reservations/form')}
                   >
                     Create Reservation
                   </Button>
@@ -255,16 +258,16 @@ const ReservationsTable = () => {
           View
         </MenuItem>
 
-        {/* {(isAdmin || isMasterAdmin) && (
+        {(isAdmin || isMasterAdmin) && (
           <MenuItem
             onClick={() => {
-              handleMenuClose()
+              navigate(`/portal/reservations/form?isEditMode=true&reservationId=${openMenu.reservationId}`)
             }}
           >
             <EditOutlined style={{ marginRight: 8 }} />
             Edit
           </MenuItem>
-        )} */}
+        )}
       </Menu>
 
     </React.Fragment>

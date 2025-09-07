@@ -19,7 +19,8 @@ const getAllBlockedDates = async () => {
           _id: 0,
           startDate: 1,
           endDate: 1,
-          reason: 1
+          reason: 1,
+          isFromReservation: { $literal: false }
         }
       }
     ]);
@@ -50,18 +51,18 @@ const getAllBlockedDates = async () => {
               "Booked Reservation for ",
               "$accommodation.name"
             ]
-          }
+          },
+          isFromReservation: { $literal: true }
         }
       }
     ]);
-
 
     return [...manualBlocked, ...confirmedReservations];
   } catch (error) {
     console.error("Error fetching blocked dates:", error);
     throw new Error("Could not fetch blocked dates");
   }
-}
+};
 
 const getBlockedDateById = async (id) => {
   try {
