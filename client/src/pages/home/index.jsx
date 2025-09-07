@@ -24,7 +24,8 @@ const Home = () => {
     banner4,
     banner5,
     banner6,
-    banner7
+    banner7,
+    banner8
   ]
 
   return (
