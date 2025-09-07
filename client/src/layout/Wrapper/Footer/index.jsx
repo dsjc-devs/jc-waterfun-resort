@@ -69,23 +69,26 @@ const Footer = () => {
               Resort Info
             </Typography>
             <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-              {["Rules & Regulations", "Amenities", "Shops"].map((item) => (
-                <li key={item} style={{ lineHeight: 1.8 }}>
+              {[
+                { label: "Rules & Regulations", href: "rules-regulations" },
+                { label: "Amenities", href: "amenities" },
+              ].map((item) => (
+                <li key={item.label} style={{ lineHeight: 1.8 }}>
                   <Link
-                    href="#"
+                    href={item.href}
                     sx={{
-                      color: "#fff",
-                      fontSize: "14px",
-                      fontFamily: "Istok Web, sans-serif",
-                      textDecoration: "none",
-                      "&:hover": { textDecoration: "underline" },
-                    }}
-                  >
-                    {item}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+                       color: "#fff",
+                       fontSize: "14px",
+                       fontFamily: "Istok Web, sans-serif",
+                       textDecoration: "none",
+                       "&:hover": { textDecoration: "underline" },
+              }}
+             >
+              {item.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
@@ -103,23 +106,28 @@ const Footer = () => {
               About Us
             </Typography>
             <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-              {["Contact Us", "Media", "FAQs", "Privacy Policy"].map((item) => (
-                <li key={item} style={{ lineHeight: 1.8 }}>
-                  <Link
-                    href="#"
+             {[
+               { label: "Contact Us", href: "contact-us" },
+               { label: "Media", href: "media" },
+               { label: "FAQs", href: "faqs" },
+               { label: "Privacy Policy", href: "privacy-policy" },
+             ].map((item) => (
+               <li key={item.label} style={{ lineHeight: 1.8 }}>
+                 <Link
+                    href={item.href}
                     sx={{
-                      color: "#fff",
-                      fontSize: "14px",
-                      fontFamily: "Istok Web, sans-serif",
-                      textDecoration: "none",
-                      "&:hover": { textDecoration: "underline" },
-                    }}
-                  >
-                    {item}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+                    color: "#fff",
+                    fontSize: "14px",
+                    fontFamily: "Istok Web, sans-serif",
+                    textDecoration: "none",
+                    "&:hover": { textDecoration: "underline" },
+                  }}
+                 >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
