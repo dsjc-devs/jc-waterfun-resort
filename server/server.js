@@ -32,6 +32,7 @@ import reservationRoutes from './routes/reservationRoutes.js';
 import blockedDateRoutes from './routes/blockedDateRoutes.js';
 import carouselRoutes from './routes/carouselRoutes.js';
 import policiesRoutes from './routes/policiesRoutes.js';
+import announcementsRoutes from './routes/announcementsRoutes.js';
 
 /*  ========== CRON ========== */
 import { startReservationCron } from './cron/reservationCron.js';
@@ -78,6 +79,7 @@ app.use(`/api/${API_VERSION}/reservations`, reservationRoutes);
 app.use(`/api/${API_VERSION}/blocked-dates`, blockedDateRoutes);
 app.use(`/api/${API_VERSION}/carousel`, carouselRoutes);
 app.use(`/api/${API_VERSION}/policies`, policiesRoutes);
+app.use(`/api/${API_VERSION}/announcements`, announcementsRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'client', 'build')));
