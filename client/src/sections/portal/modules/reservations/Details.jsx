@@ -30,7 +30,7 @@ const Details = ({ reservationData = {} }) => {
     startDate,
     endDate,
     status,
-    quantities,
+    entrances,
     amount,
   } = reservationData;
 
@@ -99,7 +99,7 @@ const Details = ({ reservationData = {} }) => {
                 <Grid item xs={12} md={4}>
                   <LabeledValue
                     title="Adults"
-                    subTitle={`${quantities?.adult || 0} (${formatPeso(
+                    subTitle={`${entrances?.adult || 0} (${formatPeso(
                       amount?.adult
                     )})`}
                     icon={<UserOutlined />}
@@ -108,7 +108,7 @@ const Details = ({ reservationData = {} }) => {
                 <Grid item xs={12} md={4}>
                   <LabeledValue
                     title="Children"
-                    subTitle={`${quantities?.child || 0} (${formatPeso(
+                    subTitle={`${entrances?.child || 0} (${formatPeso(
                       amount?.child
                     )})`}
                     icon={<UserOutlined />}
@@ -117,7 +117,7 @@ const Details = ({ reservationData = {} }) => {
                 <Grid item xs={12} md={4}>
                   <LabeledValue
                     title="PWD / Senior"
-                    subTitle={`${quantities?.pwdSenior || 0} (${formatPeso(
+                    subTitle={`${entrances?.pwdSenior || 0} (${formatPeso(
                       amount?.pwdSenior
                     )})`}
                     icon={<UserOutlined />}

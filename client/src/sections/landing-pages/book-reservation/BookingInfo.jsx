@@ -24,7 +24,7 @@ const BookingInfo = ({
   startDate,
   endDate,
   mode,
-  quantities,
+  entrances,
   includeEntrance,
   onQuantitiesChange,
   onIncludeEntranceChange,
@@ -48,9 +48,9 @@ const BookingInfo = ({
   };
 
   const entranceAmounts = {
-    adult: getPrice("adult") * quantities.adult,
-    child: getPrice("child") * quantities.child,
-    pwdSenior: getPrice("pwdSenior") * quantities.pwdSenior
+    adult: getPrice("adult") * entrances.adult,
+    child: getPrice("child") * entrances.child,
+    pwdSenior: getPrice("pwdSenior") * entrances.pwdSenior
   }
 
   const entranceTotal = useMemo(() => {
@@ -60,7 +60,7 @@ const BookingInfo = ({
       entranceAmounts.child +
       entranceAmounts.pwdSenior
     );
-  }, [quantities, resortRates, mode, includeEntrance]);
+  }, [entrances, resortRates, mode, includeEntrance]);
 
   const total = useMemo(() => {
     return price + entranceTotal;
@@ -71,39 +71,39 @@ const BookingInfo = ({
     return accomDownPayment;
   }, [price]);
 
-  const totalQuantity = quantities.adult + quantities.child + quantities.pwdSenior;
+  const totalQuantity = entrances.adult + entrances.child + entrances.pwdSenior;
 
   const handleClearAll = () => {
     onQuantitiesChange({ adult: 0, child: 0, pwdSenior: 0 });
   };
 
   const handleIncrease = (type) => {
-    const totalQuantity = quantities.adult + quantities.child + quantities.pwdSenior;
+    const totalQuantity = entrances.adult + entrances.child + entrances.pwdSenior;
     if (totalQuantity < data.capacity) {
-      onQuantitiesChange({ ...quantities, [type]: quantities[type] + 1 });
+      onQuantitiesChange({ ...entrances, [type]: entrances[type] + 1 });
     }
   };
 
   const handleDecrease = (type) => {
     onQuantitiesChange({
-      ...quantities,
-      [type]: quantities[type] > 0 ? quantities[type] - 1 : 0,
+      ...entrances,
+      [type]: entrances[type] > 0 ? entrances[type] - 1 : 0,
     });
   };
 
   const handleQuantityChange = (type, value) => {
     const numericValue = parseInt(value, 10);
     if (!isNaN(numericValue) && numericValue >= 0) {
-      const otherTypes = Object.keys(quantities).filter((t) => t !== type);
-      const otherSum = otherTypes.reduce((sum, t) => sum + quantities[t], 0);
+      const otherTypes = Object.keys(entrances).filter((t) => t !== type);
+      const otherSum = otherTypes.reduce((sum, t) => sum + entrances[t], 0);
 
       if (numericValue + otherSum <= data.capacity) {
-        onQuantitiesChange({ ...quantities, [type]: numericValue });
+        onQuantitiesChange({ ...entrances, [type]: numericValue });
       } else {
-        onQuantitiesChange({ ...quantities, [type]: data.capacity - otherSum });
+        onQuantitiesChange({ ...entrances, [type]: data.capacity - otherSum });
       }
     } else if (value === "") {
-      onQuantitiesChange({ ...quantities, [type]: 0 });
+      onQuantitiesChange({ ...entrances, [type]: 0 });
     }
   };
 
@@ -262,7 +262,7 @@ const BookingInfo = ({
                                   : "PWD/Senior"}
                             </Typography>
 
-                            {(type === "pwdSenior" && quantities.pwdSenior > 0) && (
+                            {(type === "pwdSenior" && entrances.pwdSenior > 0) && (
                               <Typography
                                 variant="caption"
                                 color="error"
@@ -288,14 +288,14 @@ const BookingInfo = ({
                                 <IconButton
                                   variant="outlined"
                                   onClick={() => handleDecrease(type)}
-                                  disabled={quantities[type] === 0}
+                                  disabled={entrances[type] === 0}
                                   color="primary"
                                 >
                                   <MinusOutlined />
                                 </IconButton>
 
                                 <TextField
-                                  value={quantities[type]}
+                                  value={entrances[type]}
                                   size="small"
                                   onChange={(e) =>
                                     handleQuantityChange(type, e.target.value)
@@ -342,7 +342,7 @@ const BookingInfo = ({
               accomName: name,
               accomPrice: price,
               includeEntrance: includeEntrance || hasPoolAccess,
-              quantities,
+              entrances,
               entranceTotal,
               minimumPayable,
               total,

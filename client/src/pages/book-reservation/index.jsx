@@ -50,7 +50,7 @@ const BookReservation = () => {
     startDate: "",
     endDate: "",
     mode: "day",
-    quantities: { adult: 0, child: 0, pwdSenior: 0 },
+    entrances: { adult: 0, child: 0, pwdSenior: 0 },
     includeEntranceFee: false,
   });
 
@@ -75,7 +75,7 @@ const BookReservation = () => {
   const endDate = queryParams.get("endDate");
   const mode = queryParams.get("mode") || "day";
   const isDayMode = mode === "day";
-  const hasNoQuantities = bookingData?.accommodationData?.hasPoolAccess && Object.values(bookingData?.quantities || {}).reduce((sum, val) => sum + val, 0) === 0
+  const hasNoQuantities = bookingData?.accommodationData?.hasPoolAccess && Object.values(bookingData?.entrances || {}).reduce((sum, val) => sum + val, 0) === 0
 
   const { data = {} } = useGetSingleAccommodation(accommodationId);
 
@@ -139,10 +139,10 @@ const BookReservation = () => {
         startDate: bookingData.startDate,
         endDate: bookingData.endDate,
         status: "CONFIRMED",
-        quantities: {
-          adult: bookingData.quantities.adult,
-          child: bookingData.quantities.child,
-          pwdSenior: bookingData.quantities.pwdSenior
+        entrances: {
+          adult: bookingData.entrances.adult,
+          child: bookingData.entrances.child,
+          pwdSenior: bookingData.entrances.pwdSenior
         },
         amount: {
           accommodationTotal: bookingData?.amount?.accommodationTotal,
@@ -191,10 +191,10 @@ const BookReservation = () => {
               isDayMode={isDayMode}
               hasNoQuantities={hasNoQuantities}
               mode={bookingData.mode}
-              quantities={bookingData.quantities}
+              entrances={bookingData.entrances}
               includeEntrance={bookingData.includeEntranceFee}
               onQuantitiesChange={(newQuantities) =>
-                saveBookingData({ ...bookingData, quantities: newQuantities })
+                saveBookingData({ ...bookingData, entrances: newQuantities })
               }
               onIncludeEntranceChange={(value) =>
                 saveBookingData({ ...bookingData, includeEntranceFee: value })

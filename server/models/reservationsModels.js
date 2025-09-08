@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const quantitiesSchema = new mongoose.Schema(
+const entrancesSchema = new mongoose.Schema(
   {
     adult: { type: Number, default: 0 },
     child: { type: Number, default: 0 },
@@ -64,7 +64,7 @@ const reservationSchema = new mongoose.Schema(
       type: String,
       enum: ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED", "RESCHEDULED", "ARCHIVED"],
     },
-    quantities: quantitiesSchema,
+    entrances: entrancesSchema,
     amount: amountSchema,
   },
   {

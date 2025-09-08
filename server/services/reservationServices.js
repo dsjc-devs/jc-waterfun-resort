@@ -60,8 +60,8 @@ const getReservationsByQuery = async (queryObject = {}) => {
       .limit(limit);
 
     const transformed = reservations.map((reservation) => {
-      const { userId, quantities, amount, ...rest } = reservation.toObject();
-      const totalGuests = Object.values(quantities || {}).reduce(
+      const { userId, entrances, amount, ...rest } = reservation.toObject();
+      const totalGuests = Object.values(entrances || {}).reduce(
         (sum, acc) => sum + (acc || 0),
         0
       );

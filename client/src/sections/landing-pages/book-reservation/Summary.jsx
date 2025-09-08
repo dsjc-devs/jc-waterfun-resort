@@ -20,7 +20,7 @@ import titleCase from "utils/titleCaseFormatter";
 const Summary = ({ bookingInfo }) => {
   const { user } = useAuth();
 
-  const { accommodationData, amount, quantities, startDate, endDate, includeEntranceFee, mode } = bookingInfo || {};
+  const { accommodationData, amount, entrances, startDate, endDate, includeEntranceFee, mode } = bookingInfo || {};
   const { firstName, lastName, emailAddress, phoneNumber, userId } = user || {};
 
   const customer_name = `${firstName || ""} ${lastName || ""}`;
@@ -114,7 +114,7 @@ const Summary = ({ bookingInfo }) => {
             <MainCard title="Entrance Tickets" sx={{ mb: 2 }}>
               <List disablePadding>
                 {["adult", "child", "pwdSenior"].map((type, idx) => {
-                  const qty = quantities[type] || 0;
+                  const qty = entrances[type] || 0;
 
                   return (
                     <React.Fragment key={type}>
@@ -157,7 +157,7 @@ const Summary = ({ bookingInfo }) => {
                 accomName: accommodationData?.name,
                 accomPrice: amount?.accommodationTotal,
                 includeEntrance: includeEntranceFee || accommodationData?.hasPoolAccess,
-                quantities: quantities,
+                entrances: entrances,
                 entranceTotal: amount?.entranceTotal,
                 minimumPayable: amount?.minimumPayable,
                 total: amount?.total,

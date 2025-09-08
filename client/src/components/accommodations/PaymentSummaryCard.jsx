@@ -8,7 +8,7 @@ const PaymentSummaryCard = ({ data }) => {
     accomName,
     accomPrice,
     includeEntrance,
-    quantities = {},
+    entrances = {},
     entranceTotal,
     total,
     minimumPayable,
@@ -30,10 +30,10 @@ const PaymentSummaryCard = ({ data }) => {
 
       {includeEntrance && (
         <React.Fragment>
-          {quantities.adult > 0 && (
+          {entrances.adult > 0 && (
             <Stack direction="row" justifyContent="space-between" mb={1}>
               <Typography variant="body1" color="textSecondary">
-                Adult x {quantities.adult}
+                Adult x {entrances.adult}
               </Typography>
               <Typography variant="body1">
                 {formatPeso(prices?.adult || 0)}
@@ -41,10 +41,10 @@ const PaymentSummaryCard = ({ data }) => {
             </Stack>
           )}
 
-          {quantities.child > 0 && (
+          {entrances.child > 0 && (
             <Stack direction="row" justifyContent="space-between" mb={1}>
               <Typography variant="body1" color="textSecondary">
-                Children x {quantities.child}
+                Children x {entrances.child}
               </Typography>
               <Typography variant="body1">
                 {formatPeso(prices?.child || 0)}
@@ -52,10 +52,10 @@ const PaymentSummaryCard = ({ data }) => {
             </Stack>
           )}
 
-          {quantities.pwdSenior > 0 && (
+          {entrances.pwdSenior > 0 && (
             <Stack direction="row" justifyContent="space-between" mb={1}>
               <Typography variant="body1" color="textSecondary">
-                PWD/Senior x {quantities.pwdSenior}
+                PWD/Senior x {entrances.pwdSenior}
               </Typography>
               <Typography variant="body1">
                 {formatPeso(prices?.pwdSenior || 0)}

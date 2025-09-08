@@ -62,13 +62,13 @@ const ReservationForm = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
-  const [quantities, setQuantities] = useState({
+  const [entrances, setEntrances] = useState({
     adult: 0,
     child: 0,
     pwdSenior: 0
   });
 
-  const totalQuantity = quantities.adult + quantities.child + quantities.pwdSenior;
+  const totalQuantity = entrances.adult + entrances.child + entrances.pwdSenior;
   const hasNoQuantities = totalQuantity === 0;
 
   const isGuestHouse = selectedAccommodation?.type === 'guest_house';
@@ -90,7 +90,7 @@ const ReservationForm = () => {
     startDate: '',
     endDate: '',
     status: 'CONFIRMED',
-    quantities: {
+    entrances: {
       adult: 0,
       child: 0,
       pwdSenior: 0
@@ -125,7 +125,7 @@ const ReservationForm = () => {
           startDate: values.startDate,
           endDate: values.endDate,
           status: values.status,
-          quantities: { ...quantities },
+          entrances: { ...entrances },
           amount: {
             accommodationTotal: price,
             entranceTotal: entranceTotal,
@@ -148,7 +148,7 @@ const ReservationForm = () => {
           setEndDate(null);
           setMode('day');
           setManualMode(false);
-          setQuantities({ adult: 0, child: 0, pwdSenior: 0 });
+          setEntrances({ adult: 0, child: 0, pwdSenior: 0 });
         }
       } catch (error) {
         console.error(error);
@@ -188,7 +188,7 @@ const ReservationForm = () => {
         startDate: r.startDate || '',
         endDate: r.endDate || '',
         status: r.status || 'CONFIRMED',
-        quantities: r.quantities || initialValues.quantities,
+        entrances: r.entrances || initialValues.entrances,
         amount: r.amount || initialValues.amount
       });
       if (r.accommodationData) {
@@ -214,17 +214,17 @@ const ReservationForm = () => {
         setMode('day');
       }
       setManualMode(false);
-      setQuantities(r.quantities || initialValues.quantities);
+      setEntrances(r.entrances || initialValues.entrances);
     }
   }, [isEditMode, singleReservation, accommodations]);
 
   const handleIncrease = (type) => {
     if (selectedAccommodation?.capacity && totalQuantity >= selectedAccommodation.capacity) return;
-    setQuantities((prev) => ({ ...prev, [type]: prev[type] + 1 }));
+    setEntrances((prev) => ({ ...prev, [type]: prev[type] + 1 }));
   };
 
   const handleDecrease = (type) => {
-    setQuantities((prev) => ({
+    setEntrances((prev) => ({
       ...prev,
       [type]: prev[type] > 0 ? prev[type] - 1 : 0
     }));
@@ -233,14 +233,14 @@ const ReservationForm = () => {
   const handleQuantityChange = (type, value) => {
     const parsed = parseInt(value, 10);
     if (!isNaN(parsed) && parsed >= 0) {
-      const nextTotal = totalQuantity - quantities[type] + parsed;
+      const nextTotal = totalQuantity - entrances[type] + parsed;
       if (selectedAccommodation?.capacity && nextTotal > selectedAccommodation.capacity) return;
-      setQuantities((prev) => ({ ...prev, [type]: parsed }));
+      setEntrances((prev) => ({ ...prev, [type]: parsed }));
     }
   };
 
   const handleClearAll = () => {
-    setQuantities({ adult: 0, child: 0, pwdSenior: 0 });
+    setEntrances({ adult: 0, child: 0, pwdSenior: 0 });
   };
 
   const getPrice = (type) => {
@@ -340,9 +340,9 @@ const ReservationForm = () => {
   const price = mode === "day" ? selectedAccommodation?.price?.day : selectedAccommodation?.price?.night;
 
   const entranceAmounts = {
-    adult: quantities.adult * getPrice('adult'),
-    child: quantities.child * getPrice('child'),
-    pwdSenior: quantities.pwdSenior * getPrice('pwdSenior')
+    adult: entrances.adult * getPrice('adult'),
+    child: entrances.child * getPrice('child'),
+    pwdSenior: entrances.pwdSenior * getPrice('pwdSenior')
   };
 
   const entranceTotal = entranceAmounts.adult + entranceAmounts.child + entranceAmounts.pwdSenior;
@@ -562,7 +562,7 @@ const ReservationForm = () => {
                                     {type === 'adult' ? 'Adult' : type === 'child' ? 'Children' : 'PWD/Senior'}
                                   </Typography>
 
-                                  {type === 'pwdSenior' && quantities.pwdSenior > 0 && (
+                                  {type === 'pwdSenior' && entrances.pwdSenior > 0 && (
                                     <Typography variant="caption" color="error" sx={{ fontStyle: 'italic' }}>
                                       *Valid ID must be presented upon entry
                                     </Typography>
@@ -577,14 +577,14 @@ const ReservationForm = () => {
                                       <IconButton
                                         variant="outlined"
                                         onClick={() => handleDecrease(type)}
-                                        disabled={quantities[type] === 0}
+                                        disabled={entrances[type] === 0}
                                         color="primary"
                                       >
                                         <MinusOutlined />
                                       </IconButton>
 
                                       <TextField
-                                        value={quantities[type]}
+                                        value={entrances[type]}
                                         size="small"
                                         onChange={(e) => handleQuantityChange(type, e.target.value)}
                                         inputProps={{
@@ -692,7 +692,7 @@ const ReservationForm = () => {
                 accomName: name,
                 accomPrice: price,
                 includeEntrance: selectedAccommodation?.hasPoolAccess,
-                quantities,
+                entrances,
                 entranceTotal,
                 minimumPayable,
                 total,
