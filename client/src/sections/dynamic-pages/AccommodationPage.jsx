@@ -228,8 +228,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
       )}
 
       {isOnPortal && (
-        <Stack direction='row' justifyContent='flex-endDate' spacing={2} marginBlock={2}>
-
+        <Stack direction='row' justifyContent='flex-end' spacing={2} marginBlock={2}>
 
           {isCustomer && (
             <AnimateButton>
