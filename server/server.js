@@ -108,7 +108,7 @@ const startServer = async () => {
       )
     );
 
-    // startReservationCron();
+    startReservationCron();
 
   } catch (error) {
     console.error(error);
