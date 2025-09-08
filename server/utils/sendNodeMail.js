@@ -9,7 +9,7 @@ async function sendEmail(email, subject, content, attachments = [], bcc = []) {
     }
   });
 
-  let from = `123partners <${process.env.MAIL_CONFIGS_EMAIL}>`;
+  let from = `noreply <johncezar.waterfun@gmail.com`;
 
   const mailConfigs = {
     from,

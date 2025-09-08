@@ -1,5 +1,8 @@
 import Reservation from "../models/reservationsModels.js";
 import generateRandomString from "../utils/generateRandomString.js";
+import reservationDetails from "../templates/reservation-details.js";
+import sendEmail from "../utils/sendNodeMail.js";
+import emailTemplate from "../templates/defaults/index.js";
 
 const hasDateConflict = async (accommodationId, newStartDate, newEndDate) => {
   const conflict = await Reservation.findOne({
@@ -10,6 +13,29 @@ const hasDateConflict = async (accommodationId, newStartDate, newEndDate) => {
   });
 
   return !!conflict;
+};
+
+const sendReservationDetails = async (reservationData) => {
+  try {
+    const { reservationId, userData } = reservationData;
+    const { emailAddress, firstName } = userData || {};
+
+    if (!emailAddress) return;
+
+    const subject = `Reservation Confirmation - ${reservationId}`;
+    const body = reservationDetails({
+      ...reservationData,
+      guestName: firstName || "Guest",
+      status: "Confirmed",
+    });
+
+    const emailContent = await emailTemplate(body);
+
+    await sendEmail(emailAddress, subject, emailContent);
+    console.log("Reservation email sent to:", emailAddress);
+  } catch (error) {
+    console.error("Error sending reservation email:", error);
+  }
 };
 
 const createReservation = async (reservationData) => {
@@ -34,6 +60,13 @@ const createReservation = async (reservationData) => {
       paymentStatus,
       ...reservationData,
     });
+
+    const hasEmailAddress = reservationData?.userData?.emailAddress;
+
+    if (hasEmailAddress) {
+      await sendReservationDetails({ ...reservationData, reservationId });
+    }
+
     return reservation;
   } catch (error) {
     console.error("Error creating reservation:", error);
