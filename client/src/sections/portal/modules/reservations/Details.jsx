@@ -10,6 +10,7 @@ import {
 } from "@ant-design/icons";
 import { Grid, Chip, Stack, Button } from "@mui/material";
 import { PESO_SIGN } from "constants/constants";
+import { useNavigate } from "react-router";
 
 import LabeledValue from "components/LabeledValue";
 import LongAccommodationCard from "components/accommodations/LongAccommodationCard";
@@ -22,6 +23,8 @@ import AnimateButton from "components/@extended/AnimateButton";
 
 const Details = ({ reservationData = {} }) => {
   const { isCustomer } = useGetPosition()
+
+  const navigate = useNavigate()
 
   if (!reservationData || !reservationData.userData) return null;
 
@@ -49,7 +52,7 @@ const Details = ({ reservationData = {} }) => {
               variant='contained'
               color='info'
               startIcon={<EditOutlined />}
-              onClick={() => `aaa`}
+              onClick={() => navigate(`/portal/reservations/form?isEditMode=true&reservationId=${reservationId}`)}
             >
               Edit
             </Button>
@@ -250,6 +253,13 @@ const Details = ({ reservationData = {} }) => {
                 <LabeledValue
                   title="Total Amount"
                   subTitle={formatPeso(amount?.total)}
+                  icon={PESO_SIGN}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <LabeledValue
+                  title="Extra Person Fee"
+                  subTitle={formatPeso(amount?.extraPersonFee)}
                   icon={PESO_SIGN}
                 />
               </Grid>

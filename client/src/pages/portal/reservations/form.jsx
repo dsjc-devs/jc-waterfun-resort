@@ -131,6 +131,7 @@ const ReservationForm = () => {
           amount: {
             accommodationTotal: price,
             entranceTotal: entranceTotal,
+            extraPersonFee: getExtraPersonFee(),
             total: total,
             totalPaid: values.amount.totalPaid,
             adult: entranceAmounts.adult,
@@ -794,6 +795,14 @@ const ReservationForm = () => {
           </LoadingButton>
         </AnimateButton>
       </Stack>
+
+      <pre>{
+        JSON.stringify({
+          selectedAccommodation,
+          values: formik.values,
+          entrances,
+        }, null, 2)
+      }</pre>
     </React.Fragment>
   );
 };
