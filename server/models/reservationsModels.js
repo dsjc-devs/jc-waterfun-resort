@@ -18,6 +18,7 @@ const amountSchema = new mongoose.Schema(
     adult: { type: Number, default: 0 },
     child: { type: Number, default: 0 },
     pwdSenior: { type: Number, default: 0 },
+    extraPersonFee: { type: Number, default: 0 },
   },
   { _id: false }
 );
@@ -66,6 +67,10 @@ const reservationSchema = new mongoose.Schema(
     },
     entrances: entrancesSchema,
     amount: amountSchema,
+    guests: {
+      type: Number,
+      required: true,
+    }
   },
   {
     timestamps: true,

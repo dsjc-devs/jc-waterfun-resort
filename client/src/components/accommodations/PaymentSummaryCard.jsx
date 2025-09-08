@@ -12,8 +12,16 @@ const PaymentSummaryCard = ({ data }) => {
     entranceTotal,
     total,
     minimumPayable,
-    prices = {}
+    prices = {},
+    extraPersonFee = 0,
+    guests = 0,
+    capacity = 0
   } = data;
+
+  let perPersonFee = 0;
+  if (extraPersonFee > 0 && guests > capacity) {
+    perPersonFee = extraPersonFee / (guests - capacity);
+  }
 
   return (
     <MainCard>
@@ -27,6 +35,17 @@ const PaymentSummaryCard = ({ data }) => {
         </Typography>
         <Typography variant="body1">{formatPeso(accomPrice)}</Typography>
       </Stack>
+
+      {extraPersonFee > 0 && (
+        <Stack direction="row" justifyContent="space-between" mb={1}>
+          <Typography variant="body1" color="textSecondary">
+            {`Extra Person Fee (${guests - capacity} x ${formatPeso(perPersonFee)})`}
+          </Typography>
+          <Typography variant="body1">
+            {formatPeso(extraPersonFee)}
+          </Typography>
+        </Stack>
+      )}
 
       {includeEntrance && (
         <React.Fragment>

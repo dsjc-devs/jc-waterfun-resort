@@ -68,6 +68,8 @@ const ReservationForm = () => {
     pwdSenior: 0
   });
 
+  const [showEntranceSection, setShowEntranceSection] = useState(false);
+
   const totalQuantity = entrances.adult + entrances.child + entrances.pwdSenior;
   const hasNoQuantities = totalQuantity === 0;
 
@@ -90,6 +92,7 @@ const ReservationForm = () => {
     startDate: '',
     endDate: '',
     status: 'CONFIRMED',
+    guests: 0,
     entrances: {
       adult: 0,
       child: 0,
@@ -105,8 +108,6 @@ const ReservationForm = () => {
       pwdSenior: 0
     }
   });
-
-
 
   const { data: singleReservation } = useGetSingleReservation(reservationId)
 
@@ -126,6 +127,7 @@ const ReservationForm = () => {
           endDate: values.endDate,
           status: values.status,
           entrances: { ...entrances },
+          guests: values.guests ? values.guests : totalQuantity,
           amount: {
             accommodationTotal: price,
             entranceTotal: entranceTotal,
@@ -159,6 +161,25 @@ const ReservationForm = () => {
     }
   });
 
+  const getExtraPersonFee = () => {
+    let guests = 0;
+    if (selectedAccommodation?.hasPoolAccess) {
+      guests = totalQuantity;
+    } else {
+      guests = Number(formik.values.guests) || 0;
+    }
+    const capacity = Number(selectedAccommodation?.capacity) || 0;
+    const extraFee = Number(selectedAccommodation?.extraPersonFee) || 0;
+    if (extraFee > 0 && guests > capacity) {
+      return (guests - capacity) * extraFee;
+    }
+    return 0;
+  };
+
+  useEffect(() => {
+    formik.setFieldValue('entrances', entrances);
+  }, [entrances]);
+
   const { data = {} } = useGetAccommodations({
     type: formik.values.accommodationType,
     sort: 'name'
@@ -189,6 +210,7 @@ const ReservationForm = () => {
         endDate: r.endDate || '',
         status: r.status || 'CONFIRMED',
         entrances: r.entrances || initialValues.entrances,
+        guests: r.guests || 0,
         amount: r.amount || initialValues.amount
       });
       if (r.accommodationData) {
@@ -219,7 +241,7 @@ const ReservationForm = () => {
   }, [isEditMode, singleReservation, accommodations]);
 
   const handleIncrease = (type) => {
-    if (selectedAccommodation?.capacity && totalQuantity >= selectedAccommodation.capacity) return;
+    if (selectedAccommodation?.hasPoolAccess && selectedAccommodation?.capacity && totalQuantity >= selectedAccommodation.capacity) return;
     setEntrances((prev) => ({ ...prev, [type]: prev[type] + 1 }));
   };
 
@@ -234,7 +256,7 @@ const ReservationForm = () => {
     const parsed = parseInt(value, 10);
     if (!isNaN(parsed) && parsed >= 0) {
       const nextTotal = totalQuantity - entrances[type] + parsed;
-      if (selectedAccommodation?.capacity && nextTotal > selectedAccommodation.capacity) return;
+      if (selectedAccommodation?.hasPoolAccess && selectedAccommodation?.capacity && nextTotal > selectedAccommodation.capacity) return;
       setEntrances((prev) => ({ ...prev, [type]: parsed }));
     }
   };
@@ -349,7 +371,8 @@ const ReservationForm = () => {
 
   const minimumPayable = (price) * 0.5;
 
-  const total = price + entranceTotal;
+  const extraPersonFee = getExtraPersonFee();
+  const total = price + entranceTotal + extraPersonFee;
 
   const name = selectedAccommodation?.name || '';
 
@@ -535,81 +558,115 @@ const ReservationForm = () => {
 
                 {startDate && (
                   <Grid item xs={12}>
-                    <MainCard>
-                      <Box marginBlockEnd={5}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center">
-                          <Typography variant="body1" color="secondary" gutterBottom>
-                            Quantity
-                          </Typography>
+                    {!selectedAccommodation?.hasPoolAccess && (
+                      <Button
+                        variant="outlined"
+                        startIcon={<PlusOutlined />}
+                        onClick={() => setShowEntranceSection((prev) => !prev)}
+                        sx={{ mb: 3 }}
+                        fullWidth
+                      >
+                        {showEntranceSection ? "Hide Entrance Tickets" : "Show Entrance Tickets"}
+                      </Button>
+                    )}
 
-                          <Button size="small" variant="text" sx={{ textDecoration: 'underline' }} color="secondary" onClick={handleClearAll}>
-                            Clear All
-                          </Button>
-                        </Stack>
+                    {(selectedAccommodation?.hasPoolAccess || showEntranceSection) && (
+                      <MainCard>
+                        <Box marginBlockEnd={5}>
+                          <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Typography variant="body1" color="secondary" gutterBottom>
+                              Quantity
+                            </Typography>
 
-                        {hasNoQuantities && (
-                          <Typography variant="body2" color="error" gutterBottom>
-                            Please select at least one guest and this could be up to {selectedAccommodation?.capacity}
-                          </Typography>
-                        )}
+                            <Button size="small" variant="text" sx={{ textDecoration: 'underline' }} color="secondary" onClick={handleClearAll}>
+                              Clear All
+                            </Button>
+                          </Stack>
 
-                        {['adult', 'child', 'pwdSenior'].map((type) => (
-                          <Box key={type} sx={{ my: 2 }}>
-                            <MainCard>
-                              <Grid container spacing={2} alignItems="center">
-                                <Grid item xs={12} md={6}>
-                                  <Typography variant="h5" fontWeight={700}>
-                                    {type === 'adult' ? 'Adult' : type === 'child' ? 'Children' : 'PWD/Senior'}
-                                  </Typography>
+                          {hasNoQuantities && (
+                            <Typography variant="body2" color="error" gutterBottom>
+                              Please select at least one guest and this could be up to {selectedAccommodation?.capacity}
+                            </Typography>
+                          )}
 
-                                  {type === 'pwdSenior' && entrances.pwdSenior > 0 && (
-                                    <Typography variant="caption" color="error" sx={{ fontStyle: 'italic' }}>
-                                      *Valid ID must be presented upon entry
+                          {['adult', 'child', 'pwdSenior'].map((type) => (
+                            <Box key={type} sx={{ my: 2 }}>
+                              <MainCard>
+                                <Grid container spacing={2} alignItems="center">
+                                  <Grid item xs={12} md={6}>
+                                    <Typography variant="h5" fontWeight={700}>
+                                      {type === 'adult' ? 'Adult' : type === 'child' ? 'Children' : 'PWD/Senior'}
                                     </Typography>
-                                  )}
-                                </Grid>
 
-                                <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                  <Stack direction="row" spacing={2} alignItems="center">
-                                    <Typography variant="h4">{formatPeso(getPrice(type))}</Typography>
+                                    {type === 'pwdSenior' && entrances.pwdSenior > 0 && (
+                                      <Typography variant="caption" color="error" sx={{ fontStyle: 'italic' }}>
+                                        *Valid ID must be presented upon entry
+                                      </Typography>
+                                    )}
+                                  </Grid>
 
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                      <IconButton
-                                        variant="outlined"
-                                        onClick={() => handleDecrease(type)}
-                                        disabled={entrances[type] === 0}
-                                        color="primary"
-                                      >
-                                        <MinusOutlined />
-                                      </IconButton>
+                                  <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                    <Stack direction="row" spacing={2} alignItems="center">
+                                      <Typography variant="h4">{formatPeso(getPrice(type))}</Typography>
 
-                                      <TextField
-                                        value={entrances[type]}
-                                        size="small"
-                                        onChange={(e) => handleQuantityChange(type, e.target.value)}
-                                        inputProps={{
-                                          style: { textAlign: 'center', width: 40 }
-                                        }}
-                                      />
+                                      <Stack direction="row" spacing={1} alignItems="center">
+                                        <IconButton
+                                          variant="outlined"
+                                          onClick={() => handleDecrease(type)}
+                                          disabled={entrances[type] === 0}
+                                          color="primary"
+                                        >
+                                          <MinusOutlined />
+                                        </IconButton>
 
-                                      <IconButton variant="outlined" onClick={() => handleIncrease(type)} color="primary">
-                                        <PlusOutlined />
-                                      </IconButton>
+                                        <TextField
+                                          value={entrances[type]}
+                                          size="small"
+                                          onChange={(e) => handleQuantityChange(type, e.target.value)}
+                                          inputProps={{
+                                            style: { textAlign: 'center', width: 40 }
+                                          }}
+                                        />
+
+                                        <IconButton variant="outlined" onClick={() => handleIncrease(type)} color="primary">
+                                          <PlusOutlined />
+                                        </IconButton>
+                                      </Stack>
                                     </Stack>
-                                  </Stack>
+                                  </Grid>
                                 </Grid>
-                              </Grid>
-                            </MainCard>
-                          </Box>
-                        ))}
+                              </MainCard>
+                            </Box>
+                          ))}
 
-                        {selectedAccommodation?.capacity === totalQuantity && (
-                          <Alert severity="info">
-                            Maximum capacity reached ({totalQuantity}/{selectedAccommodation.capacity})
-                          </Alert>
-                        )}
-                      </Box>
-                    </MainCard>
+                          {selectedAccommodation?.hasPoolAccess && selectedAccommodation?.capacity === totalQuantity && (
+                            <Alert severity="info">
+                              Maximum capacity reached ({totalQuantity}/{selectedAccommodation.capacity})
+                            </Alert>
+                          )}
+                        </Box>
+                      </MainCard>
+                    )}
+
+                    {!selectedAccommodation?.hasPoolAccess && (
+                      <Grid item xs={12} sx={{ mt: 2 }}>
+                        <Typography variant="body1" gutterBottom>
+                          Total Guests
+                        </Typography>
+
+                        <TextField
+                          type="number"
+                          placeholder='Enter number of guests'
+                          value={formik.values.guests === 0 ? '' : formik.values.guests}
+                          onChange={e => {
+                            const val = e.target.value;
+                            formik.setFieldValue('guests', val === '' ? 0 : Number(val));
+                          }}
+                          fullWidth
+                          InputLabelProps={{ shrink: true }}
+                        />
+                      </Grid>
+                    )}
 
                     <Grid item xs={12} sx={{ mt: 2 }}>
                       <Typography variant="body1" gutterBottom>
@@ -619,6 +676,7 @@ const ReservationForm = () => {
                       <TextField
                         type="number"
                         value={formik.values.amount.totalPaid === 0 ? '' : formik.values.amount.totalPaid}
+                        placeholder='Enter amount paid'
                         onChange={e => {
                           const val = e.target.value;
                           formik.setFieldValue('amount.totalPaid', val === '' ? 0 : Number(val));
@@ -636,7 +694,6 @@ const ReservationForm = () => {
                         onChange={user => formik.setFieldValue('userData', user)}
                       />
 
-                      {/* Manual Add Customer Option */}
                       <Box sx={{ mt: 2, p: 2, border: '1px dashed #ccc', borderRadius: 2 }}>
                         <Typography variant="subtitle1" gutterBottom>
                           Or add customer manually
@@ -691,11 +748,14 @@ const ReservationForm = () => {
               data={{
                 accomName: name,
                 accomPrice: price,
-                includeEntrance: selectedAccommodation?.hasPoolAccess,
+                includeEntrance: selectedAccommodation?.hasPoolAccess || showEntranceSection,
                 entrances,
                 entranceTotal,
                 minimumPayable,
                 total,
+                extraPersonFee,
+                guests: formik.values.guests,
+                capacity: selectedAccommodation?.capacity,
                 prices: {
                   adult: entranceAmounts.adult,
                   child: entranceAmounts.child,

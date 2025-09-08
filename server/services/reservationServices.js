@@ -1,4 +1,3 @@
-import cron from "node-cron";
 import Reservation from "../models/reservationsModels.js";
 import generateRandomString from "../utils/generateRandomString.js";
 
@@ -6,11 +5,8 @@ const hasDateConflict = async (accommodationId, newStartDate, newEndDate) => {
   const conflict = await Reservation.findOne({
     accommodationId,
     status: { $ne: "CANCELLED" },
-    $or: [
-      { startDate: { $lte: newStartDate }, endDate: { $gte: newStartDate } },
-      { startDate: { $lte: newEndDate }, endDate: { $gte: newEndDate } },
-      { startDate: { $gte: newStartDate }, endDate: { $lte: newEndDate } }
-    ]
+    startDate: { $lt: newEndDate },
+    endDate: { $gt: newStartDate }
   });
 
   return !!conflict;
@@ -61,10 +57,6 @@ const getReservationsByQuery = async (queryObject = {}) => {
 
     const transformed = reservations.map((reservation) => {
       const { userId, entrances, amount, ...rest } = reservation.toObject();
-      const totalGuests = Object.values(entrances || {}).reduce(
-        (sum, acc) => sum + (acc || 0),
-        0
-      );
 
       const transformedAmount = amount
         ? {
@@ -78,7 +70,6 @@ const getReservationsByQuery = async (queryObject = {}) => {
       return {
         ...rest,
         amount: transformedAmount,
-        totalGuests,
       };
     });
 

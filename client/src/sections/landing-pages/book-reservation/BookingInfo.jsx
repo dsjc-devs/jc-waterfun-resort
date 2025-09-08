@@ -28,7 +28,9 @@ const BookingInfo = ({
   includeEntrance,
   onQuantitiesChange,
   onIncludeEntranceChange,
-  onSetAmount
+  onSetAmount,
+  guests,
+  onGuestsChange
 }) => {
   const { resortRates } = useGetResortRates();
 
@@ -73,6 +75,13 @@ const BookingInfo = ({
 
   const totalQuantity = entrances.adult + entrances.child + entrances.pwdSenior;
 
+  const capacity = data?.capacity || 0;
+  const extraPersonFeeValue = data?.extraPersonFee || 0;
+  const usedGuests = hasPoolAccess ? totalQuantity : guests;
+  const extraPersonFee = (extraPersonFeeValue > 0 && usedGuests > capacity)
+    ? (usedGuests - capacity) * extraPersonFeeValue
+    : 0;
+
   const handleClearAll = () => {
     onQuantitiesChange({ adult: 0, child: 0, pwdSenior: 0 });
   };
@@ -116,8 +125,9 @@ const BookingInfo = ({
       adult: entranceAmounts.adult,
       child: entranceAmounts.child,
       pwdSenior: entranceAmounts.pwdSenior,
+      extraPersonFee
     });
-  }, [price, entranceTotal, total, minimumPayable, onSetAmount]);
+  }, [price, entranceTotal, total, minimumPayable, extraPersonFee, onSetAmount]);
 
   return (
     <Grid
@@ -171,8 +181,29 @@ const BookingInfo = ({
               )}
             </MainCard>
 
+            {/* Total Guests field for non-pool accommodations */}
             {!hasPoolAccess && (
               <Box mt={2}>
+                <Typography variant="body1" gutterBottom>
+                  Total Guests
+                </Typography>
+                <TextField
+                  type="number"
+                  placeholder="Enter number of guests"
+                  value={guests === 0 ? "" : guests}
+                  onChange={e => {
+                    const val = e.target.value;
+                    onGuestsChange(val === "" ? 0 : Number(val));
+                  }}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                />
+                {/* Show message if guests exceed capacity */}
+                {guests > capacity && (
+                  <Alert severity="warning" sx={{ mt: 2 }}>
+                    You have exceeded the maximum capacity ({capacity}). You will be charged an extra person fee of {formatPeso(extraPersonFeeValue)} for each additional guest.
+                  </Alert>
+                )}
                 <Stack alignItems="center" marginBlock={4}>
                   {!includeEntrance ? (
                     <Button
@@ -345,12 +376,15 @@ const BookingInfo = ({
               entrances,
               entranceTotal,
               minimumPayable,
-              total,
+              total: total + extraPersonFee,
               prices: {
                 adult: entranceAmounts.adult,
                 child: entranceAmounts.child,
                 pwdSenior: entranceAmounts.pwdSenior
-              }
+              },
+              extraPersonFee,
+              guests: usedGuests,
+              capacity
             }}
           />
         </Box>

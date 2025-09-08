@@ -20,7 +20,14 @@ import titleCase from "utils/titleCaseFormatter";
 const Summary = ({ bookingInfo }) => {
   const { user } = useAuth();
 
-  const { accommodationData, amount, entrances, startDate, endDate, includeEntranceFee, mode } = bookingInfo || {};
+  const { accommodationData, amount, entrances, startDate, endDate, includeEntranceFee, mode, guests } = bookingInfo || {};
+
+  const capacity = accommodationData?.capacity || 0;
+  const extraPersonFeeValue = accommodationData?.extraPersonFee || 0;
+  const usedGuests = typeof guests === 'number' ? guests : (entrances.adult + entrances.child + entrances.pwdSenior);
+  const extraPersonFee = (extraPersonFeeValue > 0 && usedGuests > capacity)
+    ? (usedGuests - capacity) * extraPersonFeeValue
+    : 0;
   const { firstName, lastName, emailAddress, phoneNumber, userId } = user || {};
 
   const customer_name = `${firstName || ""} ${lastName || ""}`;
@@ -108,6 +115,13 @@ const Summary = ({ bookingInfo }) => {
                     endDate
                   }}
                 />
+                {/* Total Guests field */}
+                <Box sx={{ mt: 2 }}>
+                  <LabeledValue
+                    title="Total Guests"
+                    subTitle={typeof guests === 'number' ? guests : (entrances.adult + entrances.child + entrances.pwdSenior)}
+                  />
+                </Box>
               </MainCard>
             </MainCard>
 
@@ -160,12 +174,15 @@ const Summary = ({ bookingInfo }) => {
                 entrances: entrances,
                 entranceTotal: amount?.entranceTotal,
                 minimumPayable: amount?.minimumPayable,
-                total: amount?.total,
+                total: amount?.total + extraPersonFee,
                 prices: {
                   adult: amount.adult,
                   child: amount.child,
                   pwdSenior: amount.pwdSenior
-                }
+                },
+                extraPersonFee,
+                guests: usedGuests,
+                capacity
               }}
             />
           </Box>

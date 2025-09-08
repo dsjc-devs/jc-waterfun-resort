@@ -50,6 +50,7 @@ const BookReservation = () => {
     startDate: "",
     endDate: "",
     mode: "day",
+    guests: 0,
     entrances: { adult: 0, child: 0, pwdSenior: 0 },
     includeEntranceFee: false,
   });
@@ -96,6 +97,10 @@ const BookReservation = () => {
     setBookingData(data);
   };
 
+  const handleGuestsChange = (guests) => {
+    saveBookingData({ ...bookingData, guests });
+  };
+
   const handleNext = () => {
     saveBookingData(bookingData);
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -139,15 +144,17 @@ const BookReservation = () => {
         startDate: bookingData.startDate,
         endDate: bookingData.endDate,
         status: "CONFIRMED",
+        guests: bookingData?.accommodationData?.hasPoolAccess ? Object.values(bookingData?.entrances || {}).reduce((sum, val) => sum + val, 0) : bookingData?.guests,
         entrances: {
           adult: bookingData.entrances.adult,
           child: bookingData.entrances.child,
           pwdSenior: bookingData.entrances.pwdSenior
         },
         amount: {
+          extraPersonFee: bookingData?.amount?.extraPersonFee || 0,
           accommodationTotal: bookingData?.amount?.accommodationTotal,
           entranceTotal: bookingData?.amount?.entranceTotal,
-          total: bookingData?.amount?.total,
+          total: (bookingData?.amount?.total || 0) + (bookingData?.amount?.extraPersonFee || 0),
           minimumPayable: bookingData?.amount?.minimumPayable,
           totalPaid,
           adult: bookingData?.amount?.adult,
@@ -159,9 +166,11 @@ const BookReservation = () => {
       await agent.Reservations.createReservation(payload)
       toast.success('Reservation successfully booked.')
       setOpenPayModal(false)
+      navigate('/success-reservation')
+      sessionStorage.removeItem("bookingData");
     } catch (error) {
       console.error(error);
-      toast.error(`Error Occured. Please try again.`)
+      toast.error(error?.message || `Error Occured. Please try again.`)
     } finally {
       setLoading(false)
     }
@@ -200,6 +209,8 @@ const BookReservation = () => {
                 saveBookingData({ ...bookingData, includeEntranceFee: value })
               }
               onSetAmount={setAmount}
+              guests={bookingData.guests}
+              onGuestsChange={handleGuestsChange}
             />
           )}
 

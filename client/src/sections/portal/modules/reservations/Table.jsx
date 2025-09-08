@@ -157,7 +157,7 @@ const ReservationsTable = () => {
       renderCell: (row) => {
         return (
           <Typography variant="body2">
-            <UserOutlined /> {row?.totalGuests} Guests
+            <UserOutlined /> {row?.guests} Guests
           </Typography>
         );
       }

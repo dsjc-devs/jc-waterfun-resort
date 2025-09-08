@@ -20,6 +20,9 @@ const BookReservation = Loadable(lazy(() => import('pages/book-reservation')));
 
 const NotFoundPage = Loadable(lazy(() => import('pages/maintenance/404')));
 
+// success
+const SuccessReservation = Loadable(lazy(() => import('pages/success/reservation')));
+
 // ==============================|| AUTH ROUTING ||============================== //
 
 const AbsoluteRoutes = {
@@ -65,6 +68,11 @@ const AbsoluteRoutes = {
     {
       path: '/book-a-reservation',
       element: <PageWrapper hasBanner={false} children={<BookReservation />} />
+    },
+
+    {
+      path: '/success-reservation',
+      element: <SuccessReservation />
     },
 
     {
