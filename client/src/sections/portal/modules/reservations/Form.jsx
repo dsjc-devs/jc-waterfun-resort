@@ -663,17 +663,36 @@ const ReservationForm = () => {
                         Total Paid
                       </Typography>
 
-                      <TextField
-                        type="number"
-                        value={formik.values.amount.totalPaid === 0 ? '' : formik.values.amount.totalPaid}
-                        placeholder='Enter amount paid'
-                        onChange={e => {
-                          const val = e.target.value;
-                          formik.setFieldValue('amount.totalPaid', val === '' ? 0 : Number(val));
-                        }}
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                      />
+                      <Grid container spacing={2} alignItems='center'>
+                        <Grid item xs={9}>
+                          <TextField
+                            type="number"
+                            value={formik.values.amount.totalPaid === 0 ? '' : formik.values.amount.totalPaid}
+                            placeholder='Enter amount paid'
+                            onChange={e => {
+                              const val = e.target.value;
+                              formik.setFieldValue('amount.totalPaid', val === '' ? 0 : Number(val));
+                            }}
+                            fullWidth
+                            InputLabelProps={{ shrink: true }}
+                          />
+                        </Grid>
+
+                        <Grid item xs={3}>
+                          <Button
+                            variant="outlined"
+                            startIcon={<CheckOutlined />}
+                            color='success'
+                            fullWidth
+                            disabled={formik.values.amount.totalPaid >= total}
+                            onClick={() => {
+                              formik.setFieldValue('amount.totalPaid', total);
+                            }}
+                          >
+                            Mark as Fully Paid
+                          </Button>
+                        </Grid>
+                      </Grid>
                     </Grid>
 
                     <Grid item xs={12} sx={{ mt: 2 }}>
@@ -781,6 +800,7 @@ const ReservationForm = () => {
               onClick={() => setConfirmDialog(true)}
               sx={{ width: '180px' }}
               startIcon={<CheckOutlined />}
+              color='success'
             >
               Mark as Fully Paid
             </LoadingButton>
