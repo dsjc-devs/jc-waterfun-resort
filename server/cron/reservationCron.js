@@ -3,7 +3,6 @@ import reservationServices from "../services/reservationServices.js";
 
 export const startReservationCron = () => {
   cron.schedule("* * * * *", async () => {
-    console.log("Running Reservation Status Check...");
     try {
       await reservationServices.checkAndUpdateReservationStatus();
     } catch (error) {

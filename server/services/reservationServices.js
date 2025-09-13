@@ -200,9 +200,8 @@ const checkAndUpdateReservationStatus = async () => {
       { $set: { status: "COMPLETED" } }
     );
 
-    console.log(
-      `Updated reservations => Cancelled: ${cancelled.modifiedCount}, Completed: ${completed.modifiedCount}`
-    );
+    return { cancelled, completed };
+
   } catch (error) {
     console.error("Error running reservation status check:", error);
   }
