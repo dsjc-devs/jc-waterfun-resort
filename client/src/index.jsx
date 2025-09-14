@@ -1,11 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-// scrolls
-import AOS from "aos";
-import "aos/dist/aos.css";
-import gsap from "gsap";
-
 // scroll bar
 import 'simplebar-react/dist/simplebar.min.css';
 import 'slick-carousel/slick/slick.css';
