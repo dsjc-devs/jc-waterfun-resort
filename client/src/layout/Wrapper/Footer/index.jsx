@@ -1,9 +1,12 @@
+
 import { Box, Container, Typography, Link, Skeleton, Grid } from "@mui/material";
 import { useGetResortDetails } from "api/resort-details";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
   const { resortDetails, isLoading } = useGetResortDetails();
+  const navigate = useNavigate();
 
   const {
     name,
@@ -75,20 +78,21 @@ const Footer = () => {
               ].map((item) => (
                 <li key={item.label} style={{ lineHeight: 1.8 }}>
                   <Link
-                    href={item.href}
+                    component="button"
+                    onClick={() => navigate(`/${item.href}`)}
                     sx={{
-                       color: "#fff",
-                       fontSize: "14px",
-                       fontFamily: "Istok Web, sans-serif",
-                       textDecoration: "none",
-                       "&:hover": { textDecoration: "underline" },
-              }}
-             >
-              {item.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
+                      color: "#fff",
+                      fontSize: "14px",
+                      fontFamily: "Istok Web, sans-serif",
+                      textDecoration: "none",
+                      "&:hover": { textDecoration: "underline" },
+                    }}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
@@ -106,30 +110,30 @@ const Footer = () => {
               About Us
             </Typography>
             <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-             {[
-               { label: "Contact Us", href: "contact-us" },
-               { label: "Media", href: "media" },
-               { label: "FAQs", href: "faqs" },
-               { label: "Privacy Policy", href: "privacy-policy" },
-             ].map((item) => (
-               <li key={item.label} style={{ lineHeight: 1.8 }}>
-                 <Link
-                    href={item.href}
+              {[
+                { label: "Contact Us", href: "contact-us" },
+                { label: "Media", href: "media" },
+                { label: "FAQs", href: "faqs" },
+                { label: "Privacy Policy", href: "privacy-policy" },
+              ].map((item) => (
+                <li key={item.label} style={{ lineHeight: 1.8 }}>
+                  <Link
+                    component="button"
+                    onClick={() => navigate(`/${item.href}`)}
                     sx={{
-                    color: "#fff",
-                    fontSize: "14px",
-                    fontFamily: "Istok Web, sans-serif",
-                    textDecoration: "none",
-                    "&:hover": { textDecoration: "underline" },
-                  }}
-                 >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+                      color: "#fff",
+                      fontSize: "14px",
+                      fontFamily: "Istok Web, sans-serif",
+                      textDecoration: "none",
+                      "&:hover": { textDecoration: "underline" },
+                    }}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </Grid>
-
           <Grid item xs={12} sm={6} md={3}>
             <Typography
               variant="h6"
@@ -195,7 +199,7 @@ const Footer = () => {
           )}
         </Box>
       </Container>
-    </Box>
+    </Box >
   );
 };
 
