@@ -170,7 +170,7 @@ const getModules = ({ accommodations = [] }) => {
           id: 'marketing-materials',
           title: 'Marketing Materials',
           type: 'item',
-          url: '/portal/content-management/marketing-materials',
+          url: '/portal/content-management/articles',
           icon: icons.ImageIcon,
           breadcrumbs: false,
           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],

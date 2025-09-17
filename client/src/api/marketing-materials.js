@@ -43,7 +43,23 @@ const MarketingMaterials = {
       throw new Error(error?.response?.data?.message);
     }
   },
+  createMarketingMaterial: async (payload) => {
+    try {
+      const response = await axiosServices.post(`/${endpoints.key}/create`, payload)
+      return response
+    } catch (error) {
+      throw new Error(error?.response?.data?.message);
+    }
+  },
   editMarketingMaterial: async (materialId, payload) => {
+    try {
+      const response = await axiosServices.patch(`/${endpoints.key}/${materialId}`, payload)
+      return response
+    } catch (error) {
+      throw new Error(error?.response?.data?.message);
+    }
+  },
+  updateMarketingMaterial: async (materialId, payload) => {
     try {
       const response = await axiosServices.patch(`/${endpoints.key}/${materialId}`, payload)
       return response
@@ -58,9 +74,15 @@ const MarketingMaterials = {
     } catch (error) {
       throw new Error(error?.response?.data?.message);
     }
+  },
+  getMarketingMaterialById: async (materialId) => {
+    try {
+      const response = await axiosServices.get(`/${endpoints.key}/${materialId}`)
+      return response.data
+    } catch (error) {
+      throw new Error(error?.response?.data?.message);
+    }
   }
 }
 
-export default {
-  MarketingMaterials
-};
+export default MarketingMaterials;

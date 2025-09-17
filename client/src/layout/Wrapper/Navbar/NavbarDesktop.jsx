@@ -82,6 +82,7 @@ const NavbarDesktop = ({ hasBanner = true }) => {
       backgroundImage: accom3,
       sublinks: [
         { title: "Resort Gallery", link: "/gallery" },
+        { title: "Articles", link: "/articles" },
       ]
     },
     {

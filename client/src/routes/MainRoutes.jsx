@@ -34,8 +34,9 @@ const AccommodationType = Loadable(lazy(() => import('pages/portal/accommodation
 const AboutUs = Loadable(lazy(() => import('pages/portal/content-management/about-us')));
 const CompanyInfo = Loadable(lazy(() => import('pages/portal/content-management/company-info')));
 const Faqs = Loadable(lazy(() => import('pages/portal/content-management/faqs')));
-const MarketingMaterials = Loadable(lazy(() => import('pages/portal/content-management/marketing-materials')));
-const MarketingMaterialDetails = Loadable(lazy(() => import('pages/portal/content-management/marketing-materials/details')));
+const Articles = Loadable(lazy(() => import('pages/portal/content-management/articles')));
+const ArticleDetails = Loadable(lazy(() => import('pages/portal/content-management/articles/details')));
+const ArticleForm = Loadable(lazy(() => import('pages/portal/content-management/articles/form')));
 
 const MainRoutes = {
   path: '/',
@@ -130,15 +131,19 @@ const MainRoutes = {
               element: <AccommodationType />
             },
             {
-              path: 'marketing-materials',
+              path: 'articles',
               children: [
                 {
                   index: true,
-                  element: <MarketingMaterials />
+                  element: <Articles />
                 },
                 {
                   path: 'details/:id',
-                  element: <MarketingMaterialDetails />
+                  element: <ArticleDetails />
+                },
+                {
+                  path: 'form',
+                  element: <ArticleForm />
                 },
               ]
             },

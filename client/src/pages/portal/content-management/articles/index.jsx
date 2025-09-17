@@ -1,24 +1,24 @@
 import { APP_DEFAULT_PATH } from 'config/config';
 
 import React from 'react'
-import Table from 'sections/portal/modules/marketing-materials/Table'
+import Table from 'sections/portal/modules/articles/Table'
 import PageTitle from 'components/PageTitle'
 import Breadcrumbs from 'components/@extended/Breadcrumbs'
 
 const breadcrumbLinks = [
   { title: 'Home', to: APP_DEFAULT_PATH },
-  { title: 'Content Management - Marketing Materials' },
+  { title: 'Articles' },
 ];
 
-const MarketingMaterials = () => {
+const Articles = () => {
   return (
     <React.Fragment>
-      <PageTitle title="Marketing Materials" />
+      <PageTitle title="Articles" />
       <Breadcrumbs
         custom
-        heading="Marketing Materials"
+        heading="Articles"
         links={breadcrumbLinks}
-        subheading="Manage the resort's marketing materials displayed on the website."
+        subheading="Manage the resort's articles displayed on the website."
       />
 
       <Table />
@@ -26,4 +26,4 @@ const MarketingMaterials = () => {
   )
 }
 
-export default MarketingMaterials
+export default Articles;

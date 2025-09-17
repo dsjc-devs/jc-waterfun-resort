@@ -46,11 +46,16 @@ const getSingleMarketingMaterialById = expressAsnc(async (req, res) => {
 });
 
 const updateMarketingMaterialById = expressAsnc(async (req, res) => {
-
-  const thumbnail = req.files?.['thumbnail']?.[0]?.path || "";
+  let updateData = { ...req.body };
+  
+  if (req.files?.['thumbnail']?.[0]?.path) {
+    updateData.thumbnail = req.files['thumbnail'][0].path;
+  } else if (req.body.thumbnailUrl) {
+    updateData.thumbnail = req.body.thumbnailUrl;
+  }
 
   if (req.files?.attachments) {
-    req.body.attachments = req.files.attachments.map(file => ({
+    updateData.attachments = req.files.attachments.map(file => ({
       fileName: file.originalname,
       attachment: file.path
     }));
@@ -60,7 +65,7 @@ const updateMarketingMaterialById = expressAsnc(async (req, res) => {
     const response =
       await marketingMaterialsServices.updateMarketingMaterialById(
         req.params.materialId,
-        { thumbnail, ...req.body }
+        updateData
       );
     res.json(response);
   } catch (error) {
