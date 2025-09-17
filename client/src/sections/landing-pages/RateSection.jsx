@@ -49,21 +49,66 @@ const RateSection = () => {
               exclusive
               onChange={handleModeChange}
               aria-label="time of day selection"
-              color="primary"
+              sx={{
+                borderRadius: 8,
+                background: '#fff',
+                boxShadow: 'none',
+                p: 0.5,
+                mb: 3,
+                border: '1px solid #e0e0e0',
+                display: 'inline-flex',
+                gap: 1,
+              }}
             >
               <ToggleButton
                 value="day"
                 aria-label="day mode"
                 disabled={selectedDate && isDateBlocked(selectedDate, 'day')}
+                sx={{
+                  borderRadius: 8,
+                  px: 2,
+                  py: 1,
+                  mx: 0.5,
+                  backgroundColor: mode === 'day' ? '#e8f5fd' : '#fff',
+                  color: '#004b80',
+                  fontWeight: 600,
+                  fontFamily: 'inherit',
+                  fontSize: '1rem',
+                  border: 'none',
+                  boxShadow: 'none',
+                  transition: 'background 0.2s',
+                  '&:hover': {
+                    backgroundColor: '#e8f5fd',
+                  },
+                }}
               >
-                <SunOutlined style={{ marginRight: 6 }} /> Day Tour (7 AM - 5 PM)
+                <SunOutlined style={{ marginRight: 6, color: '#f9d976', fontSize: 20 }} />
+                Day Tour
               </ToggleButton>
               <ToggleButton
                 value="night"
                 aria-label="night mode"
                 disabled={selectedDate && isDateBlocked(selectedDate, 'night')}
+                sx={{
+                  borderRadius: 8,
+                  px: 2,
+                  py: 1,
+                  mx: 0.5,
+                  backgroundColor: mode === 'night' ? '#e8f5fd' : '#fff',
+                  color: '#004b80',
+                  fontWeight: 600,
+                  fontFamily: 'inherit',
+                  fontSize: '1rem',
+                  border: 'none',
+                  boxShadow: 'none',
+                  transition: 'background 0.2s',
+                  '&:hover': {
+                    backgroundColor: '#e8f5fd',
+                  },
+                }}
               >
-                <MoonOutlined style={{ marginRight: 6 }} /> Night Tour (5 PM - 7 AM)
+                <MoonOutlined style={{ marginRight: 6, color: '#2a93c1', fontSize: 20 }} />
+                Night Tour
               </ToggleButton>
             </ToggleButtonGroup>
           )}
@@ -81,6 +126,7 @@ const RateSection = () => {
                 xs={12}
                 sm={6}
                 key={i}
+                data-aos={i === 0 ? "fade-right" : "fade-left"}
                 sx={{
                   backgroundColor: i === 0 ? '#2a93c1' : '#f29023',
                   border: '1px solid #eee',
@@ -136,6 +182,7 @@ const RateSection = () => {
                 color="#634131"
                 fontFamily="Poppins"
                 textAlign="center"
+                data-aos="zoom-in"
               >
                 Senior Citizens / PWD -
                 {pwdSeniorRate !== undefined ? `₱${pwdSeniorRate}` : 'No data'}

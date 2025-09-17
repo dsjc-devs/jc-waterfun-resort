@@ -28,6 +28,7 @@ const ContactUsHomePage = () => {
                                 component="img"
                                 src={accom}
                                 alt={companyInfo?.name || "Resort"}
+                                data-aos="fade-right"
                                 sx={{
                                     width: "100%",
                                     height: "625px",
@@ -48,23 +49,24 @@ const ContactUsHomePage = () => {
                             justifyContent="center"
                             height="100%"
                             px={2}
+                            data-aos="fade-left"
                         >
                             <TitleTag title="Get In Touch" />
 
-                            <Typography variant="h4" fontWeight={700} gutterBottom>
+                            <Typography variant="h4" fontWeight={700} gutterBottom data-aos="zoom-in">
                                 Make a Splash, Create Memories!
                             </Typography>
 
-                            <Typography variant="body1" color="text.secondary">
+                            <Typography variant="body1" color="text.secondary" data-aos="fade-up">
                                 Dive into fun and enjoy the sunshine at <br />
                                 <strong>{companyInfo?.name}</strong>
                             </Typography>
 
-                            <Typography variant="h6" mt={3} fontStyle="italic" color="primary">
+                            <Typography variant="h6" mt={3} fontStyle="italic" color="primary" data-aos="fade-up">
                                 “See you under the sun!” <br /> #SummerAdventure #JCWFR
                             </Typography>
 
-                            <Box mt={6}>
+                            <Box mt={6} data-aos="fade-up">
                                 <Typography variant="body2" color="text.secondary">
                                     Have questions or need assistance? <br />
                                     We're here to help you.

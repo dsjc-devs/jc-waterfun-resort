@@ -14,7 +14,7 @@ const AboutUs = () => {
             <Box sx={{ backgroundColor: '#f5e7cc' }}>
                 <Container sx={{ paddingBlock: 5 }}>
                     <Grid container alignItems="center" spacing={2}>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12} sm={6} data-aos="fade-right">
                             <TitleTag title="About Us" />
 
                             <Typography
@@ -22,6 +22,7 @@ const AboutUs = () => {
                                 fontWeight="bold"
                                 variant="h4"
                                 marginBlock={5}
+                                data-aos="zoom-in"
                             >
                                 Dive into Fun & <br /> Create Lasting Memories
                             </Typography>
@@ -31,6 +32,7 @@ const AboutUs = () => {
                                 fontSize={15}
                                 variant="body1"
                                 paddingInline="15%"
+                                data-aos="fade-up"
                             >
                                 Welcome to <strong>{companyInfo?.name}</strong>,
                                 your perfect destination for relaxation and family fun.
@@ -52,6 +54,7 @@ const AboutUs = () => {
                                     marginRight: 'auto',
                                     marginBlock: 5,
                                 }}
+                                data-aos="fade-up"
                             >
                                 View More Photos
                             </Button>
@@ -62,6 +65,7 @@ const AboutUs = () => {
                             xs={12}
                             sm={6}
                             sx={{ display: { xs: 'none', sm: 'block' } }}
+                            data-aos="fade-left"
                         >
                             <img
                                 src={banner2}

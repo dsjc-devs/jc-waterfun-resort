@@ -32,11 +32,12 @@ const CarouselSection = () => {
       interval={5000}
     >
       {
-        items.map((item) => (
-          <Box sx={{ position: "relative", height: "100dvh" }}>
+        items.map((item, idx) => (
+          <Box sx={{ position: "relative", height: "100dvh" }} key={idx}>
             <Box
               component="img"
               src={item}
+              data-aos="fade-up"
               sx={{
                 width: "100%",
                 height: "100dvh",
@@ -44,6 +45,7 @@ const CarouselSection = () => {
               }}
             />
             <Box
+              data-aos="fade-up"
               sx={{
                 position: "absolute",
                 top: 0,

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
-import { Box, Fab, Tooltip, Zoom } from '@mui/material'
+import { Box, useMediaQuery } from '@mui/material'
 import { useLocation } from 'react-router'
-import { KeyboardArrowUp } from '@mui/icons-material'
 
 import Navbar from './Navbar'
 import Footer from './Footer'
@@ -9,6 +8,7 @@ import ScrollTopButton from 'components/ScrollTopButton'
 
 const Wrapper = ({ children, hasBanner }) => {
   const location = useLocation()
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
 
   useEffect(() => {
     window.scrollTo({
@@ -21,12 +21,14 @@ const Wrapper = ({ children, hasBanner }) => {
     <React.Fragment>
       <Navbar hasBanner={hasBanner} />
       <Box sx={{ minHeight: '80dvh', backgroundColor: '#f5f5f5' }}>
-        {children}
+        <Box sx={{ marginTop: isMobile && -20 }}>
+          {children}
+        </Box>
       </Box>
       <Footer />
 
       <ScrollTopButton />
-    </React.Fragment>
+    </React.Fragment >
   )
 }
 

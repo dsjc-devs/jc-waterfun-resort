@@ -42,7 +42,7 @@ const GridCard = ({ material, isOnPortal = false, onDelete, onEdit }) => {
       <Box sx={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}>
         <Avatar
           variant="rectangle"
-          src={material.thumbnail}
+          src="src/assets/images/logo/logo.png"
           alt={material.title}
           sx={{
             position: 'absolute',
