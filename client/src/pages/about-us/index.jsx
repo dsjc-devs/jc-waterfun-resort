@@ -1,12 +1,12 @@
 import React from 'react'
 import { Box, Container, Grid, Typography, useMediaQuery } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import { AimOutlined, HeartOutlined, TeamOutlined } from '@ant-design/icons'
+import { useGetResortDetails } from 'api/resort-details'
 
 import PageTitle from 'components/PageTitle'
 import Banner from 'components/Banner'
 import TitleTag from 'components/TitleTag'
-import { useGetResortDetails } from 'api/resort-details'
+
 import AboutUS from 'assets/images/upload/about-us-header.jpg'
 import img1 from 'assets/images/upload/our-mission.jpg'
 import img2 from 'assets/images/upload/vision.jpg'
