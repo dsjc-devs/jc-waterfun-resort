@@ -32,6 +32,19 @@ const Editor = ({ content, formik, readonly, field = 'description', forceUpdate 
     debouncedOnChange(editor);
   };
 
+  if (readonly) {
+    return (
+      <div
+        style={{ minHeight: 120, padding: 8 }}
+        dangerouslySetInnerHTML={{
+          __html: typeof content === 'string'
+            ? content
+            : (content?.value || '')
+        }}
+      />
+    );
+  }
+
   return (
     <WYIWYG
       spellCheck

@@ -213,15 +213,70 @@ const BookReservation = () => {
 
       <Container>
         <Box sx={{ width: "100%", p: 3 }}>
-          <Stepper activeStep={activeStep}>
-            {steps.map((label, index) => (
-              <Step key={index}>
-                <StepLabel StepIconComponent={StepIcon}>
-                  <Typography variant="subtitle1">{label}</Typography>
-                </StepLabel>
-              </Step>
-            ))}
-          </Stepper>
+          {isMobile ? (
+            <Box
+              sx={{
+                mb: 2,
+                overflowX: "auto",
+                maxWidth: "100%",
+                px: 1,
+                display: "flex",
+                justifyContent: "center"
+              }}
+            >
+              {(() => {
+                let start = activeStep - 1;
+                if (start < 0) start = 0;
+                if (start > steps.length - 2) start = steps.length - 2;
+                const visibleSteps = steps.slice(start, start + 2);
+                return (
+                  <Stepper
+                    activeStep={activeStep - start}
+                    orientation="horizontal"
+                    sx={{
+                      minWidth: 250,
+                      flexWrap: "nowrap",
+                      width: "fit-content"
+                    }}
+                  >
+                    {visibleSteps.map((label, idx) => (
+                      <Step key={start + idx}>
+                        <StepLabel StepIconComponent={StepIcon}>
+                          <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>{label}</Typography>
+                        </StepLabel>
+                      </Step>
+                    ))}
+                  </Stepper>
+                );
+              })()}
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                mb: 2,
+                overflowX: "auto",
+                maxWidth: "100%",
+                px: { xs: 1, sm: 0 }
+              }}
+            >
+              <Stepper
+                activeStep={activeStep}
+                orientation="horizontal"
+                sx={{
+                  minWidth: { xs: 400, sm: 0 },
+                  flexWrap: "nowrap",
+                }}
+              >
+                {steps.map((label, index) => (
+                  <Step key={index}>
+                    <StepLabel StepIconComponent={StepIcon}>
+                      <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>{label}</Typography>
+                    </StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
+            </Box>
+          )}
 
           <Grid container spacing={2} flexDirection={isMobile ? "column-reverse" : "row"}>
             <Grid item xs={12} md={8}>
