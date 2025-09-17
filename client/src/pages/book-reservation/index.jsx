@@ -9,12 +9,10 @@ import {
   Typography,
   Container,
   Grid,
-  Dialog,
-  DialogTitle,
   Divider,
-  DialogContent,
   TextField,
   DialogActions,
+  useMediaQuery,
 } from "@mui/material";
 import { toast } from "react-toastify";
 import { useGetSingleAccommodation } from "api/accommodations";
@@ -29,8 +27,10 @@ import AnimateButton from "components/@extended/AnimateButton";
 import LoadingButton from "components/@extended/LoadingButton";
 import PageTitle from "components/PageTitle";
 import agent from "api";
+import PaymentPage from "sections/landing-pages/book-reservation/PaymentPage";
+import PaymentSummaryCard from "components/accommodations/PaymentSummaryCard";
 
-const steps = ["Choose Booking", "Enter Info", "Summary"];
+const steps = ["Choose Booking", "Enter Info", "Summary", "Payment"];
 
 const StepIcon = ({ active, completed }) => {
   if (completed) return <CheckCircleIcon color="success" />;
@@ -65,10 +65,10 @@ const BookReservation = () => {
     total: 0
   })
 
-  const [openPayModal, setOpenPayModal] = useState(false)
   const [totalPaid, setTotalPaid] = useState(0)
 
   const [loading, setLoading] = useState(false)
+  const [redirectUrl, setRedirectUrl] = useState(null);
 
   const queryParams = new URLSearchParams(location.search);
   const accommodationId = queryParams.get("accommodationId");
@@ -79,6 +79,8 @@ const BookReservation = () => {
   const hasNoQuantities = bookingData?.accommodationData?.hasPoolAccess && Object.values(bookingData?.entrances || {}).reduce((sum, val) => sum + val, 0) === 0
 
   const { data = {} } = useGetSingleAccommodation(accommodationId);
+
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
   useEffect(() => {
     setBookingData((prev) => ({
@@ -132,6 +134,35 @@ const BookReservation = () => {
     }
   }, []);
 
+  const handlePay = async (reservationId, amount) => {
+    setLoading(true);
+    try {
+      const payload = {
+        reservationId,
+        amount: amount * 100,
+        name: `${user?.firstName || ""} ${user?.lastName || ""}`,
+        email: user?.emailAddress || "",
+        phone: user?.phoneNumber || "",
+        returnUrl: "http://localhost:3000/success-reservation",
+      };
+
+      const response = await agent.Payments.createPayment(payload);
+      const data = response?.data || response;
+
+      if (data.redirectUrl) {
+        setRedirectUrl(data.redirectUrl);
+        window.location.href = data.redirectUrl;
+      } else {
+        toast.error("No redirect URL received.");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCreateReservation = async () => {
     setLoading(true)
     try {
@@ -163,10 +194,10 @@ const BookReservation = () => {
         }
       }
 
-      await agent.Reservations.createReservation(payload)
-      toast.success('Reservation successfully booked.')
-      setOpenPayModal(false)
-      navigate('/success-reservation')
+      const reservation = await agent.Reservations.createReservation(payload);
+
+      await handlePay(reservation?.id || reservation?._id || "unknown", totalPaid);
+
       sessionStorage.removeItem("bookingData");
     } catch (error) {
       console.error(error);
@@ -192,124 +223,115 @@ const BookReservation = () => {
             ))}
           </Stepper>
 
-          {activeStep === 1 && (
-            <BookingInfo
-              data={data}
-              startDate={bookingData.startDate}
-              endDate={bookingData.endDate}
-              isDayMode={isDayMode}
-              hasNoQuantities={hasNoQuantities}
-              mode={bookingData.mode}
-              entrances={bookingData.entrances}
-              includeEntrance={bookingData.includeEntranceFee}
-              onQuantitiesChange={(newQuantities) =>
-                saveBookingData({ ...bookingData, entrances: newQuantities })
-              }
-              onIncludeEntranceChange={(value) =>
-                saveBookingData({ ...bookingData, includeEntranceFee: value })
-              }
-              onSetAmount={setAmount}
-              guests={bookingData.guests}
-              onGuestsChange={handleGuestsChange}
-            />
-          )}
-
-          {activeStep === 2 && (
-            <Summary
-              bookingInfo={bookingData}
-            />
-          )}
-
-          <Grid container spacing={2}>
+          <Grid container spacing={2} flexDirection={isMobile ? "column-reverse" : "row"}>
             <Grid item xs={12} md={8}>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  mt: 3,
-                }}
-              >
-                <Button onClick={() => activeStep === 1 ? navigate(`/accommodations/details/${data?._id}`) : handleBack()} variant="outlined">
-                  Back
-                </Button>
+              <Box sx={{ my: 4 }}>
+                {activeStep === 1 && (
+                  <BookingInfo
+                    data={data}
+                    startDate={bookingData.startDate}
+                    endDate={bookingData.endDate}
+                    isDayMode={isDayMode}
+                    hasNoQuantities={hasNoQuantities}
+                    mode={bookingData.mode}
+                    entrances={bookingData.entrances}
+                    includeEntrance={bookingData.includeEntranceFee}
+                    onQuantitiesChange={(newQuantities) =>
+                      saveBookingData({ ...bookingData, entrances: newQuantities })
+                    }
+                    onIncludeEntranceChange={(value) =>
+                      saveBookingData({ ...bookingData, includeEntranceFee: value })
+                    }
+                    onSetAmount={setAmount}
+                    guests={bookingData.guests}
+                    onGuestsChange={handleGuestsChange}
+                  />
+                )}
 
-                <AnimateButton>
-                  <LoadingButton
-                    onClick={() => {
-                      if (activeStep !== steps.length - 1) {
-                        handleNext()
-                      } else {
-                        setOpenPayModal(true)
-                      }
-                    }}
-                    variant="contained"
-                    disableElevation
-                    disabled={hasNoQuantities}
-                    loadingPosition="start"
-                    fullWidth
-                    color="primary"
-                    sx={{ width: "200px" }}
-                  >
-                    {activeStep === steps.length - 1 ? "Confirm Booking" : "Next"}
-                  </LoadingButton>
-                </AnimateButton>
+                {activeStep === 2 && (
+                  <Summary
+                    bookingInfo={bookingData}
+                  />
+                )}
+
+                {activeStep === 3 && (
+                  <PaymentPage
+                    totalPaid={totalPaid}
+                    setTotalPaid={setTotalPaid}
+                    handleCreateReservation={handleCreateReservation}
+                    loading={loading}
+                    bookingData={bookingData}
+                    onCancel={() => setActiveStep(2)}
+                  />
+                )}
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Box sx={{ my: 4, position: 'sticky', top: 120 }}>
+                <PaymentSummaryCard
+                  data={{
+                    accomName: bookingData?.accommodationData?.name,
+                    accomPrice: amount?.accommodationTotal,
+                    includeEntrance: bookingData?.includeEntranceFee || bookingData?.accommodationData?.hasPoolAccess,
+                    entrances: bookingData?.entrances,
+                    entranceTotal: amount?.entranceTotal,
+                    total: amount?.total,
+                    minimumPayable: amount?.minimumPayable,
+                    prices: {
+                      adult: amount?.adult,
+                      child: amount?.child,
+                      pwdSenior: amount?.pwdSenior
+                    },
+                    extraPersonFee: amount?.extraPersonFee,
+                    guests: bookingData?.guests,
+                    capacity: bookingData?.accommodationData?.capacity
+                  }}
+                />
               </Box>
             </Grid>
           </Grid>
-        </Box>
-      </Container>
 
-      <Dialog fullWidth maxWidth="md" open={openPayModal} onClose={() => setOpenPayModal(false)}>
-        <DialogTitle>Payment</DialogTitle>
-        <Divider />
-
-        <DialogContent>
-          <Typography variant="subtitle1" gutterBottom>
-            Complete your reservation payment
-          </Typography>
-
-          <Box mt={2}>
+          {activeStep < 3 && (
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <Typography>
-                  Amount
-                </Typography>
+              <Grid item xs={12} md={8}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    mt: 3,
+                  }}
+                >
+                  <Button onClick={() => activeStep === 1 ? navigate(`/accommodations/details/${data?._id}`) : handleBack()} variant="outlined">
+                    Back
+                  </Button>
 
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  value={totalPaid}
-                  type="number"
-                  onChange={(e) => setTotalPaid(e.target.value)}
-                />
+                  <AnimateButton>
+                    <LoadingButton
+                      onClick={() => {
+                        if (activeStep !== steps.length - 1) {
+                          handleNext()
+                        } else {
+                          setActiveStep(3)
+                        }
+                      }}
+                      variant="contained"
+                      disableElevation
+                      disabled={hasNoQuantities}
+                      loadingPosition="start"
+                      fullWidth
+                      color="primary"
+                      sx={{ width: "200px" }}
+                    >
+                      {activeStep === steps.length - 1 ? "Confirm Booking" : "Next"}
+                    </LoadingButton>
+                  </AnimateButton>
+                </Box>
               </Grid>
             </Grid>
-          </Box>
-        </DialogContent>
-
-        <Divider />
-
-        <DialogActions>
-          <Button onClick={() => setOpenPayModal(false)} variant="outlined" sx={{ borderRadius: 2 }}>
-            Cancel
-          </Button>
-
-          <LoadingButton
-            onClick={handleCreateReservation}
-            variant="contained"
-            color="primary"
-            sx={{ borderRadius: 2 }}
-            loading={loading}
-            disableElevation
-            disabled={loading || totalPaid === 0 || totalPaid < bookingData?.amount?.minimumPayable}
-            loadingPosition="start"
-            fullWidth
-            style={{ width: '150px' }}
-          >
-            Pay Now
-          </LoadingButton>
-        </DialogActions>
-      </Dialog>
+          )}
+        </Box>
+      </Container>
     </React.Fragment>
   );
 };

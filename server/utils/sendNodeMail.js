@@ -9,7 +9,7 @@ async function sendEmail(email, subject, content, attachments = [], bcc = []) {
     }
   });
 
-  let from = `noreply <johncezar.waterfun@gmail.com`;
+  let from = `John Cezar Waterfun Resort <johncezar.waterfun@gmail.com`;
 
   const mailConfigs = {
     from,

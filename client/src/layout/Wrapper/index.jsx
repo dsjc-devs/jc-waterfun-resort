@@ -6,7 +6,7 @@ import Navbar from './Navbar'
 import Footer from './Footer'
 import ScrollTopButton from 'components/ScrollTopButton'
 
-const Wrapper = ({ children, hasBanner }) => {
+const Wrapper = ({ children, hasBanner = true }) => {
   const location = useLocation()
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
 
@@ -21,7 +21,7 @@ const Wrapper = ({ children, hasBanner }) => {
     <React.Fragment>
       <Navbar hasBanner={hasBanner} />
       <Box sx={{ minHeight: '80dvh', backgroundColor: '#f5f5f5' }}>
-        <Box sx={{ marginTop: isMobile && -20 }}>
+        <Box sx={{ marginTop: (isMobile && hasBanner) && -20 }}>
           {children}
         </Box>
       </Box>

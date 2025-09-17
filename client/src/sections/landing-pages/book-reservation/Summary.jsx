@@ -53,141 +53,112 @@ const Summary = ({ bookingInfo }) => {
 
   return (
     <Box marginBlock={2}>
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={8}>
-          <MainCard title="Customer Information">
+      <MainCard title="Customer Information">
+        <Grid container spacing={2}>
+          <Grid item sm={12} md={12}>
             <Grid container spacing={2}>
-              <Grid item sm={12} md={12}>
-                <Grid container spacing={2}>
-                  <Grid item sm={12} md={6}>
-                    <LabeledValue
-                      ellipsis
-                      title='Name'
-                      subTitle={customer_name}
-                      icon={<UserOutlined />}
-                    />
-                  </Grid>
-
-                  <Grid item sm={12} md={6}>
-                    <LabeledValue
-                      ellipsis
-                      title='User ID'
-                      subTitle={userId}
-                      icon={<IdcardOutlined />}
-                    />
-                  </Grid>
-                </Grid>
+              <Grid item sm={12} md={6}>
+                <LabeledValue
+                  ellipsis
+                  title='Name'
+                  subTitle={customer_name}
+                  icon={<UserOutlined />}
+                />
               </Grid>
 
-              <Grid item sm={12} md={12}>
-                <Grid container spacing={2}>
-                  <Grid item sm={12} md={6}>
-                    <LabeledValue
-                      ellipsis
-                      title='Email Address'
-                      subTitle={emailAddress}
-                      icon={<MailOutlined />}
-                    />
-                  </Grid>
-
-                  <Grid item sm={12} md={6}>
-                    <LabeledValue
-                      ellipsis
-                      title='Phone Number'
-                      subTitle={`+63 ${phoneNumber}`}
-                      icon={<UserOutlined />}
-                    />
-                  </Grid>
-                </Grid>
+              <Grid item sm={12} md={6}>
+                <LabeledValue
+                  ellipsis
+                  title='User ID'
+                  subTitle={userId}
+                  icon={<IdcardOutlined />}
+                />
               </Grid>
             </Grid>
-          </MainCard>
+          </Grid>
 
-          <MainCard title="Booking Details" sx={{ mt: 2 }}>
-            <MainCard title="Accommodations" style={{ marginBlockEnd: '1em' }} >
-              <MainCard content={false} style={{ marginBlockEnd: '1em', padding: '1em' }}>
-                <LongAccommodationCard
-                  data={{
-                    ...accommodationData,
-                    price: amount.accommodationTotal,
-                    isDayMode: mode === 'day',
-                    startDate,
-                    endDate
-                  }}
+          <Grid item sm={12} md={12}>
+            <Grid container spacing={2}>
+              <Grid item sm={12} md={6}>
+                <LabeledValue
+                  ellipsis
+                  title='Email Address'
+                  subTitle={emailAddress}
+                  icon={<MailOutlined />}
                 />
-                {/* Total Guests field */}
-                <Box sx={{ mt: 2 }}>
-                  <LabeledValue
-                    title="Total Guests"
-                    subTitle={typeof guests === 'number' ? guests : (entrances.adult + entrances.child + entrances.pwdSenior)}
-                  />
-                </Box>
-              </MainCard>
-            </MainCard>
+              </Grid>
 
-            <MainCard title="Entrance Tickets" sx={{ mb: 2 }}>
-              <List disablePadding>
-                {["adult", "child", "pwdSenior"].map((type, idx) => {
-                  const qty = entrances[type] || 0;
-
-                  return (
-                    <React.Fragment key={type}>
-                      <ListItem
-                        sx={{
-                          py: 1.5,
-                          px: 2,
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Typography variant="body1" fontWeight={600}>
-                          {idx !== 2 ? titleCase(type) : "PWD/Senior"}
-                        </Typography>
-
-                        <Stack direction="row" spacing={2} alignItems="center">
-                          <Typography
-                            variant="body1"
-                            color={qty === 0 ? "text.secondary" : "text.primary"}
-                          >
-                            {qty} {qty === 1 ? "ticket" : "tickets"}
-                          </Typography>
-                        </Stack>
-                      </ListItem>
-
-                      {idx < 2 && <Divider />}
-                    </React.Fragment>
-                  );
-                })}
-              </List>
-            </MainCard>
-          </MainCard>
+              <Grid item sm={12} md={6}>
+                <LabeledValue
+                  ellipsis
+                  title='Phone Number'
+                  subTitle={`+63 ${phoneNumber}`}
+                  icon={<UserOutlined />}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
         </Grid>
+      </MainCard>
 
-        <Grid item xs={12} md={4}>
-          <Box sx={{ position: "sticky", top: 100 }}>
-            <PaymentSummaryCard
+      <MainCard title="Booking Details" sx={{ mt: 2 }}>
+        <MainCard title="Accommodations" style={{ marginBlockEnd: '1em' }} >
+          <MainCard content={false} style={{ marginBlockEnd: '1em', padding: '1em' }}>
+            <LongAccommodationCard
               data={{
-                accomName: accommodationData?.name,
-                accomPrice: amount?.accommodationTotal,
-                includeEntrance: includeEntranceFee || accommodationData?.hasPoolAccess,
-                entrances: entrances,
-                entranceTotal: amount?.entranceTotal,
-                minimumPayable: amount?.minimumPayable,
-                total: amount?.total + extraPersonFee,
-                prices: {
-                  adult: amount.adult,
-                  child: amount.child,
-                  pwdSenior: amount.pwdSenior
-                },
-                extraPersonFee,
-                guests: usedGuests,
-                capacity
+                ...accommodationData,
+                price: amount.accommodationTotal,
+                isDayMode: mode === 'day',
+                startDate,
+                endDate
               }}
             />
-          </Box>
-        </Grid>
-      </Grid>
+            <Box sx={{ mt: 2 }}>
+              <LabeledValue
+                title="Total Guests"
+                subTitle={typeof guests === 'number' ? guests : (entrances.adult + entrances.child + entrances.pwdSenior)}
+              />
+            </Box>
+          </MainCard>
+        </MainCard>
+
+        <MainCard title="Entrance Tickets" sx={{ mb: 2 }}>
+          <List disablePadding>
+            {["adult", "child", "pwdSenior"].map((type, idx) => {
+              const qty = entrances[type] || 0;
+
+              return (
+                <React.Fragment key={type}>
+                  <ListItem
+                    sx={{
+                      py: 1.5,
+                      px: 2,
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography variant="body1" fontWeight={600}>
+                      {idx !== 2 ? titleCase(type) : "PWD/Senior"}
+                    </Typography>
+
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <Typography
+                        variant="body1"
+                        color={qty === 0 ? "text.secondary" : "text.primary"}
+                      >
+                        {qty} {qty === 1 ? "ticket" : "tickets"}
+                      </Typography>
+                    </Stack>
+                  </ListItem>
+
+                  {idx < 2 && <Divider />}
+                </React.Fragment>
+              );
+            })}
+          </List>
+        </MainCard>
+      </MainCard>
     </Box>
   );
 };
