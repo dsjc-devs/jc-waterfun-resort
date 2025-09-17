@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import Users from "../models/usersModels.js";
+import { PERMISSIONS, hasPermission, getUserRole, canManageUser } from './permissions.js';
 
 const checkIfUserExists = async (req, res, next) => {
   try {
@@ -39,7 +40,125 @@ const protect = async (req, res, next) => {
   }
 };
 
+const requirePermission = (permission) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
+    const userRole = getUserRole(req.user);
+    if (!userRole) {
+      return res.status(403).json({ message: "User role not found" });
+    }
+
+    if (!hasPermission(userRole, permission)) {
+      return res.status(403).json({ 
+        message: `Access denied. Required permission: ${permission}` 
+      });
+    }
+
+    next();
+  };
+};
+
+const requireAnyPermission = (permissions) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
+    const userRole = getUserRole(req.user);
+    if (!userRole) {
+      return res.status(403).json({ message: "User role not found" });
+    }
+
+    const hasAnyPermission = permissions.some(permission => 
+      hasPermission(userRole, permission)
+    );
+
+    if (!hasAnyPermission) {
+      return res.status(403).json({ 
+        message: `Access denied. Required permissions: ${permissions.join(' or ')}` 
+      });
+    }
+
+    next();
+  };
+};
+
+const canManageTargetUser = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ message: "Authentication required" });
+  }
+
+  const managerRole = getUserRole(req.user);
+  if (!managerRole) {
+    return res.status(403).json({ message: "User role not found" });
+  }
+
+  const targetRole = req.body.position?.[0]?.value || req.targetUserRole;
+  
+  if (targetRole && !canManageUser(managerRole, targetRole)) {
+    return res.status(403).json({ 
+      message: "You don't have permission to manage this user role" 
+    });
+  }
+
+  next();
+};
+
+const requireMasterAdminForAdminCreation = (req, res, next) => {
+  const targetRole = req.body.position?.[0]?.value;
+  const userRole = getUserRole(req.user);
+  
+  if (targetRole === 'ADMIN' && userRole !== 'MASTER_ADMIN') {
+    return res.status(403).json({ 
+      message: "Only Master Admin can create Admin accounts" 
+    });
+  }
+  
+  if (targetRole === 'RECEPTIONIST' && userRole !== 'MASTER_ADMIN' && userRole !== 'ADMIN') {
+    return res.status(403).json({ 
+      message: "Only Master Admin or Admin can create Receptionist accounts" 
+    });
+  }
+  
+  next();
+};
+
+const canChangeUserStatus = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ message: "Authentication required" });
+  }
+
+  const managerRole = getUserRole(req.user);
+  
+  if (req.targetUserRole === 'ADMIN') {
+    if (managerRole !== 'MASTER_ADMIN') {
+      return res.status(403).json({ 
+        message: "Only Master Admin can change Admin status" 
+      });
+    }
+  }
+  
+  if (req.targetUserRole === 'RECEPTIONIST') {
+    if (managerRole !== 'MASTER_ADMIN' && managerRole !== 'ADMIN') {
+      return res.status(403).json({ 
+        message: "Only Master Admin or Admin can change Receptionist status" 
+      });
+    }
+  }
+  
+  next();
+};
+
 export {
   protect,
-  checkIfUserExists
+  checkIfUserExists,
+  requirePermission,
+  requireAnyPermission,
+  canManageTargetUser,
+  requireMasterAdminForAdminCreation,
+  canChangeUserStatus,
+  PERMISSIONS
 }

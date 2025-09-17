@@ -1,6 +1,15 @@
 import express from 'express';
 import { createValidator } from '../middleware/validations/userValidator.js'
-import { checkIfUserExists, protect } from '../middleware/authMiddleware.js'
+import { 
+  checkIfUserExists, 
+  protect, 
+  requirePermission,
+  requireAnyPermission,
+  canManageTargetUser,
+  requireMasterAdminForAdminCreation,
+  canChangeUserStatus,
+  PERMISSIONS
+} from '../middleware/authMiddleware.js'
 
 import {
   authUser,
@@ -18,6 +27,7 @@ router.post('/login', authUser)
 
 router.post(
   '/create',
+  protect,
   createUploadMiddleware({
     fields: [
       { name: 'avatar', maxCount: 1 },
@@ -27,13 +37,24 @@ router.post(
     },
   }),
   checkIfUserExists,
+  requireAnyPermission([
+    PERMISSIONS.CREATE_ADMIN,
+    PERMISSIONS.CREATE_RECEPTIONIST,
+    PERMISSIONS.CREATE_CUSTOMER
+  ]),
+  requireMasterAdminForAdminCreation,
+  canManageTargetUser,
   createValidator,
   createUser
 );
 
-router.get('/', protect, getUsers)
+router.get('/', 
+  protect,
+  getUsers
+)
 
-router.get('/:userId', getSingleUserById)
+router.get('/:userId', protect, getSingleUserById)
+
 router.patch('/:userId',
   protect,
   createUploadMiddleware({
@@ -44,8 +65,18 @@ router.patch('/:userId',
       avatar: 'user_avatars',
     },
   }),
+  canChangeUserStatus,
   updateUserById
 );
-router.delete('/:userId', protect, deleteUserById)
+
+router.delete('/:userId', 
+  protect,
+  requireAnyPermission([
+    PERMISSIONS.DELETE_ADMIN,
+    PERMISSIONS.DELETE_RECEPTIONIST,
+    PERMISSIONS.DELETE_CUSTOMER
+  ]),
+  deleteUserById
+)
 
 export default router
