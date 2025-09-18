@@ -46,7 +46,7 @@ const AbsoluteRoutes = {
     },
     {
       path: '/book-now',
-      element: <PageWrapper children={<BookNow />} />
+      element: <PageWrapper hasBanner={false} children={<BookNow />} />
     },
     {
       path: '/faqs',
