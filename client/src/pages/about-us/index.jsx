@@ -30,69 +30,33 @@ const AboutUs = () => {
       />
 
       <Container sx={{ my: 5 }}>
-        <Grid
-          container
-          spacing={4}
-          justifyContent="center"
-          alignItems="center"
-          direction="column"
-          sx={{ maxWidth: 900, mx: "auto" }}
-        >
-          <Grid item xs={12} sm={10} md={8}>
+        <Grid container spacing={4} sx={{ maxWidth: 1200, mx: "auto" }}>
+          {/* Mission Section */}
+          <Grid item xs={12}>
             <Box
               data-aos="fade-up"
               data-aos-delay="100"
               sx={{
-                position: "relative",
-                background: "#181c20",
-                color: "#fff",
-                borderRadius: 0,
-                boxShadow: "none",
-                minHeight: { xs: 400, md: 520 },
-                py: { xs: 6, md: 10 },
-                px: { xs: 2, md: 6 },
-                width: { xs: "100%", md: "203%" },
-                maxWidth: { xs: "100%", md: "none" },
                 display: "flex",
-                flexDirection: { xs: "column", md: "row-reverse" },
-                alignItems: "stretch",
-                overflow: "visible",
-                ml: { xs: 0, md: -8 },
+                flexDirection: { xs: "column", md: "row" },
+                alignItems: "center",
+                gap: { xs: 3, md: 6 },
+                mb: { xs: 4, md: 8 },
               }}
             >
               <Box
                 sx={{
                   flex: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  zIndex: 2,
-                  pr: { xs: 0, md: 8 },
-                  textAlign: "center",
+                  order: { xs: 2, md: 1 },
                 }}
               >
-                <TitleTag
-                  title="Our Mission"
-                  subtitle="Mission"
-                />
-                <Typography variant="body1" sx={{ color: "#cfd8dc", lineHeight: 1.7, mb: 3, maxWidth: 540 }}>
-                  {mission || "No mission statement available."}
-                </Typography>
-              </Box>
-              {isDesktop && (
                 <Box
                   sx={{
-                    position: "absolute",
-                    top: 75,
-                    left: -400,
-                    width: 600,
-                    height: 400,
-                    zIndex: 3,
-                    borderRadius: "12px",
+                    width: "100%",
+                    height: { xs: 250, md: 400 },
+                    borderRadius: 3,
                     overflow: "hidden",
-                    boxShadow: 4,
-                    background: "#fff",
+                    boxShadow: 3,
                   }}
                 >
                   <img
@@ -102,68 +66,79 @@ const AboutUs = () => {
                       width: "100%",
                       height: "100%",
                       objectFit: "cover",
-                      display: "block",
                     }}
                   />
                 </Box>
-              )}
+              </Box>
+              <Box
+                sx={{
+                  flex: 1,
+                  order: { xs: 1, md: 2 },
+                  background: "#181c20",
+                  color: "#fff",
+                  p: { xs: 4, md: 6 },
+                  borderRadius: 3,
+                  textAlign: "center",
+                  minHeight: { xs: 300, md: 400 },
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                }}
+              >
+                <TitleTag title="Our Mission" subtitle="Mission" />
+                <Typography variant="body1" sx={{ color: "#cfd8dc", lineHeight: 1.7 }}>
+                  {mission || "No mission statement available."}
+                </Typography>
+              </Box>
             </Box>
           </Grid>
-          <Grid item xs={12} sm={10} md={8}>
+
+          {/* Vision Section */}
+          <Grid item xs={12}>
             <Box
               data-aos="fade-up"
               data-aos-delay="250"
               sx={{
-                position: "relative",
-                background: "#181c20",
-                color: "#fff",
-                borderRadius: 0,
-                boxShadow: "none",
-                minHeight: { xs: 400, md: 520 },
-                py: { xs: 6, md: 10 },
-                px: { xs: 2, md: 6 },
                 display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                ml: { xs: 0, md: -65 },
-                width: { xs: "100%", md: "150%" },
-                overflow: "visible",
+                flexDirection: { xs: "column", md: "row" },
+                alignItems: "center",
+                gap: { xs: 3, md: 6 },
+                mb: { xs: 4, md: 8 },
               }}
             >
               <Box
                 sx={{
                   flex: 1,
+                  order: { xs: 1, md: 1 },
+                  background: "#181c20",
+                  color: "#fff",
+                  p: { xs: 4, md: 6 },
+                  borderRadius: 3,
+                  textAlign: "center",
+                  minHeight: { xs: 300, md: 400 },
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
-                  alignItems: "center",
-                  textAlign: "center",
-                  zIndex: 2,
-                  maxWidth: { xs: "100%", md: "60%" },
-                  ml: { xs: 4, md: 20 },
                 }}
               >
-                <TitleTag
-                  title="Our Vision"
-                  subtitle="Vision"
-                />
-                <Typography variant="body1" sx={{ color: "#cfd8dc", lineHeight: 1.7, mb: 3 }}>
+                <TitleTag title="Our Vision" subtitle="Vision" />
+                <Typography variant="body1" sx={{ color: "#cfd8dc", lineHeight: 1.7 }}>
                   {vision || "No vision statement available."}
                 </Typography>
               </Box>
-              {isDesktop && (
+              <Box
+                sx={{
+                  flex: 1,
+                  order: { xs: 2, md: 2 },
+                }}
+              >
                 <Box
                   sx={{
-                    position: "absolute",
-                    top: 75,
-                    right: -400,
-                    width: 600,
-                    height: 400,
-                    zIndex: 3,
-                    borderRadius: "12px",
+                    width: "100%",
+                    height: { xs: 250, md: 400 },
+                    borderRadius: 3,
                     overflow: "hidden",
-                    boxShadow: 4,
-                    background: "#fff",
+                    boxShadow: 3,
                   }}
                 >
                   <img
@@ -173,69 +148,38 @@ const AboutUs = () => {
                       width: "100%",
                       height: "100%",
                       objectFit: "cover",
-                      display: "block",
                     }}
                   />
                 </Box>
-              )}
+              </Box>
             </Box>
           </Grid>
-          <Grid item xs={12} sm={10} md={8}>
+
+          {/* Goals Section */}
+          <Grid item xs={12}>
             <Box
               data-aos="fade-up"
               data-aos-delay="400"
               sx={{
-                position: "relative",
-                background: "#181c20",
-                color: "#fff",
-                borderRadius: 0,
-                boxShadow: "none",
-                minHeight: { xs: 400, md: 520 },
-                py: { xs: 6, md: 10 },
-                px: { xs: 2, md: 6 },
-                width: { xs: "100%", md: "203%" },
-                maxWidth: { xs: "100%", md: "none" },
                 display: "flex",
-                flexDirection: { xs: "column", md: "row-reverse" },
-                alignItems: "stretch",
-                overflow: "visible",
-                ml: { xs: 0, md: -8 },
+                flexDirection: { xs: "column", md: "row" },
+                alignItems: "center",
+                gap: { xs: 3, md: 6 },
               }}
             >
               <Box
                 sx={{
                   flex: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  zIndex: 2,
-                  pr: { xs: 0, md: 8 },
-                  textAlign: "center",
+                  order: { xs: 2, md: 1 },
                 }}
               >
-                <TitleTag
-                  title="Our Goals"
-                  subtitle="Goals"
-                />
-                <Typography variant="body1" sx={{ color: "#cfd8dc", lineHeight: 1.7, mb: 3, maxWidth: 540 }}>
-                  {goals || "No goals statement available."}
-                </Typography>
-              </Box>
-
-              {isDesktop && (
                 <Box
                   sx={{
-                    position: "absolute",
-                    top: 75,
-                    left: -400,
-                    width: 600,
-                    height: 400,
-                    zIndex: 3,
-                    borderRadius: "12px",
+                    width: "100%",
+                    height: { xs: 250, md: 400 },
+                    borderRadius: 3,
                     overflow: "hidden",
-                    boxShadow: 4,
-                    background: "#fff",
+                    boxShadow: 3,
                   }}
                 >
                   <img
@@ -245,11 +189,30 @@ const AboutUs = () => {
                       width: "100%",
                       height: "100%",
                       objectFit: "cover",
-                      display: "block",
                     }}
                   />
                 </Box>
-              )}
+              </Box>
+              <Box
+                sx={{
+                  flex: 1,
+                  order: { xs: 1, md: 2 },
+                  background: "#181c20",
+                  color: "#fff",
+                  p: { xs: 4, md: 6 },
+                  borderRadius: 3,
+                  textAlign: "center",
+                  minHeight: { xs: 300, md: 400 },
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                }}
+              >
+                <TitleTag title="Our Goals" subtitle="Goals" />
+                <Typography variant="body1" sx={{ color: "#cfd8dc", lineHeight: 1.7 }}>
+                  {goals || "No goals statement available."}
+                </Typography>
+              </Box>
             </Box>
           </Grid>
         </Grid>
