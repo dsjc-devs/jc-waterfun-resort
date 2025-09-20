@@ -17,6 +17,7 @@ import MainCard from 'components/MainCard';
 import Banner from 'components/Banner';
 import Logo from 'components/logo/LogoMain';
 import contactUs from 'assets/images/upload/contact-us-header.jpg';
+import MapSection from 'sections/landing-pages/MapSection';
 
 const ContactUs = () => {
   const theme = useTheme()
@@ -157,6 +158,7 @@ const ContactUs = () => {
           </Grid>
         </Container>
       </Box>
+      <MapSection />
     </React.Fragment>
   );
 };

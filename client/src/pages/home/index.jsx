@@ -8,6 +8,7 @@ import ContactUsHomePage from "sections/landing-pages/ContactUs";
 import AboutUs from "sections/landing-pages/AboutUs";
 import DiscoverSection from "sections/landing-pages/DiscoverSection";
 import MapSection from "sections/landing-pages/MapSection";
+import FAQs from "sections/landing-pages/FAQs";
 
 const Home = () => {
   useEffect(() => {
@@ -22,7 +23,7 @@ const Home = () => {
       <AboutUs />
       <DiscoverSection />
       <MapSection />
-
+      <FAQs />
     </React.Fragment>
   );
 };
