@@ -1,3 +1,5 @@
+import { NO_CATEGORY } from "constants/constants"
+
 const navItems = [
   { _id: "home", name: "Home", link: '/' },
   { _id: "book-now", name: "Book Now", link: '/book-now' },
@@ -5,4 +7,47 @@ const navItems = [
   { _id: "contact-us", name: "Contact Us", link: '/contact-us' },
 ]
 
+const getDropdownNavItems = (accomodationTypes = []) => [
+  {
+    title: "Accommodations",
+    subtitle: "Our Spaces",
+    link: "/accommodations",
+    sublinks: accomodationTypes
+      ?.filter((f) => f.title !== NO_CATEGORY)
+      .map((f) => ({
+        title: f.title,
+        link: `/accommodations?type=${f.title.toLowerCase().replace(/\s+/g, '-')}`
+      })),
+  },
+  {
+    title: "Amenities",
+    subtitle: "Facilities",
+    link: "/amenities",
+    sublinks: [
+      { title: "Swimming Pool", link: "/amenities?type=swimming-pool" },
+      { title: "Billiards", link: "/amenities?type=billiards" },
+      { title: "Karaoke", link: "/amenities?type=karaoke" }
+    ]
+  },
+  {
+    title: "Gallery",
+    subtitle: "Memories",
+    link: "/gallery",
+    sublinks: [
+      { title: "Resort Gallery", link: "/gallery" },
+      { title: "Articles", link: "/articles" },
+    ]
+  },
+  {
+    title: "Rates",
+    subtitle: "Pricing",
+    link: "/rates",
+    sublinks: [
+      { title: "Day Tour", link: "/rates?type=day-tour" },
+      { title: "Overnight Stay", link: "/rates?type=overnight-stay" },
+    ]
+  }
+]
+
 export default navItems
+export { getDropdownNavItems }

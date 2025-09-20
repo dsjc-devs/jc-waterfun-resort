@@ -7,64 +7,40 @@ import {
   ListItemText,
   Button,
   useMediaQuery,
-  Collapse
+  Collapse,
+  Divider
 } from '@mui/material'
 import { MenuOutlined } from '@ant-design/icons'
-import { useNavigate } from 'react-router'
+import { useNavigate, useLocation } from 'react-router'
 import { useGetAccommodationTypes } from 'api/accomodation-type'
-import { NO_CATEGORY } from 'constants/constants'
 import React, { useState } from 'react'
 
 import Logo from 'components/logo/LogoMain'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
-import textFormatter from 'utils/textFormatter'
+import navItems, { getDropdownNavItems } from './nav-items/navItems'
+import useAuth from 'hooks/useAuth'
 
 const NavbarMobile = ({ handleDrawerToggle, drawerOpen }) => {
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
   const navigate = useNavigate()
+  const location = useLocation()
+  const { isLoggedIn } = useAuth()
 
   const { accomodationTypes, isLoading } = useGetAccommodationTypes()
-
   const [openSection, setOpenSection] = useState(null)
 
   const handleToggleSection = (title) => {
     setOpenSection(openSection === title ? null : title)
   }
 
-  const _navItems = [
-    {
-      title: "Accommodations",
-      link: "/accommodations",
-      sublinks: accomodationTypes
-        ?.filter((f) => f.title !== NO_CATEGORY)
-        .map((f) => ({
-          title: f.title,
-          link: `/accommodations?type=${textFormatter.toSlug(f.title)}`
-        })),
-    },
-    {
-      title: "Amenities",
-      link: "/amenities",
-      sublinks: [
-        { title: "Swimming Pool", link: "/amenities?type=swimming-pool" },
-        { title: "Billiards", link: "/amenities?type=billiards" },
-        { title: "Karaoke", link: "/amenities?type=karaoke" }
-      ]
-    },
-    {
-      title: "Rates",
-      link: "/rates",
-      sublinks: [
-        { title: "Day Tour", link: "/rates?type=day-tour" },
-        { title: "Overnight Stay", link: "/rates?type=overnight-stay" },
-      ]
-    },
-    {
-      title: "Gallery",
-      link: "/gallery",
-    },
-  ]
+  const handleNavigation = (link) => {
+    navigate(link)
+    handleDrawerToggle() // Close drawer after navigation
+  }
+
+  // Get unified navigation items
+  const dropdownNavItems = getDropdownNavItems(accomodationTypes)
 
   return (
     <React.Fragment>
@@ -97,20 +73,64 @@ const NavbarMobile = ({ handleDrawerToggle, drawerOpen }) => {
             onClose={handleDrawerToggle}
             PaperProps={{
               sx: {
-                backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                backgroundColor: 'rgba(0, 0, 0, 0.9)',
                 padding: 2,
+                width: 280,
               },
             }}
           >
-            <List sx={{ width: 250 }}>
-              {_navItems.map((item) => (
+            <List sx={{ width: '100%' }}>
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.link
+                return (
+                  <ListItem
+                    key={item._id}
+                    button
+                    onClick={() => handleNavigation(item.link)}
+                    sx={{
+                      color: isActive ? '#1976d2' : '#fff',
+                      backgroundColor: isActive ? 'rgba(25, 118, 210, 0.1)' : 'transparent',
+                      borderRadius: 1,
+                      mb: 0.5,
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                      }
+                    }}
+                  >
+                    <ListItemText
+                      primary={item.name}
+                      primaryTypographyProps={{
+                        fontFamily: "'Cinzel', sans-serif",
+                        fontWeight: isActive ? 600 : 400
+                      }}
+                    />
+                  </ListItem>
+                )
+              })}
+
+              <Divider sx={{ my: 2, backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
+
+              {dropdownNavItems.map((item) => (
                 <React.Fragment key={item.title}>
                   <ListItem
                     button
-                    onClick={() => item.sublinks ? handleToggleSection(item.title) : navigate(item.link)}
-                    sx={{ color: '#fff' }}
+                    onClick={() => item.sublinks ? handleToggleSection(item.title) : handleNavigation(item.link)}
+                    sx={{
+                      color: '#fff',
+                      borderRadius: 1,
+                      mb: 0.5,
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                      }
+                    }}
                   >
-                    <ListItemText primary={item.title} />
+                    <ListItemText
+                      primary={item.title}
+                      primaryTypographyProps={{
+                        fontFamily: "'Cinzel', sans-serif",
+                        fontWeight: 500
+                      }}
+                    />
                     {item.sublinks ? (
                       openSection === item.title ? <ExpandLess /> : <ExpandMore />
                     ) : null}
@@ -123,10 +143,22 @@ const NavbarMobile = ({ handleDrawerToggle, drawerOpen }) => {
                           <ListItem
                             key={sub.title}
                             button
-                            sx={{ pl: 4, color: '#ddd' }}
-                            onClick={() => navigate(sub.link)}
+                            sx={{
+                              pl: 4,
+                              color: '#ddd',
+                              borderRadius: 1,
+                              '&:hover': {
+                                backgroundColor: 'rgba(255, 255, 255, 0.05)'
+                              }
+                            }}
+                            onClick={() => handleNavigation(sub.link)}
                           >
-                            <ListItemText primary={sub.title} />
+                            <ListItemText
+                              primary={sub.title}
+                              primaryTypographyProps={{
+                                fontSize: '0.85rem'
+                              }}
+                            />
                           </ListItem>
                         ))}
                       </List>
@@ -139,17 +171,21 @@ const NavbarMobile = ({ handleDrawerToggle, drawerOpen }) => {
             <Stack
               sx={{
                 padding: 2,
-                borderTop: '1px solid #fff',
+                borderTop: '1px solid rgba(255, 255, 255, 0.2)',
                 marginTop: 'auto',
                 textAlign: 'center',
               }}
             >
               <Button
                 variant='contained'
-                sx={{ borderRadius: 2 }}
-                onClick={() => navigate('/login')}
+                sx={{
+                  borderRadius: 2,
+                  fontFamily: "'Cinzel', sans-serif",
+                  fontWeight: 500
+                }}
+                onClick={() => handleNavigation('/login')}
               >
-                Login
+                {isLoggedIn ? "Portal" : "Login"}
               </Button>
             </Stack>
           </Drawer>

@@ -2,14 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { Stack, Container, Box, Link, Button, Typography, Grid, Popper, Paper } from '@mui/material'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useGetAccommodationTypes } from 'api/accomodation-type'
-import { NO_CATEGORY } from 'constants/constants'
 
 import useAuth from 'hooks/useAuth'
-import navItems from './nav-items/navItems'
+import navItems, { getDropdownNavItems } from './nav-items/navItems'
 import LogoSection from 'components/logo'
 import AnimateButton from 'components/@extended/AnimateButton'
 import PreviewCard from 'components/PreviewCard'
-import textFormatter from 'utils/textFormatter'
 
 import accom1 from 'assets/images/upload/accom1.jpg'
 import accom2 from 'assets/images/upload/accom2.jpg'
@@ -18,7 +16,6 @@ import accom4 from 'assets/images/upload/accom4.jpg'
 
 const NavbarDesktop = ({ hasBanner = true }) => {
   const { accomodationTypes, isLoading } = useGetAccommodationTypes()
-
   const { isLoggedIn } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -26,8 +23,8 @@ const NavbarDesktop = ({ hasBanner = true }) => {
   const [scrolled, setScrolled] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null)
   const [hoveredItem, setHoveredItem] = useState(null)
-
   const [open, setOpen] = useState(false)
+
   let timer = null
 
   const handleEnter = (event, item) => {
@@ -51,51 +48,15 @@ const NavbarDesktop = ({ hasBanner = true }) => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const _navItems = [
-    {
-      title: "Accommodations",
-      subtitle: "Our Spaces",
-      link: "/accommodations",
-      backgroundImage: accom1,
-      sublinks: accomodationTypes
-        ?.filter((f) => f.title !== NO_CATEGORY)
-        .map((f) => ({
-          title: f.title,
-          link: `/accommodations?type=${textFormatter.toSlug(f.title)}`
-        })),
-    },
-    {
-      title: "Amenities",
-      subtitle: "Facilities",
-      link: "/amenities",
-      backgroundImage: accom2,
-      sublinks: [
-        { title: "Swimming Pool", link: "/amenities?type=swimming-pool" },
-        { title: "Billiards", link: "/amenities?type=billiards" },
-        { title: "Karaoke", link: "/amenities?type=karaoke" }
-      ]
-    },
-    {
-      title: "Gallery",
-      subtitle: "Memories",
-      link: "/gallery",
-      backgroundImage: accom3,
-      sublinks: [
-        { title: "Resort Gallery", link: "/gallery" },
-        { title: "Articles", link: "/articles" },
-      ]
-    },
-    {
-      title: "Rates",
-      subtitle: "Pricing",
-      link: "/rates",
-      backgroundImage: accom4,
-      sublinks: [
-        { title: "Day Tour", link: "/rates?type=day-tour" },
-        { title: "Overnight Stay", link: "/rates?type=overnight-stay" },
-      ]
-    }
-  ]
+  // Get unified dropdown navigation items
+  const dropdownNavItems = getDropdownNavItems(accomodationTypes)
+
+  // Add background images to dropdown items
+  const backgroundImages = [accom1, accom2, accom3, accom4]
+  const enhancedDropdownItems = dropdownNavItems.map((item, index) => ({
+    ...item,
+    backgroundImage: backgroundImages[index] || accom1
+  }))
 
   return (
     <Box sx={{ position: hasBanner ? 'absolute' : 'relative', width: '100%' }}>
@@ -117,7 +78,7 @@ const NavbarDesktop = ({ hasBanner = true }) => {
                 const isActive = location.pathname === item.link
                 return (
                   <Link
-                    key={item.name}
+                    key={item._id}
                     onClick={() => navigate(item.link)}
                     sx={{
                       borderTop: isActive ? "3px solid" : "3px solid transparent",
@@ -164,22 +125,32 @@ const NavbarDesktop = ({ hasBanner = true }) => {
       >
         <Container>
           <Grid container textAlign="center" spacing={2}>
-            {_navItems.map((item, index) => (
-              <Grid item md={3} key={item.title}>
+            {enhancedDropdownItems.map((item, index) => (
+              <Grid item xs={12} sm={6} md={3} key={item.title}>
                 <Box
                   onMouseLeave={handleLeave}
                   sx={{
                     cursor: "pointer",
-                    borderRight: index !== _navItems.length - 1 ? "2px solid #fff" : "none",
-                    pr: 3,
+                    borderRight: {
+                      xs: "none",
+                      md: index !== enhancedDropdownItems.length - 1 ? "2px solid #fff" : "none"
+                    },
+                    borderBottom: {
+                      xs: index !== enhancedDropdownItems.length - 1 ? "1px solid rgba(255,255,255,0.3)" : "none",
+                      md: "none"
+                    },
+                    pr: { xs: 0, md: 3 },
+                    pb: { xs: 2, md: 0 },
+                    mb: { xs: 2, md: 0 },
                   }}
                 >
                   <Typography
                     onMouseEnter={(e) => handleEnter(e, item)}
+                    onClick={() => navigate(item.link)}
                     sx={{
                       fontFamily: "Cinzel",
                       fontWeight: "normal",
-                      fontSize: "1rem",
+                      fontSize: { xs: "0.9rem", md: "1rem" },
                       color: (theme) => theme.palette.secondary.contrastText,
                       transition: ".3s",
                       "&:hover": { opacity: 0.4 }
@@ -191,7 +162,7 @@ const NavbarDesktop = ({ hasBanner = true }) => {
                     sx={{
                       fontFamily: "Cinzel",
                       fontWeight: "700",
-                      fontSize: "85%",
+                      fontSize: { xs: "75%", md: "85%" },
                       color: (theme) => theme.palette.secondary.contrastText,
                       opacity: 0.8,
                     }}
