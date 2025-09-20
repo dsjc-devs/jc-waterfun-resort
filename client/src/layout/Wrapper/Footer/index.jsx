@@ -114,7 +114,7 @@ const Footer = () => {
                 { label: "Contact Us", href: "contact-us" },
                 { label: "Media", href: "media" },
                 { label: "FAQs", href: "faqs" },
-                { label: "Privacy Policy", href: "privacy-policy" },
+                { label: "Policies", href: "policies" },
               ].map((item) => (
                 <li key={item.label} style={{ lineHeight: 1.8 }}>
                   <Link
