@@ -30,8 +30,8 @@ const getDropdownNavItems = (accomodationTypes = []) => [
     ]
   },
   {
-    title: "Gallery",
-    subtitle: "Memories",
+    title: "Media Center",
+    subtitle: "Photos & Articles",
     link: "/gallery",
     sublinks: [
       { title: "Resort Gallery", link: "/gallery" },
