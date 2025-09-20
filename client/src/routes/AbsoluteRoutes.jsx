@@ -25,6 +25,9 @@ const BookReservation = Loadable(lazy(() => import('pages/book-reservation')));
 // policies
 const Policies = Loadable(lazy(() => import('pages/policies')));
 
+// policies
+const ResortRates = Loadable(lazy(() => import('pages/resort-rates')));
+
 const NotFoundPage = Loadable(lazy(() => import('pages/maintenance/404')));
 
 // success
@@ -98,13 +101,23 @@ const AbsoluteRoutes = {
     },
 
     // policies
-
     {
       path: '/policies',
       children: [
         {
           index: true,
           element: <PageWrapper hasBanner={false} children={<Policies />} />
+        },
+      ]
+    },
+
+    // resort rates
+    {
+      path: '/resort-rates',
+      children: [
+        {
+          index: true,
+          element: <PageWrapper hasBanner={false} children={<ResortRates />} />
         },
       ]
     },

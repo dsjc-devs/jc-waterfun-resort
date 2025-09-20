@@ -43,8 +43,8 @@ const getDropdownNavItems = (accomodationTypes = []) => [
     subtitle: "Pricing",
     link: "/rates",
     sublinks: [
-      { title: "Day Tour", link: "/rates?type=day-tour" },
-      { title: "Overnight Stay", link: "/rates?type=overnight-stay" },
+      { title: "Day Tour", link: "/resort-rates?type=day" },
+      { title: "Night Tour", link: "/resort-rates?type=night" },
     ]
   }
 ]
