@@ -37,6 +37,8 @@ const Faqs = Loadable(lazy(() => import('pages/portal/content-management/faqs'))
 const Articles = Loadable(lazy(() => import('pages/portal/content-management/articles')));
 const ArticleDetails = Loadable(lazy(() => import('pages/portal/content-management/articles/details')));
 const ArticleForm = Loadable(lazy(() => import('pages/portal/content-management/articles/form')));
+const Policies = Loadable(lazy(() => import('pages/portal/content-management/policies')));
+const PolicyForm = Loadable(lazy(() => import('pages/portal/content-management/policies/form')));
 
 const MainRoutes = {
   path: '/',
@@ -158,7 +160,20 @@ const MainRoutes = {
             {
               path: 'faqs',
               element: <Faqs />
-            }
+            },
+            {
+              path: 'policies',
+              children: [
+                {
+                  index: true,
+                  element: <Policies />
+                },
+                {
+                  path: 'form',
+                  element: <PolicyForm />
+                }
+              ]
+            },
           ]
         },
         {
