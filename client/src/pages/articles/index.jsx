@@ -23,8 +23,8 @@ const Articles = () => {
         image={banner}
       />
 
-      <Container>
-        <Box sx={{ my: 2 }} >
+      <Container maxWidth="lg">
+        <Box sx={{ my: 4, px: { xs: 0, md: 2 } }} >
           <ArticleList articles={articles} isOnPortal={false} />
         </Box>
       </Container>

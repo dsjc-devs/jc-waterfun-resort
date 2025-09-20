@@ -31,18 +31,23 @@ const GridCard = ({ material, isOnPortal = false, onDelete, onEdit }) => {
     <Box
       sx={{
         bgcolor: 'background.paper',
-        boxShadow: 1,
-        borderRadius: 2,
+        boxShadow: 2,
+        borderRadius: 3,
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        height: '100%'
+        height: '100%',
+        transition: 'box-shadow 0.2s, transform 0.2s',
+        '&:hover': {
+          boxShadow: 6,
+          transform: 'translateY(-4px)'
+        }
       }}
     >
-      <Box sx={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}>
+      <Box sx={{ position: 'relative', width: '100%', height: 0, paddingTop: '60%' }}>
         <Avatar
           variant="rectangle"
-          src="src/assets/images/logo/logo.png"
+          src={material.thumbnail}
           alt={material.title}
           sx={{
             position: 'absolute',
@@ -50,31 +55,60 @@ const GridCard = ({ material, isOnPortal = false, onDelete, onEdit }) => {
             left: 0,
             width: '100%',
             height: '100%',
-            objectFit: 'cover'
+            objectFit: 'cover',
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12
           }}
         />
         <Box
           sx={{
             position: 'absolute',
-            bottom: 8,
-            left: 8,
-            bgcolor: 'rgba(0,0,0,0.6)',
+            top: 12,
+            left: 12,
+            bgcolor: 'rgba(0,0,0,0.55)',
             color: '#fff',
-            px: 1,
-            py: 0.3,
-            borderRadius: 1,
-            fontSize: '0.75rem',
-            fontWeight: 'medium'
+            px: 1.5,
+            py: 0.5,
+            borderRadius: 2,
+            fontSize: '0.85rem',
+            fontWeight: 500,
+            boxShadow: 1
           }}
         >
           <ConvertDate dateString={material.createdAt} />
         </Box>
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 12,
+            right: 12,
+            bgcolor: 'rgba(255,255,255,0.85)',
+            color: 'text.primary',
+            px: 1.2,
+            py: 0.4,
+            borderRadius: 2,
+            fontSize: '0.8rem',
+            fontWeight: 500,
+            boxShadow: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5
+          }}
+        >
+          <EyeOutlined style={{ fontSize: 15, marginRight: 4 }} />
+          {material.views || 0}
+        </Box>
       </Box>
 
-      <Box sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+      <Box sx={{ p: 2.5, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Typography variant="h6" fontWeight={700} gutterBottom sx={{ mb: 0.5 }}>
           {material.title}
         </Typography>
+        {material.excerpt && (
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, minHeight: 40 }}>
+            {material.excerpt}
+          </Typography>
+        )}
 
         <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 2 }}>
           {isOnPortal && (
@@ -87,16 +121,13 @@ const GridCard = ({ material, isOnPortal = false, onDelete, onEdit }) => {
               onClick={() => navigate(`/articles/details/${material._id}`)}
               sx={{ cursor: 'pointer', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
             >
-              View Article
+              Read More
             </Typography>
           )}
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
-            Views: {material.views || 0}
-          </Typography>
         </Stack>
 
         {isOnPortal && (
-          <Stack direction="row" spacing={1.5} sx={{ '& .MuiButton-root': { borderRadius: 1.5, fontSize: 13, px: 2.2, py: 0.65, minWidth: 92, textTransform: 'none' } }}>
+          <Stack direction="row" spacing={1.5} sx={{ mt: 'auto', '& .MuiButton-root': { borderRadius: 1.5, fontSize: 13, px: 2.2, py: 0.65, minWidth: 92, textTransform: 'none' } }}>
             <Button
               size="small"
               variant="contained"

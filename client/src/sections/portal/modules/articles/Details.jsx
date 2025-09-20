@@ -1,4 +1,4 @@
-import { Box, Chip, Skeleton, Stack, Typography } from '@mui/material'
+import { Box, Chip, Skeleton, Stack, Typography, Divider, Paper } from '@mui/material'
 import { useGetSingleMarketingMaterial } from 'api/marketing-materials'
 import { useParams } from 'react-router'
 
@@ -31,78 +31,96 @@ const ArticleDetails = ({ article = {}, isLoading = false, isOnPortal = false })
                 </MainCard >
             ) : (
                 material && (
-                    <Box>
+                    <Paper elevation={3} sx={{ borderRadius: 4, overflow: 'hidden', mb: 4 }}>
                         {article.thumbnail && (
-                            <Box sx={{ mb: 2 }}>
+                            <Box sx={{ width: '100%', height: { xs: 220, md: 400 }, overflow: 'hidden' }}>
                                 <Avatar
                                     variant="rectangle"
                                     src={article.thumbnail}
                                     alt={article.title}
                                     sx={{
                                         width: '100%',
-                                        height: 400,
+                                        height: '100%',
                                         objectFit: 'cover',
-                                        borderRadius: 2
+                                        borderRadius: 0
                                     }}
                                 />
                             </Box>
                         )}
 
-                        <Stack
-                            direction="row"
-                            justifyContent="space-between"
-                            alignItems="center"
-                            sx={{ mb: 2 }}
-                        >
-                            {isOnPortal && (
-                                <Chip
-                                    label={article.status || 'N/A'}
-                                    variant="filled"
-                                    color="primary"
-                                    size="small"
-                                    sx={{
-                                        fontWeight: 500,
-                                        textTransform: 'capitalize',
-                                        borderRadius: '4px',
-                                        px: 1.5,
-                                        py: 0.5
-                                    }}
-                                />
+                        <Box sx={{ px: { xs: 2, md: 6 }, py: { xs: 3, md: 5 } }}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                                {isOnPortal && (
+                                    <Chip
+                                        label={article.status || 'N/A'}
+                                        variant="filled"
+                                        color="primary"
+                                        size="small"
+                                        sx={{
+                                            fontWeight: 500,
+                                            textTransform: 'capitalize',
+                                            borderRadius: '6px',
+                                            px: 1.5,
+                                            py: 0.5
+                                        }}
+                                    />
+                                )}
+                                <Typography variant="body2" color="text.secondary">
+                                    Views: {article.views ?? 0}
+                                </Typography>
+                            </Stack>
+
+                            <Typography
+                                variant="h3"
+                                fontWeight={800}
+                                align="center"
+                                gutterBottom
+                                sx={{ mb: 1, letterSpacing: 0.5 }}
+                            >
+                                {article.title}
+                            </Typography>
+
+                            {article.excerpt && (
+                                <Typography
+                                    variant="subtitle1"
+                                    color="text.secondary"
+                                    align="center"
+                                    sx={{ mb: 2, fontStyle: 'italic', maxWidth: 600, mx: 'auto' }}
+                                >
+                                    {article.excerpt}
+                                </Typography>
                             )}
 
-                            <Typography variant="body2" color="text.secondary">
-                                Views: {article.views ?? 0}
-                            </Typography>
-                        </Stack>
-
-                        <Typography variant="h4" fontWeight="bold" gutterBottom>
-                            {article.title}
-                        </Typography>
-
-                        {article.createdAt && (
-                            <Typography variant="body2" color="text.secondary" gutterBottom>
-                                <ConvertDate dateString={article.createdAt} />
-                            </Typography>
-                        )}
-
-                        {article.tags?.length > 0 && (
-                            <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 1, mb: 2 }}>
-                                {article.tags.map((tag, index) => (
-                                    <Chip
-                                        key={index}
-                                        label={tag}
-                                        variant="outlined"
-                                        size="small"
-                                        color="primary"
-                                    />
-                                ))}
+                            <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+                                {article.createdAt && (
+                                    <Typography variant="body2" color="text.secondary">
+                                        <ConvertDate dateString={article.createdAt} />
+                                    </Typography>
+                                )}
+                                {article.tags?.length > 0 && (
+                                    <Stack direction="row" spacing={1} flexWrap="wrap">
+                                        {article.tags.map((tag, index) => (
+                                            <Chip
+                                                key={index}
+                                                label={tag}
+                                                variant="outlined"
+                                                size="small"
+                                                color="primary"
+                                            />
+                                        ))}
+                                    </Stack>
+                                )}
                             </Stack>
-                        )}
-                        <Box marginBlock={5}>
-                            <Box dangerouslySetInnerHTML={{ __html: article.content }} />
+
+                            <Divider sx={{ my: 3 }} />
+
+                            <Box sx={{ maxWidth: 800, mx: 'auto', fontSize: '1.15rem', lineHeight: 1.8 }}>
+                                <Box dangerouslySetInnerHTML={{ __html: article.content }} />
+                            </Box>
                         </Box>
-                    </Box>
-                ))}
+                    </Paper>
+                )
+            )}
         </React.Fragment>
     )
 }

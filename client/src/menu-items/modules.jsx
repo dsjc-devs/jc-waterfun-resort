@@ -168,10 +168,10 @@ const getModules = ({ accommodations = [] }) => {
         },
         {
           id: 'marketing-materials',
-          title: 'Marketing Materials',
+          title: 'Articles',
           type: 'item',
           url: '/portal/content-management/articles',
-          icon: icons.ImageIcon,
+          icon: icons.FileTextOutlined,
           breadcrumbs: false,
           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
         },
