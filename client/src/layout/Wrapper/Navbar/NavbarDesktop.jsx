@@ -48,10 +48,8 @@ const NavbarDesktop = ({ hasBanner = true }) => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Get unified dropdown navigation items
   const dropdownNavItems = getDropdownNavItems(accomodationTypes)
 
-  // Add background images to dropdown items
   const backgroundImages = [accom1, accom2, accom3, accom4]
   const enhancedDropdownItems = dropdownNavItems.map((item, index) => ({
     ...item,

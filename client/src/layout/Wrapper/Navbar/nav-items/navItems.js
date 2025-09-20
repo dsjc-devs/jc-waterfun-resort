@@ -1,4 +1,5 @@
 import { NO_CATEGORY } from "constants/constants"
+import textFormatter from "utils/textFormatter"
 
 const navItems = [
   { _id: "home", name: "Home", link: '/' },
@@ -16,7 +17,7 @@ const getDropdownNavItems = (accomodationTypes = []) => [
       ?.filter((f) => f.title !== NO_CATEGORY)
       .map((f) => ({
         title: f.title,
-        link: `/accommodations?type=${f.title.toLowerCase().replace(/\s+/g, '-')}`
+        link: `/accommodations?type=${textFormatter.toSlug(f.title)}`
       })),
   },
   {
