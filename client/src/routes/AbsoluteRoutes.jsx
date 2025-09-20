@@ -25,8 +25,11 @@ const BookReservation = Loadable(lazy(() => import('pages/book-reservation')));
 // policies
 const Policies = Loadable(lazy(() => import('pages/policies')));
 
-// policies
+// resort rates
 const ResortRates = Loadable(lazy(() => import('pages/resort-rates')));
+
+// gallery
+const Gallery = Loadable(lazy(() => import('pages/gallery')));
 
 const NotFoundPage = Loadable(lazy(() => import('pages/maintenance/404')));
 
@@ -107,6 +110,17 @@ const AbsoluteRoutes = {
         {
           index: true,
           element: <PageWrapper hasBanner={false} children={<Policies />} />
+        },
+      ]
+    },
+
+    // gallery
+    {
+      path: '/gallery',
+      children: [
+        {
+          index: true,
+          element: <PageWrapper hasBanner={true} children={<Gallery />} />
         },
       ]
     },
