@@ -112,7 +112,7 @@ const Footer = () => {
             <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
               {[
                 { label: "Contact Us", href: "contact-us" },
-                { label: "Media", href: "media" },
+                { label: "Gallery", href: "gallery" },
                 { label: "FAQs", href: "faqs" },
                 { label: "Policies", href: "policies" },
               ].map((item) => (
