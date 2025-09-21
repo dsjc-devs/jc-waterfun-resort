@@ -30,6 +30,7 @@ import {
   TableFurniture as TableIcon,
   OfficeBuilding as EventHallIcon,
   HomeGroup as CottageIcon,
+  Pool
 } from 'mdi-material-ui';
 
 // icon map
@@ -58,7 +59,8 @@ export const icons = {
   ChevronUp,
   TableIcon,
   EventHallIcon,
-  CottageIcon
+  CottageIcon,
+  Pool
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
@@ -163,6 +165,15 @@ const getModules = ({ accommodations = [] }) => {
           type: 'item',
           url: '/portal/content-management/accommodation-type',
           icon: icons.FormOutlined,
+          breadcrumbs: false,
+          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
+        },
+        {
+          id: 'amenity-type',
+          title: 'Amenity Types',
+          type: 'item',
+          url: '/portal/content-management/amenity-type',
+          icon: icons.Pool,
           breadcrumbs: false,
           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
         },

@@ -31,6 +31,7 @@ const EditProfile = Loadable(lazy(() => import('pages/portal/profile/edit')));
 
 // content management
 const AccommodationType = Loadable(lazy(() => import('pages/portal/accommodation-type')));
+const AmenityType = Loadable(lazy(() => import('pages/portal/amenity-type')));
 const AboutUs = Loadable(lazy(() => import('pages/portal/content-management/about-us')));
 const CompanyInfo = Loadable(lazy(() => import('pages/portal/content-management/company-info')));
 const Faqs = Loadable(lazy(() => import('pages/portal/content-management/faqs')));
@@ -131,6 +132,10 @@ const MainRoutes = {
             {
               path: 'accommodation-type',
               element: <AccommodationType />
+            },
+            {
+              path: 'amenity-type',
+              element: <AmenityType />
             },
             {
               path: 'articles',

@@ -11,8 +11,8 @@ import { protect } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 router.post("/", protect, createAmenitiesType);
-router.get("/", protect, getAllAmenitiesTypes);
-router.get("/:id", protect, getSingleAmenitiesType);
+router.get("/", getAllAmenitiesTypes);
+router.get("/:id", getSingleAmenitiesType);
 router.patch("/:id", protect, updateAmenitiesType);
 router.delete("/:id", protect, deleteAmenitiesType);
 
