@@ -201,10 +201,25 @@ const ReservationsTable = () => {
       }
     }
 
+    const dateCreatedColumn = {
+      id: 'createdAt',
+      align: 'center',
+      disablePadding: false,
+      label: 'Date Created',
+      renderCell: (row) => {
+
+        return (
+          <Typography variant="subtitle2">
+            <ConvertDate dateString={row?.createdAt} time={true} />
+          </Typography>
+        )
+      }
+    }
+
     if (isCustomer) {
-      return [reservationColumn, reservationDatesColumn, guestsColumns, statusColumn, financialsColumn, actionsColumn];
+      return [reservationColumn, reservationDatesColumn, dateCreatedColumn, guestsColumns, statusColumn, financialsColumn, actionsColumn];
     } else {
-      return [reservationColumn, customerColumn, reservationDatesColumn, guestsColumns, statusColumn, financialsColumn, actionsColumn];
+      return [reservationColumn, customerColumn, reservationDatesColumn, dateCreatedColumn, guestsColumns, statusColumn, financialsColumn, actionsColumn];
     }
   }, [isCustomer]);
 
@@ -239,7 +254,8 @@ const ReservationsTable = () => {
                 </AnimateButton>
               )}
             </React.Fragment>
-          )
+          ),
+          order: 'desc',
         }}
       />
 
