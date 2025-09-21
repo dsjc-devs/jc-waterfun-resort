@@ -1,8 +1,8 @@
 import express from 'express';
 import { createValidator } from '../middleware/validations/userValidator.js'
-import { 
-  checkIfUserExists, 
-  protect, 
+import {
+  checkIfUserExists,
+  protect,
   requirePermission,
   requireAnyPermission,
   canManageTargetUser,
@@ -27,7 +27,6 @@ router.post('/login', authUser)
 
 router.post(
   '/create',
-  protect,
   createUploadMiddleware({
     fields: [
       { name: 'avatar', maxCount: 1 },
@@ -48,7 +47,7 @@ router.post(
   createUser
 );
 
-router.get('/', 
+router.get('/',
   protect,
   getUsers
 )
@@ -69,7 +68,7 @@ router.patch('/:userId',
   updateUserById
 );
 
-router.delete('/:userId', 
+router.delete('/:userId',
   protect,
   requireAnyPermission([
     PERMISSIONS.DELETE_ADMIN,
