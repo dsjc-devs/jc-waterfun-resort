@@ -13,12 +13,14 @@ const getDropdownNavItems = (accomodationTypes = []) => [
     title: "Accommodations",
     subtitle: "Our Spaces",
     link: "/accommodations",
-    sublinks: accomodationTypes
-      ?.filter((f) => f.title !== NO_CATEGORY)
-      .map((f) => ({
-        title: f.title,
-        link: `/accommodations?type=${textFormatter.toSlug(f.title)}`
-      })),
+    sublinks: Array.isArray(accomodationTypes)
+      ? accomodationTypes
+        .filter((f) => f.title !== NO_CATEGORY)
+        .map((f) => ({
+          title: f.title,
+          link: `/accommodations?type=${textFormatter.toSlug(f.title)}`
+        }))
+      : [],
   },
   {
     title: "Amenities",
