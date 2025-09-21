@@ -36,13 +36,6 @@ router.post(
     },
   }),
   checkIfUserExists,
-  requireAnyPermission([
-    PERMISSIONS.CREATE_ADMIN,
-    PERMISSIONS.CREATE_RECEPTIONIST,
-    PERMISSIONS.CREATE_CUSTOMER
-  ]),
-  requireMasterAdminForAdminCreation,
-  canManageTargetUser,
   createValidator,
   createUser
 );
