@@ -18,7 +18,7 @@ import {
   MessageOutlined,
   CaretRightOutlined,
   FormOutlined,
-  HomeFilled
+  HomeFilled,
 } from '@ant-design/icons';
 
 import {
@@ -167,13 +167,32 @@ const getModules = ({ accommodations = [] }) => {
           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
         },
         {
-          id: 'marketing-materials',
-          title: 'Articles',
-          type: 'item',
-          url: '/portal/content-management/articles',
-          icon: icons.FileTextOutlined,
+          id: 'media-center',
+          title: 'Media Center',
+          type: 'collapse',
+          icon: icons.StarIcon,
           breadcrumbs: false,
-          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
+          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+          children: [
+            {
+              id: 'marketing-materials',
+              title: 'Articles',
+              type: 'item',
+              url: '/portal/content-management/articles',
+              icon: icons.FileTextOutlined,
+              breadcrumbs: false,
+              access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
+            },
+            {
+              id: 'gallery',
+              title: 'Gallery',
+              type: 'item',
+              url: '/portal/content-management/gallery',
+              icon: icons.ImageIcon,
+              breadcrumbs: false,
+              access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
+            },
+          ]
         },
         {
           id: 'resort-details',
