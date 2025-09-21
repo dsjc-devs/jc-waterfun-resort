@@ -15,7 +15,7 @@ const authUser = expressAsync(async (req, res) => {
 const createUser = expressAsync(async (req, res) => {
   try {
     const avatar = req.files && req.files['avatar'] ? req.files['avatar'][0].path : "";
-    const payload = { ...req.body, avatar, createdBy: req.user.userId }
+    const payload = { ...req.body, avatar }
 
     const user = await userServices.createUser(payload);
     res.json({ user, message: "User successfully created." })
@@ -55,15 +55,15 @@ const updateUserById = expressAsync(async (req, res) => {
 
     const userRole = getUserRole(req.user);
     const targetUserId = req.params.userId;
-    
+
     const targetUser = await userServices.getSingleUserById(targetUserId);
     if (!targetUser) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     const targetRole = targetUser.position[0].value;
     req.targetUserRole = targetRole;
-    
+
     if (userRole === 'CUSTOMER') {
       if (req.user.userId !== targetUserId) {
         return res.status(403).json({ message: "You can only update your own profile" });
@@ -71,11 +71,11 @@ const updateUserById = expressAsync(async (req, res) => {
       delete req.body.position;
       delete req.body.status;
     }
-    
+
     if ((targetRole === 'ADMIN' || targetRole === 'MASTER_ADMIN') && userRole !== 'MASTER_ADMIN') {
       return res.status(403).json({ message: "Only Master Admin can update Admin accounts" });
     }
-    
+
     if (targetRole === 'RECEPTIONIST' && userRole !== 'MASTER_ADMIN' && userRole !== 'ADMIN') {
       return res.status(403).json({ message: "Only Master Admin or Admin can update Receptionist accounts" });
     }
@@ -94,22 +94,22 @@ const deleteUserById = expressAsync(async (req, res) => {
   try {
     const userRole = getUserRole(req.user);
     const targetUserId = req.params.userId;
-    
+
     const targetUser = await userServices.getSingleUserById(targetUserId);
     if (!targetUser) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     const targetRole = targetUser.position[0].value;
-    
+
     if ((targetRole === 'ADMIN' || targetRole === 'MASTER_ADMIN') && userRole !== 'MASTER_ADMIN') {
       return res.status(403).json({ message: "Only Master Admin can delete Admin accounts" });
     }
-    
+
     if (targetRole === 'RECEPTIONIST' && userRole !== 'MASTER_ADMIN' && userRole !== 'ADMIN') {
       return res.status(403).json({ message: "Only Master Admin or Admin can delete Receptionist accounts" });
     }
-    
+
     if (req.user.userId === targetUserId) {
       return res.status(400).json({ message: "You cannot delete your own account" });
     }
