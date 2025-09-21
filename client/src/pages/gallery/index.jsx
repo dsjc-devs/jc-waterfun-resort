@@ -23,6 +23,7 @@ import {
 } from '@mui/material'
 import { Close, ZoomIn, ViewModule, Category, ArrowBackIos, ArrowForwardIos } from '@mui/icons-material'
 import TitleTag2 from 'components/TitleTag2'
+import { useTheme, useMediaQuery } from '@mui/material'
 
 const Gallery = () => {
   const { data, isLoading } = useGetGallery()
@@ -31,6 +32,15 @@ const Gallery = () => {
   const [selectedImage, setSelectedImage] = useState(null)
   const [openDialog, setOpenDialog] = useState(false)
   const [viewMode, setViewMode] = useState('categorized')
+
+  const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.down('sm'));
+  const isSm = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  const isMd = useMediaQuery(theme.breakpoints.between('md', 'lg'));
+  const isLg = useMediaQuery(theme.breakpoints.up('lg'));
+
+  const imageListCols = isXs ? 1 : isSm ? 2 : isMd ? 3 : 4;
+  const imageRowHeight = isXs ? 300 : isSm ? 200 : isMd ? 240 : 300;
 
   const categories = useMemo(() => {
     if (!galleryImages) return ['ALL']
@@ -44,7 +54,6 @@ const Gallery = () => {
     return galleryImages.filter(img => (img.category || 'UNCATEGORIZED') === selectedCategory)
   }, [galleryImages, selectedCategory])
 
-  // Group images by category
   const imagesByCategory = useMemo(() => {
     if (!galleryImages) return {}
     const grouped = galleryImages.reduce((acc, image) => {
@@ -58,14 +67,12 @@ const Gallery = () => {
     return grouped
   }, [galleryImages])
 
-  // Get current image index for navigation
   const currentImageIndex = useMemo(() => {
     if (!selectedImage) return -1
     const imagesToUse = viewMode === 'categorized' ? galleryImages : filteredImages
     return imagesToUse?.findIndex(img => img._id === selectedImage._id) ?? -1
   }, [selectedImage, galleryImages, filteredImages, viewMode])
 
-  // Get total count for display
   const totalImages = useMemo(() => {
     const imagesToUse = viewMode === 'categorized' ? galleryImages : filteredImages
     return imagesToUse?.length ?? 0
@@ -113,8 +120,8 @@ const Gallery = () => {
         image='https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'
       />
 
-      <Box sx={{ backgroundColor: '#f4e8cf', py: 8 }}>
-        <Container>
+      <Box sx={{ backgroundColor: '#f4e8cf', py: { xs: 2, md: 8 } }}>
+        <Container maxWidth="xl">
           <TitleTag2
             title="Resort Gallery"
             subtitle="Discover the beauty and experiences at our resort"
@@ -204,13 +211,15 @@ const Gallery = () => {
           )}
 
           {isLoading ? (
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
               {Array.from({ length: 12 }).map((_, index) => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
                   <Skeleton
                     variant="rectangular"
-                    height={250}
-                    sx={{ borderRadius: 3 }}
+                    sx={{
+                      borderRadius: 3,
+                      height: imageRowHeight
+                    }}
                   />
                 </Grid>
               ))}
@@ -239,9 +248,8 @@ const Gallery = () => {
               </Typography>
             </Box>
           ) : viewMode === 'categorized' ? (
-            // Categorized View
             Object.entries(imagesByCategory).map(([category, images]) => (
-              <Box key={category} sx={{ mb: 8 }}>
+              <Box key={category} sx={{ mb: { xs: 3, md: 8 } }}>
                 <Typography
                   variant="h4"
                   fontWeight={900}
@@ -273,10 +281,12 @@ const Gallery = () => {
                   sx={{
                     width: '100%',
                     height: 'auto',
+                    pb: 2,
+                    gap: 0,
                   }}
-                  cols={4}
-                  rowHeight={300}
-                  gap={16}
+                  cols={imageListCols}
+                  rowHeight={imageRowHeight}
+                  gap={isXs ? 8 : 16}
                 >
                   {images.map((image, index) => (
                     <ImageListItem
@@ -285,33 +295,49 @@ const Gallery = () => {
                         cursor: 'pointer',
                         borderRadius: 3,
                         overflow: 'hidden',
-                        boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+                        boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
                         transition: 'all 0.3s ease',
                         position: 'relative',
+                        bgcolor: '#fff',
+                        m: 0.5,
                         '&:hover': {
-                          transform: 'translateY(-8px)',
-                          boxShadow: '0 16px 40px rgba(0,0,0,0.2)',
+                          transform: 'translateY(-4px)',
+                          boxShadow: '0 12px 32px rgba(0,0,0,0.18)',
                           '& .overlay': {
                             opacity: 1,
                           },
                           '& img': {
-                            transform: 'scale(1.1)',
+                            transform: 'scale(1.04)',
                           },
                         },
                       }}
                       onClick={() => handleImageClick(image)}
                     >
-                      <img
-                        src={image.image}
-                        alt={`${category} ${index + 1}`}
-                        loading="lazy"
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          transition: 'transform 0.3s ease',
-                        }}
-                      />
+                      <Box sx={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: '#f4e8cf'
+                      }}>
+                        <img
+                          src={image.image}
+                          alt={`${category} ${index + 1}`}
+                          loading="lazy"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            aspectRatio: isXs ? '1/1' : '4/3',
+                            borderRadius: 12,
+                            transition: 'transform 0.3s ease',
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            background: '#fff'
+                          }}
+                        />
+                      </Box>
 
                       <Box
                         className="overlay"
@@ -337,15 +363,16 @@ const Gallery = () => {
               </Box>
             ))
           ) : (
-            // All Images View with Filter
             <ImageList
               sx={{
                 width: '100%',
                 height: 'auto',
+                pb: 2,
+                gap: 0,
               }}
-              cols={4}
-              rowHeight={300}
-              gap={16}
+              cols={imageListCols}
+              rowHeight={imageRowHeight}
+              gap={isXs ? 8 : 16}
             >
               {filteredImages.map((image, index) => (
                 <ImageListItem
@@ -354,33 +381,49 @@ const Gallery = () => {
                     cursor: 'pointer',
                     borderRadius: 3,
                     overflow: 'hidden',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
                     transition: 'all 0.3s ease',
                     position: 'relative',
+                    bgcolor: '#fff',
+                    m: 0.5,
                     '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: '0 16px 40px rgba(0,0,0,0.2)',
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 12px 32px rgba(0,0,0,0.18)',
                       '& .overlay': {
                         opacity: 1,
                       },
                       '& img': {
-                        transform: 'scale(1.1)',
+                        transform: 'scale(1.04)',
                       },
                     },
                   }}
                   onClick={() => handleImageClick(image)}
                 >
-                  <img
-                    src={image.image}
-                    alt={`Gallery image ${index + 1}`}
-                    loading="lazy"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      transition: 'transform 0.3s ease',
-                    }}
-                  />
+                  <Box sx={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor: '#f4e8cf'
+                  }}>
+                    <img
+                      src={image.image}
+                      alt={`Gallery image ${index + 1}`}
+                      loading="lazy"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        aspectRatio: isXs ? '1/1' : '4/3',
+                        borderRadius: 12,
+                        transition: 'transform 0.3s ease',
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        background: '#fff'
+                      }}
+                    />
+                  </Box>
 
                   <Box
                     className="overlay"
@@ -512,17 +555,32 @@ const Gallery = () => {
           </Box>
 
           {selectedImage && (
-            <img
-              src={selectedImage.image}
-              alt="Full size gallery image"
-              style={{
+            <Box
+              sx={{
                 width: '100%',
-                height: 'auto',
-                maxHeight: '90vh',
-                objectFit: 'contain',
-                borderRadius: 8,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: { xs: '40vh', md: '60vh' },
+                maxHeight: { xs: '70vh', md: '90vh' },
+                p: { xs: 1, md: 2 },
               }}
-            />
+            >
+              <img
+                src={selectedImage.image}
+                alt="Full size gallery image"
+                style={{
+                  width: isXs ? '90vw' : '100%',
+                  height: isXs ? '90vw' : 'auto',
+                  maxHeight: isXs ? '90vw' : '65vh',
+                  objectFit: 'cover',
+                  borderRadius: 12,
+                  maxWidth: '100vw',
+                  aspectRatio: isXs ? '1/1' : '4/3',
+                  background: '#fff'
+                }}
+              />
+            </Box>
           )}
         </DialogContent>
       </Dialog>

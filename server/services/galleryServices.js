@@ -31,23 +31,37 @@ const createGalleryImage = async (galleryData) => {
 
 const getAllGalleryImages = async (queryObject) => {
   try {
-    const page = parseInt(queryObject.page) || 1;
-    const limit = parseInt(queryObject.limit) || 10;
-    const skip = (page - 1) * limit;
-
     const { page: _page, limit: _limit, ...filters } = queryObject;
+    const filterObj = Object.keys(filters).length === 0 ? {} : filters;
 
-    const galleryImages = await Gallery.find(filters)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    let galleryImages, totalCount, totalPages, currentPage;
 
-    const totalCount = await Gallery.countDocuments(filters);
+    if (!queryObject.page && !queryObject.limit) {
+      // No pagination, return all
+      galleryImages = await Gallery.find(filterObj).sort({ createdAt: -1 });
+      totalCount = galleryImages.length;
+      totalPages = 1;
+      currentPage = 1;
+    } else {
+      // Paginated
+      const page = parseInt(queryObject.page) || 1;
+      const limit = parseInt(queryObject.limit) || 10;
+      const skip = (page - 1) * limit;
+
+      galleryImages = await Gallery.find(filterObj)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      totalCount = await Gallery.countDocuments(filterObj);
+      totalPages = Math.ceil(totalCount / limit);
+      currentPage = page;
+    }
 
     return {
       galleryImages,
-      totalPages: Math.ceil(totalCount / limit),
-      currentPage: page,
+      totalPages,
+      currentPage,
       totalImages: totalCount,
     };
   } catch (error) {
@@ -96,8 +110,8 @@ const updateGalleryImageById = async (galleryId, galleryData) => {
     }
 
     const updatedGalleryImage = await Gallery.findOneAndUpdate(
-      { _id: galleryId }, 
-      updateData, 
+      { _id: galleryId },
+      updateData,
       {
         new: true,
         runValidators: true,
