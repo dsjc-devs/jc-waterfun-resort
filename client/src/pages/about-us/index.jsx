@@ -1,20 +1,17 @@
-import React from 'react'
-import { Box, Container, Grid, Typography, useMediaQuery } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
+import { Box, Container, Grid, Typography, Divider, Paper } from '@mui/material'
 import { useGetResortDetails } from 'api/resort-details'
 
+import React from 'react'
 import PageTitle from 'components/PageTitle'
 import Banner from 'components/Banner'
 import TitleTag from 'components/TitleTag'
 
 import AboutUS from 'assets/images/upload/about-us-header.jpg'
-import img1 from 'assets/images/upload/our-mission.jpg'
-import img2 from 'assets/images/upload/vision.jpg'
-import img3 from 'assets/images/upload/our-goals.jpg'
+import FlagIcon from '@mui/icons-material/Flag'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 
 const AboutUs = () => {
-  const theme = useTheme()
-  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const { resortDetails } = useGetResortDetails()
   const { aboutUs } = resortDetails || {}
   const { mission, vision, goals } = aboutUs || {}
@@ -29,191 +26,90 @@ const AboutUs = () => {
         subtitle="Where relaxation and fun meet unforgettable memories"
       />
 
+      <Box sx={{
+        width: "100%",
+        height: 18,
+        mb: 3,
+        background: "linear-gradient(90deg, #43cea2 0%, #185a9d 100%)",
+        borderRadius: 8,
+        opacity: 0.7
+      }} />
+
       <Container sx={{ my: 5 }}>
-        <Grid container spacing={4} sx={{ maxWidth: 1200, mx: "auto" }}>
-          {/* Mission Section */}
-          <Grid item xs={12}>
-            <Box
+        <Grid container spacing={5} justifyContent='center' alignItems="center">
+          <Grid item xs={12} md={12}>
+            <Paper
               data-aos="fade-up"
-              data-aos-delay="100"
+              elevation={6}
               sx={{
-                display: "flex",
-                flexDirection: { xs: "column", md: "row" },
-                alignItems: "center",
-                gap: { xs: 3, md: 6 },
-                mb: { xs: 4, md: 8 },
+                borderRadius: 4,
+                p: 4,
+                mb: 2,
+                background: "#f8fffa",
+                boxShadow: "0 8px 32px 0 rgba(67,206,162,0.10)",
+                position: "relative",
+                overflow: "hidden"
               }}
             >
-              <Box
-                sx={{
-                  flex: 1,
-                  order: { xs: 2, md: 1 },
-                }}
-              >
-                <Box
-                  sx={{
-                    width: "100%",
-                    height: { xs: 250, md: 400 },
-                    borderRadius: 3,
-                    overflow: "hidden",
-                    boxShadow: 3,
-                  }}
-                >
-                  <img
-                    src={img1}
-                    alt="Mission"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                </Box>
+              <Box sx={{ position: "absolute", top: 12, right: 18, fontSize: 32, opacity: 0.25 }}>
+                🌴
               </Box>
-              <Box
-                sx={{
-                  flex: 1,
-                  order: { xs: 1, md: 2 },
-                  background: "#181c20",
-                  color: "#fff",
-                  p: { xs: 4, md: 6 },
-                  borderRadius: 3,
-                  textAlign: "center",
-                  minHeight: { xs: 300, md: 400 },
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                <TitleTag title="Our Mission" subtitle="Mission" />
-                <Typography variant="body1" sx={{ color: "#cfd8dc", lineHeight: 1.7 }}>
-                  {mission || "No mission statement available."}
-                </Typography>
-              </Box>
-            </Box>
+              <TitleTag icon={<FlagIcon />} title="Our Mission" subtitle="Mission" />
+              <Divider sx={{ mb: 3 }} />
+              <Typography variant="body1" sx={{ color: "#185a9d", fontSize: { xs: "1.1rem", md: "1.25rem" }, lineHeight: 1.8, textAlign: "center", maxWidth: 700, mx: "auto", fontWeight: 500 }}>
+                {mission || "No mission statement available."}
+              </Typography>
+            </Paper>
           </Grid>
-
-          {/* Vision Section */}
-          <Grid item xs={12}>
-            <Box
+          <Grid item xs={12} md={12}>
+            <Paper
               data-aos="fade-up"
-              data-aos-delay="250"
+              data-aos-delay="150"
+              elevation={6}
               sx={{
-                display: "flex",
-                flexDirection: { xs: "column", md: "row" },
-                alignItems: "center",
-                gap: { xs: 3, md: 6 },
-                mb: { xs: 4, md: 8 },
+                borderRadius: 4,
+                p: 4,
+                mb: 2,
+                background: "#f8fffa",
+                boxShadow: "0 8px 32px 0 rgba(24,90,157,0.10)",
+                position: "relative",
+                overflow: "hidden"
               }}
             >
-              <Box
-                sx={{
-                  flex: 1,
-                  order: { xs: 1, md: 1 },
-                  background: "#181c20",
-                  color: "#fff",
-                  p: { xs: 4, md: 6 },
-                  borderRadius: 3,
-                  textAlign: "center",
-                  minHeight: { xs: 300, md: 400 },
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                <TitleTag title="Our Vision" subtitle="Vision" />
-                <Typography variant="body1" sx={{ color: "#cfd8dc", lineHeight: 1.7 }}>
-                  {vision || "No vision statement available."}
-                </Typography>
+              <Box sx={{ position: "absolute", top: 12, right: 18, fontSize: 32, opacity: 0.25 }}>
+                🏖️
               </Box>
-              <Box
-                sx={{
-                  flex: 1,
-                  order: { xs: 2, md: 2 },
-                }}
-              >
-                <Box
-                  sx={{
-                    width: "100%",
-                    height: { xs: 250, md: 400 },
-                    borderRadius: 3,
-                    overflow: "hidden",
-                    boxShadow: 3,
-                  }}
-                >
-                  <img
-                    src={img2}
-                    alt="Vision"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                </Box>
-              </Box>
-            </Box>
+              <TitleTag icon={<VisibilityIcon />} title="Our Vision" subtitle="Vision" />
+              <Divider sx={{ mb: 3 }} />
+              <Typography variant="body1" sx={{ color: "#185a9d", fontSize: { xs: "1.1rem", md: "1.25rem" }, lineHeight: 1.8, textAlign: "center", maxWidth: 700, mx: "auto", fontWeight: 500 }}>
+                {vision || "No vision statement available."}
+              </Typography>
+            </Paper>
           </Grid>
-
-          {/* Goals Section */}
-          <Grid item xs={12}>
-            <Box
+          <Grid item xs={12} md={12}>
+            <Paper
               data-aos="fade-up"
-              data-aos-delay="400"
+              data-aos-delay="300"
+              elevation={6}
               sx={{
-                display: "flex",
-                flexDirection: { xs: "column", md: "row" },
-                alignItems: "center",
-                gap: { xs: 3, md: 6 },
+                borderRadius: 4,
+                p: 4,
+                mb: 2,
+                background: "#f8fffa",
+                boxShadow: "0 8px 32px 0 rgba(67,206,162,0.10)",
+                position: "relative",
+                overflow: "hidden"
               }}
             >
-              <Box
-                sx={{
-                  flex: 1,
-                  order: { xs: 2, md: 1 },
-                }}
-              >
-                <Box
-                  sx={{
-                    width: "100%",
-                    height: { xs: 250, md: 400 },
-                    borderRadius: 3,
-                    overflow: "hidden",
-                    boxShadow: 3,
-                  }}
-                >
-                  <img
-                    src={img3}
-                    alt="Goals"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                </Box>
+              <Box sx={{ position: "absolute", top: 12, right: 18, fontSize: 32, opacity: 0.25 }}>
+                🍹
               </Box>
-              <Box
-                sx={{
-                  flex: 1,
-                  order: { xs: 1, md: 2 },
-                  background: "#181c20",
-                  color: "#fff",
-                  p: { xs: 4, md: 6 },
-                  borderRadius: 3,
-                  textAlign: "center",
-                  minHeight: { xs: 300, md: 400 },
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                <TitleTag title="Our Goals" subtitle="Goals" />
-                <Typography variant="body1" sx={{ color: "#cfd8dc", lineHeight: 1.7 }}>
-                  {goals || "No goals statement available."}
-                </Typography>
-              </Box>
-            </Box>
+              <TitleTag icon={<EmojiEventsIcon />} title="Our Goals" subtitle="Goals" />
+              <Divider sx={{ mb: 3 }} />
+              <Typography variant="body1" sx={{ color: "#185a9d", fontSize: { xs: "1.1rem", md: "1.25rem" }, lineHeight: 1.8, textAlign: "center", maxWidth: 700, mx: "auto", fontWeight: 500 }}>
+                {goals || "No goals statement available."}
+              </Typography>
+            </Paper>
           </Grid>
         </Grid>
       </Container>
