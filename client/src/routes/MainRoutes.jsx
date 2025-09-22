@@ -2,6 +2,7 @@ import { lazy } from 'react';
 import Loadable from 'components/Loadable';
 import DashboardLayout from 'layout/Dashboard';
 
+
 // Lazy-loaded components
 const DashboardDefault = Loadable(lazy(() => import('pages/portal/dashboard')));
 const UnderConstruction = Loadable(lazy(() => import('pages/maintenance/under-construction')));
@@ -45,6 +46,7 @@ const ArticleDetails = Loadable(lazy(() => import('pages/portal/content-manageme
 const ArticleForm = Loadable(lazy(() => import('pages/portal/content-management/articles/form')));
 const Policies = Loadable(lazy(() => import('pages/portal/content-management/policies')));
 const PolicyForm = Loadable(lazy(() => import('pages/portal/content-management/policies/form')));
+const Gallery = Loadable(lazy(() => import('pages/portal/content-management/gallery')));
 
 const MainRoutes = {
   path: '/',
@@ -175,6 +177,10 @@ const MainRoutes = {
                   element: <ArticleForm />
                 },
               ]
+            },
+            {
+              path: 'gallery',
+              element: <Gallery />
             },
             {
               path: 'about-us',
