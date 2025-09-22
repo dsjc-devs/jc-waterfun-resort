@@ -20,6 +20,11 @@ const Accommodations = Loadable(lazy(() => import('pages/portal/accommodations')
 const AccommodationDetails = Loadable(lazy(() => import('pages/portal/accommodations/details')));
 const AccommodationForm = Loadable(lazy(() => import('pages/portal/accommodations/form')));
 
+// amenities
+const Amenities = Loadable(lazy(() => import('pages/portal/amenities')));
+const AmenityDetails = Loadable(lazy(() => import('pages/portal/amenities/details')));
+const AmenityForm = Loadable(lazy(() => import('pages/portal/amenities/form')));
+
 // reservations
 const Reservations = Loadable(lazy(() => import('pages/portal/reservations')));
 const ReservationDetails = Loadable(lazy(() => import('pages/portal/reservations/details')));
@@ -91,6 +96,23 @@ const MainRoutes = {
               path: 'form',
               element: <AccommodationForm />
             }
+          ]
+        },
+        {
+          path: 'amenities',
+          children: [
+            {
+              index: true,
+              element: <Amenities />
+            },
+            {
+              path: 'details/:id',
+              element: <AmenityDetails />
+            },
+            {
+              path: 'form',
+              element: <AmenityForm />
+            },
           ]
         },
         {

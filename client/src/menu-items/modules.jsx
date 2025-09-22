@@ -60,12 +60,12 @@ export const icons = {
   TableIcon,
   EventHallIcon,
   CottageIcon,
-  Pool
+  Pool,
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
 
-const getModules = ({ accommodations = [] }) => {
+const getModules = ({ accommodations = [], amenities = [] }) => {
   return [
     {
       id: 'group-dashboard',
@@ -111,16 +111,27 @@ const getModules = ({ accommodations = [] }) => {
       ]
     },
     {
-      id: "accommodations",
-      title: "Accommodations",
+      id: "offers",
+      title: "Facilities",
       children: [
         {
-          id: "roomsGroup",
+          id: "accommodations",
           type: "collapse",
           title: "Accommodations",
           icon: icons.HomeGroup,
           children: [
             ...(accommodations?.map((item) => ({
+              ...item,
+            })) || []),
+          ]
+        },
+        {
+          id: "amenities",
+          type: "collapse",
+          title: "Amenities",
+          icon: icons.Pool,
+          children: [
+            ...(amenities?.map((item) => ({
               ...item,
             })) || []),
           ]
@@ -173,7 +184,7 @@ const getModules = ({ accommodations = [] }) => {
           title: 'Amenity Types',
           type: 'item',
           url: '/portal/content-management/amenity-type',
-          icon: icons.Pool,
+          icon: icons.FormOutlined,
           breadcrumbs: false,
           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
         },

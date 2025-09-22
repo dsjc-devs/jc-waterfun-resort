@@ -1,6 +1,7 @@
 import Users from "./users"
 import ResortDetails from "./resort-details"
 import Accommodations from "./accommodations"
+import Amenities from "./amenities"
 import FAQS from "./faqs"
 import AccommodationType from "./accomodation-type"
 import AmenityType from "./amenity-type"
@@ -13,6 +14,7 @@ const agent = {
   ...Users,
   ...ResortDetails,
   ...Accommodations,
+  ...Amenities,
   ...FAQS,
   ...AccommodationType,
   ...AmenityType,

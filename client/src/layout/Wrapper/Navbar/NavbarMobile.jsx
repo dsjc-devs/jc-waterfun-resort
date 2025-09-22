@@ -1,3 +1,4 @@
+import React, { useState } from 'react'
 import {
   Stack,
   Drawer,
@@ -13,12 +14,12 @@ import {
 import { MenuOutlined } from '@ant-design/icons'
 import { useNavigate, useLocation } from 'react-router'
 import { useGetAccommodationTypes } from 'api/accomodation-type'
-import React, { useState } from 'react'
+import { useGetAmenityTypes } from 'api/amenity-type'
+import navItems, { getDropdownNavItems } from './nav-items/navItems'
 
 import Logo from 'components/logo/LogoMain'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
-import navItems, { getDropdownNavItems } from './nav-items/navItems'
 import useAuth from 'hooks/useAuth'
 
 const NavbarMobile = ({ handleDrawerToggle, drawerOpen }) => {
@@ -28,6 +29,7 @@ const NavbarMobile = ({ handleDrawerToggle, drawerOpen }) => {
   const { isLoggedIn } = useAuth()
 
   const { accomodationTypes, isLoading } = useGetAccommodationTypes()
+  const { amenityTypes, amenityLoading } = useGetAmenityTypes()
   const [openSection, setOpenSection] = useState(null)
 
   const handleToggleSection = (title) => {
@@ -36,11 +38,11 @@ const NavbarMobile = ({ handleDrawerToggle, drawerOpen }) => {
 
   const handleNavigation = (link) => {
     navigate(link)
-    handleDrawerToggle() // Close drawer after navigation
+    handleDrawerToggle()
   }
 
   // Get unified navigation items
-  const dropdownNavItems = getDropdownNavItems(accomodationTypes)
+  const dropdownNavItems = getDropdownNavItems({ accomodationTypes, amenityTypes })
 
   return (
     <React.Fragment>

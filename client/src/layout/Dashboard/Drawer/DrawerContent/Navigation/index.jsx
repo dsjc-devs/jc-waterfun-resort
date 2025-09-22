@@ -7,6 +7,7 @@ import useAuth from 'hooks/useAuth';
 import getModules, { icons } from 'menu-items/modules';
 import { NO_CATEGORY, USER_ROLES } from 'constants/constants';
 import { useGetAccommodationTypes } from 'api/accomodation-type';
+import { useGetAmenityTypes } from 'api/amenity-type';
 
 // ==============================|| DRAWER CONTENT - NAVIGATION ||============================== //
 
@@ -15,6 +16,7 @@ export default function Navigation() {
   const userRole = user?.position[0]?.value
 
   const { accomodationTypes: _accomodationTypes } = useGetAccommodationTypes()
+  const { amenityTypes: _amenityTypes } = useGetAmenityTypes()
 
   const accomodationTypes = _accomodationTypes
     ?.filter(item => item.title !== NO_CATEGORY)
@@ -57,7 +59,37 @@ export default function Navigation() {
     };
   });
 
-  const menuItems = getModules({ accommodations });
+  const amenities = _amenityTypes?.map((item, idx) => {
+    let icon;
+    switch (item?.slug) {
+      case 'swimming_pool':
+        icon = icons.Pool;
+        break;
+      case 'billiards':
+        icon = icons.TableIcon;
+        break;
+      case 'karaoke':
+        icon = icons.StarIcon;
+        break;
+      case 'no_category':
+        icon = icons.QuestionCircleOutlined;
+        break;
+      default:
+        icon = icons.CaretRightOutlined;
+    }
+    return {
+      ...item,
+      id: idx,
+      type: 'item',
+      title: item.name,
+      url: `/portal/amenities?type=${item?.slug}`,
+      icon: icon,
+      breadcrumbs: false,
+      access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+    };
+  });
+
+  const menuItems = getModules({ accommodations, amenities });
 
   const navGroups = menuItems
     .filter((item) => {

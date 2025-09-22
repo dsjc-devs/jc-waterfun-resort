@@ -1,7 +1,7 @@
 // project import
 import getModules from "./modules";
 
-const modules = getModules({ accommodations: [] })
+const modules = getModules({ accommodations: [], amenities: [] });
 
 // ==============================|| MENU ITEMS ||============================== //
 

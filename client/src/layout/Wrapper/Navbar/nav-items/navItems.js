@@ -8,7 +8,7 @@ const navItems = [
   { _id: "contact-us", name: "Contact Us", link: '/contact-us' },
 ]
 
-const getDropdownNavItems = (accomodationTypes = []) => [
+const getDropdownNavItems = ({ accomodationTypes = [], amenityTypes = [] }) => [
   {
     title: "Accommodations",
     subtitle: "Our Spaces",
@@ -26,16 +26,18 @@ const getDropdownNavItems = (accomodationTypes = []) => [
     title: "Amenities",
     subtitle: "Facilities",
     link: "/amenities",
-    sublinks: [
-      { title: "Swimming Pool", link: "/amenities?type=swimming-pool" },
-      { title: "Billiards", link: "/amenities?type=billiards" },
-      { title: "Karaoke", link: "/amenities?type=karaoke" }
-    ]
+    sublinks: Array.isArray(amenityTypes)
+      ? amenityTypes
+        .filter((f) => f.name !== NO_CATEGORY)
+        .map((f) => ({
+          title: f.name,
+          link: `/amenities?type=${textFormatter.toSlug(f.name)}`
+        }))
+      : [],
   },
   {
     title: "Media Center",
     subtitle: "Photos & Articles",
-    link: "/gallery",
     sublinks: [
       { title: "Resort Gallery", link: "/gallery" },
       { title: "Articles", link: "/articles" },
@@ -44,7 +46,6 @@ const getDropdownNavItems = (accomodationTypes = []) => [
   {
     title: "Rates",
     subtitle: "Pricing",
-    link: "/rates",
     sublinks: [
       { title: "Day Tour", link: "/resort-rates?type=day" },
       { title: "Night Tour", link: "/resort-rates?type=night" },

@@ -15,6 +15,10 @@ const FAQs = Loadable(lazy(() => import('pages/faqs')));
 const Accommodations = Loadable(lazy(() => import('pages/accommodations')));
 const AccommodationDetails = Loadable(lazy(() => import('pages/accommodations/details')));
 
+// accommodations 
+const Amenities = Loadable(lazy(() => import('pages/amenities')));
+const AmenitiesDetails = Loadable(lazy(() => import('pages/amenities/details')));
+
 // articles
 const Articles = Loadable(lazy(() => import('pages/articles')));
 const ArticleDetails = Loadable(lazy(() => import('pages/articles/details')));
@@ -73,6 +77,21 @@ const AbsoluteRoutes = {
         {
           path: 'details/:id',
           element: <PageWrapper hasBanner={false} children={<AccommodationDetails />} />
+        },
+      ]
+    },
+
+    // amenities
+    {
+      path: '/amenities',
+      children: [
+        {
+          index: true,
+          element: <PageWrapper children={<Amenities />} />
+        },
+        {
+          path: 'details/:id',
+          element: <PageWrapper hasBanner={false} children={<AmenitiesDetails />} />
         },
       ]
     },

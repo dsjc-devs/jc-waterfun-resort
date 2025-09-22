@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { Stack, Container, Box, Link, Button, Typography, Grid, Popper, Paper } from '@mui/material'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useGetAccommodationTypes } from 'api/accomodation-type'
+import { useGetAmenityTypes } from 'api/amenity-type'
+import navItems, { getDropdownNavItems } from './nav-items/navItems'
 
 import useAuth from 'hooks/useAuth'
-import navItems, { getDropdownNavItems } from './nav-items/navItems'
 import LogoSection from 'components/logo'
 import AnimateButton from 'components/@extended/AnimateButton'
 import PreviewCard from 'components/PreviewCard'
@@ -16,6 +17,7 @@ import accom4 from 'assets/images/upload/accom4.jpg'
 
 const NavbarDesktop = ({ hasBanner = true }) => {
   const { accomodationTypes, isLoading } = useGetAccommodationTypes()
+  const { amenityTypes, isLoading: amenityLoading } = useGetAmenityTypes()
   const { isLoggedIn } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -48,7 +50,7 @@ const NavbarDesktop = ({ hasBanner = true }) => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const dropdownNavItems = getDropdownNavItems(accomodationTypes)
+  const dropdownNavItems = getDropdownNavItems({ accomodationTypes, amenityTypes })
 
   const backgroundImages = [accom1, accom2, accom3, accom4]
   const enhancedDropdownItems = dropdownNavItems.map((item, index) => ({
@@ -77,7 +79,7 @@ const NavbarDesktop = ({ hasBanner = true }) => {
                 return (
                   <Link
                     key={item._id}
-                    onClick={() => navigate(item.link)}
+                    onClick={() => item.link && navigate(item.link)}
                     sx={{
                       borderTop: isActive ? "3px solid" : "3px solid transparent",
                       fontFamily: "'Cinzel', sans-serif",

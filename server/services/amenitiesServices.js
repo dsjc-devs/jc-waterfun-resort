@@ -26,7 +26,7 @@ const getAmenitiesByQuery = async (queryObject) => {
     }
 
     const amenities = await Amenities.find(query)
-      .sort({ createdAt: -1 })
+      .sort({ status: -1, createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
