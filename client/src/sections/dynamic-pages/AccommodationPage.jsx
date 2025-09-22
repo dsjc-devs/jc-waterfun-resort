@@ -23,6 +23,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { addHours } from 'date-fns';
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers';
 import { useGetBlockedDates } from 'api/blocked-dates';
+import { useGetReservations } from 'api/reservations';
 
 import agent from 'api';
 import AnimateButton from 'components/@extended/AnimateButton';
@@ -36,6 +37,7 @@ import MainCard from 'components/MainCard';
 import useAuth from 'hooks/useAuth';
 import LoginModal from 'components/LoginModal';
 import useGetPosition from 'hooks/useGetPosition';
+import Calendar from 'sections/portal/modules/reservations/Calendar';
 
 const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const { isCustomer } = useGetPosition()
@@ -43,6 +45,8 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const { isLoggedIn } = useAuth()
 
   const { data: blockedDates = [] } = useGetBlockedDates()
+  const { data: reservationData } = useGetReservations({ accommodationId: "68ac20f35d77b5085f81fd8d" })
+  const { reservations = [] } = reservationData || {}
 
   const bookedRanges = blockedDates?.filter((f) => f.accommodationId === data?._id)?.map((d) => ({
     startDate: new Date(d.startDate),
@@ -587,6 +591,11 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
             </Grid>
           )}
         </Grid>
+
+        {(isOnPortal && !isCustomer) && (
+          <Calendar events={reservations} title={`${name}`} subtitle='See all scheduled reservations, events, and maintenance for this accommodation at a glance.'
+          />
+        )}
       </Box>
 
       <Dialog

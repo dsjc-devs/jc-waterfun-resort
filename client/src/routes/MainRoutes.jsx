@@ -26,6 +26,9 @@ const Amenities = Loadable(lazy(() => import('pages/portal/amenities')));
 const AmenityDetails = Loadable(lazy(() => import('pages/portal/amenities/details')));
 const AmenityForm = Loadable(lazy(() => import('pages/portal/amenities/form')));
 
+// calendar
+const BookingCalendar = Loadable(lazy(() => import('pages/portal/booking-calendar')));
+
 // reservations
 const Reservations = Loadable(lazy(() => import('pages/portal/reservations')));
 const ReservationDetails = Loadable(lazy(() => import('pages/portal/reservations/details')));
@@ -136,7 +139,7 @@ const MainRoutes = {
         },
         {
           path: 'calendar',
-          element: <UnderConstruction />
+          element: <BookingCalendar />
         },
         {
           path: 'banners',
