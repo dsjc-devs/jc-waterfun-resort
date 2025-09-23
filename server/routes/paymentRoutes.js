@@ -1,8 +1,12 @@
 import express from 'express';
-import { createPaymentIntent, payWithGCash } from '../controllers/paymentControllers.js';
+import { createPaymentIntent, payWithGCash, payWithMaya, payWithBankTransfer, payWithMethod } from '../controllers/paymentControllers.js';
 
 const router = express.Router();
 
 router.post('/pay-with-gcash', payWithGCash);
+router.post('/pay-with-maya', payWithMaya);
+router.post('/pay-with-bank-transfer', payWithBankTransfer);
+router.post('/pay-with-method', payWithMethod);
+router.post('/create-payment-with-booking', payWithMethod); // Alias for the new workflow
 
 export default router;

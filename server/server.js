@@ -34,6 +34,7 @@ import carouselRoutes from './routes/carouselRoutes.js';
 import policiesRoutes from './routes/policiesRoutes.js';
 import announcementsRoutes from './routes/announcementsRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import webhookRoutes from './routes/webhookRoutes.js';
 
 /*  ========== CRON ========== */
 import { startReservationCron } from './cron/reservationCron.js';
@@ -82,6 +83,9 @@ app.use(`/api/${API_VERSION}/carousel`, carouselRoutes);
 app.use(`/api/${API_VERSION}/policies`, policiesRoutes);
 app.use(`/api/${API_VERSION}/announcements`, announcementsRoutes);
 app.use(`/api/${API_VERSION}/payments`, paymentRoutes);
+
+// Webhooks
+app.use(`/api/${API_VERSION}/webhooks`, webhookRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'client', 'build')));

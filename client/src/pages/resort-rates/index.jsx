@@ -224,6 +224,9 @@ const ResortRates = () => {
                     • GCash
                   </Typography>
                   <Typography variant="body2" color="#634131" mb={1}>
+                    • Maya (PayMaya)
+                  </Typography>
+                  <Typography variant="body2" color="#634131" mb={1}>
                     • Cash payments (at the resort)
                   </Typography>
                   <Typography variant="body2" color="#634131" mb={3}>

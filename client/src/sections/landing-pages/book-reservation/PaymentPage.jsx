@@ -1,5 +1,26 @@
 import React, { useState, useRef } from 'react';
-import { Container, Typography, Divider, Box, Grid, TextField, Button, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox, FormControlLabel } from '@mui/material';
+import {
+  Container,
+  Typography,
+  Divider,
+  Box,
+  Grid,
+  TextField,
+  Button,
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Checkbox,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  Radio,
+  Card,
+  CardContent
+} from '@mui/material';
 import { useGetSinglePolicy } from 'api/policies';
 
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -21,9 +42,25 @@ const PaymentPage = ({
   const [termsOpen, setTermsOpen] = useState(false);
   const [ackNoRefund, setAckNoRefund] = useState(false);
   const [canAcknowledge, setCanAcknowledge] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('gcash');
   const termsRef = useRef(null);
   const minPayable = bookingData?.amount?.minimumPayable || 1;
   const maxPayable = bookingData?.amount?.total || 1;
+
+  const paymentMethods = [
+    {
+      value: 'gcash',
+      label: 'GCash',
+      description: 'Pay using your GCash wallet',
+      icon: '💙'
+    },
+    {
+      value: 'maya',
+      label: 'Maya (PayMaya)',
+      description: 'Pay using your Maya account',
+      icon: '🟢'
+    },
+  ];
 
   const handlePaidChange = (e) => {
     const value = e.target.value;
@@ -31,6 +68,10 @@ const PaymentPage = ({
     setTotalPaid(numValue);
     setShowMinAlert(value !== '' && numValue < minPayable);
     setShowMaxAlert(value !== '' && numValue > maxPayable);
+  };
+
+  const handlePaymentMethodChange = (event) => {
+    setSelectedPaymentMethod(event.target.value);
   };
 
   const handlePayNowClick = () => {
@@ -43,7 +84,7 @@ const PaymentPage = ({
 
   const handlePay = () => {
     setTermsOpen(false);
-    handleCreateReservation();
+    handleCreateReservation(selectedPaymentMethod);
   };
 
   const handleScroll = () => {
@@ -94,10 +135,61 @@ const PaymentPage = ({
         </Alert>
       )}
       <Box mt={2}>
-        <Grid container spacing={2}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Typography variant="h6" gutterBottom>
+              Select Payment Method
+            </Typography>
+            <FormControl component="fieldset" sx={{ width: '100%' }}>
+              <RadioGroup
+                value={selectedPaymentMethod}
+                onChange={handlePaymentMethodChange}
+                name="payment-method"
+              >
+                <Grid container spacing={2}>
+                  {paymentMethods.map((method) => (
+                    <Grid item xs={12} sm={6} md={6} key={method.value}>
+                      <Card
+                        sx={{
+                          cursor: 'pointer',
+                          border: selectedPaymentMethod === method.value ? '2px solid #1976d2' : '1px solid #e0e0e0',
+                          transition: 'all 0.2s ease-in-out',
+                          '&:hover': {
+                            borderColor: '#1976d2',
+                            boxShadow: 1
+                          }
+                        }}
+                        onClick={() => setSelectedPaymentMethod(method.value)}
+                      >
+                        <CardContent>
+                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                            <Typography variant="h4" sx={{ mr: 1 }}>
+                              {method.icon}
+                            </Typography>
+                            <Radio
+                              value={method.value}
+                              checked={selectedPaymentMethod === method.value}
+                              sx={{ ml: 'auto' }}
+                            />
+                          </Box>
+                          <Typography variant="subtitle1" fontWeight={600}>
+                            {method.label}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {method.description}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </RadioGroup>
+            </FormControl>
+          </Grid>
+
           <Grid item xs={12} sm={6}>
-            <Typography>
-              Amount
+            <Typography variant="h6" gutterBottom>
+              Payment Amount
             </Typography>
 
             <TextField

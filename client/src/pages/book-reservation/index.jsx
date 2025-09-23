@@ -134,39 +134,10 @@ const BookReservation = () => {
     }
   }, []);
 
-  const handlePay = async (reservationId, amount) => {
-    setLoading(true);
-    try {
-      const payload = {
-        reservationId,
-        amount: amount * 100,
-        name: `${user?.firstName || ""} ${user?.lastName || ""}`,
-        email: user?.emailAddress || "",
-        phone: user?.phoneNumber || "",
-        returnUrl: "http://localhost:3000/success-reservation",
-      };
-
-      const response = await agent.Payments.createPayment(payload);
-      const data = response?.data || response;
-
-      if (data.redirectUrl) {
-        setRedirectUrl(data.redirectUrl);
-        window.location.href = data.redirectUrl;
-      } else {
-        toast.error("No redirect URL received.");
-      }
-    } catch (error) {
-      console.error("Payment error:", error);
-      toast.error("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCreateReservation = async () => {
+  const handleCreateReservation = async (paymentMethod = 'gcash') => {
     setLoading(true)
     try {
-      const payload = {
+      const bookingPayload = {
         userId: user?.userId,
         userData: {
           ...user
@@ -174,7 +145,6 @@ const BookReservation = () => {
         accommodationId: bookingData.accommodationData?._id,
         startDate: bookingData.startDate,
         endDate: bookingData.endDate,
-        status: "CONFIRMED",
         guests: bookingData?.accommodationData?.hasPoolAccess ? Object.values(bookingData?.entrances || {}).reduce((sum, val) => sum + val, 0) : bookingData?.guests,
         entrances: {
           adult: bookingData.entrances.adult,
@@ -194,11 +164,27 @@ const BookReservation = () => {
         }
       }
 
-      const reservation = await agent.Reservations.createReservation(payload);
+      const paymentPayload = {
+        amount: totalPaid * 100,
+        name: `${user?.firstName || ""} ${user?.lastName || ""}`,
+        email: user?.emailAddress || "",
+        phone: user?.phoneNumber || "",
+        returnUrl: "http://localhost:3000/payment-result",
+        paymentMethod,
+        bookingData: bookingPayload
+      };
 
-      await handlePay(reservation?.id || reservation?._id || "unknown", totalPaid);
+      const response = await agent.Payments.createPaymentWithBooking(paymentPayload);
+      const data = response?.data || response;
 
-      sessionStorage.removeItem("bookingData");
+      if (data.redirectUrl) {
+        setRedirectUrl(data.redirectUrl);
+        sessionStorage.setItem("paymentIntentId", data.paymentIntentId);
+        sessionStorage.removeItem("bookingData");
+        window.location.href = data.redirectUrl;
+      } else {
+        toast.error("No redirect URL received.");
+      }
     } catch (error) {
       console.error(error);
       toast.error(error?.message || `Error Occured. Please try again.`)

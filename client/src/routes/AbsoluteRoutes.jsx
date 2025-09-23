@@ -38,7 +38,7 @@ const Gallery = Loadable(lazy(() => import('pages/gallery')));
 const NotFoundPage = Loadable(lazy(() => import('pages/maintenance/404')));
 
 // success
-const SuccessReservation = Loadable(lazy(() => import('pages/success/reservation')));
+const PaymentResult = Loadable(lazy(() => import('pages/payment-result')));
 
 // ==============================|| AUTH ROUTING ||============================== //
 
@@ -118,8 +118,8 @@ const AbsoluteRoutes = {
     },
 
     {
-      path: '/success-reservation',
-      element: <SuccessReservation />
+      path: '/payment-result',
+      element: <PageWrapper hasBanner={false} children={<PaymentResult />} />
     },
 
     // policies
