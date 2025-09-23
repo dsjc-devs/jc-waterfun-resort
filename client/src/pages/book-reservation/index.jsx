@@ -174,7 +174,7 @@ const BookReservation = () => {
         name: `${user?.firstName || ""} ${user?.lastName || ""}`,
         email: user?.emailAddress || "",
         phone: user?.phoneNumber || "",
-        returnUrl: "http://localhost:3000/payment-result",
+        returnUrl: `${window.location.origin}/payment-result`,
         paymentMethod,
         bookingData: bookingPayload
       };
