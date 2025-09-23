@@ -1,7 +1,37 @@
 import React, { useMemo, useState } from 'react'
 import { useGetReservations } from 'api/reservations';
-import { Box, Button, Chip, Divider, Fade, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
-import { EditOutlined, EllipsisOutlined, EyeOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  Box,
+  Button,
+  Chip,
+  Divider,
+  Fade,
+  Menu,
+  MenuItem,
+  Stack,
+  Tooltip,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  TextField,
+  Grid,
+  Collapse,
+  Paper,
+  alpha,
+  useTheme
+} from '@mui/material';
+import {
+  EditOutlined,
+  EllipsisOutlined,
+  EyeOutlined,
+  PlusOutlined,
+  UserOutlined,
+  FilterOutlined,
+  ClearOutlined,
+  CalendarOutlined,
+  DollarOutlined
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { truncate } from 'lodash';
 
@@ -17,6 +47,7 @@ import AnimateButton from 'components/@extended/AnimateButton';
 import textFormatter from 'utils/textFormatter';
 
 const ReservationsTable = () => {
+  const theme = useTheme()
   const { user } = useAuth()
   const { isCustomer, isAdmin, isMasterAdmin } = useGetPosition()
 
@@ -24,6 +55,19 @@ const ReservationsTable = () => {
   const { reservations = [] } = data || {}
 
   const [openMenu, setOpenMenu] = useState({ anchorEl: null, reservationId: '' })
+  const [showFilters, setShowFilters] = useState(false)
+
+  const [filters, setFilters] = useState({
+    status: '',
+    paymentStatus: '',
+    startDate: '',
+    endDate: '',
+    customer: '',
+    accommodationType: '',
+    minAmount: '',
+    maxAmount: '',
+    dateRange: 'all'
+  })
 
   const navigate = useNavigate()
 
@@ -34,6 +78,95 @@ const ReservationsTable = () => {
   const handleMenuClose = () => {
     setOpenMenu({ anchorEl: null, reservationId: '' })
   }
+
+  const handleFilterChange = (field, value) => {
+    setFilters(prev => ({ ...prev, [field]: value }))
+  }
+
+  const clearAllFilters = () => {
+    setFilters({
+      status: '',
+      paymentStatus: '',
+      startDate: '',
+      endDate: '',
+      customer: '',
+      accommodationType: '',
+      minAmount: '',
+      maxAmount: '',
+      dateRange: 'all'
+    })
+  }
+
+  const filterOptions = useMemo(() => {
+    const statuses = [...new Set(reservations.map(r => r.status))].filter(Boolean)
+    const accommodationTypes = [...new Set(reservations.map(r => r.accommodationData?.name))].filter(Boolean)
+    const customers = [...new Set(reservations.map(r => `${r.userData?.firstName} ${r.userData?.lastName}`))].filter(Boolean)
+
+    return { statuses, accommodationTypes, customers }
+  }, [reservations])
+
+  const filteredReservations = useMemo(() => {
+    return reservations.filter(reservation => {
+      if (filters.status && reservation.status !== filters.status) return false
+
+      if (filters.paymentStatus) {
+        const paymentsStatus = reservation?.amount?.totalPaid >= reservation?.amount?.total
+        const paymentsStatusLabel = paymentsStatus ? 'FULLY_PAID' : (reservation?.amount?.totalPaid > 0 ? 'PARTIALLY_PAID' : 'UNPAID')
+        if (paymentsStatusLabel !== filters.paymentStatus) return false
+      }
+
+      if (filters.customer) {
+        const customerName = `${reservation.userData?.firstName} ${reservation.userData?.lastName}`.toLowerCase()
+        if (!customerName.includes(filters.customer.toLowerCase())) return false
+      }
+
+      if (filters.accommodationType && reservation.accommodationData?.name !== filters.accommodationType) return false
+
+      if (filters.minAmount && reservation.amount?.total < parseFloat(filters.minAmount)) return false
+      if (filters.maxAmount && reservation.amount?.total > parseFloat(filters.maxAmount)) return false
+
+      if (filters.dateRange && filters.dateRange !== 'all') {
+        const reservationDate = new Date(reservation.startDate)
+        const today = new Date()
+
+        today.setHours(0, 0, 0, 0)
+        reservationDate.setHours(0, 0, 0, 0)
+
+        switch (filters.dateRange) {
+          case 'today':
+            if (reservationDate.getTime() !== today.getTime()) return false
+            break
+          case 'thisWeek':
+            const currentWeekStart = new Date(today)
+            currentWeekStart.setDate(today.getDate() - today.getDay())
+
+            const currentWeekEnd = new Date(currentWeekStart)
+            currentWeekEnd.setDate(currentWeekStart.getDate() + 6)
+
+            if (reservationDate < currentWeekStart || reservationDate > currentWeekEnd) return false
+            break
+          case 'thisMonth':
+            if (reservationDate.getMonth() !== today.getMonth() || reservationDate.getFullYear() !== today.getFullYear()) return false
+            break
+          case 'custom':
+            if (filters.startDate) {
+              const filterStartDate = new Date(filters.startDate)
+              filterStartDate.setHours(0, 0, 0, 0)
+              if (reservationDate < filterStartDate) return false
+            }
+            if (filters.endDate) {
+              const filterEndDate = new Date(filters.endDate)
+              if (reservationDate > filterEndDate) return false
+            }
+            break
+        }
+      }
+
+      return true
+    })
+  }, [reservations, filters])
+
+  const activeFiltersCount = Object.values(filters).filter(value => value && value !== 'all').length
 
   const columns = useMemo(() => {
     const reservationColumn = {
@@ -225,6 +358,287 @@ const ReservationsTable = () => {
 
   return (
     <React.Fragment>
+      {!isCustomer && (
+        <Paper
+          elevation={0}
+          sx={{
+            mb: 3,
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.12)}`,
+            borderRadius: 2,
+            overflow: 'hidden',
+            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.02)} 0%, ${alpha(theme.palette.secondary.main, 0.02)} 100%)`
+          }}
+        >
+          <Box
+            sx={{
+              p: 2,
+              background: alpha(theme.palette.primary.main, 0.04),
+              borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.08)}`
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <FilterOutlined style={{ color: theme.palette.primary.main, fontSize: '1.2rem' }} />
+                <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
+                  Advanced Filters
+                </Typography>
+                {activeFiltersCount > 0 && (
+                  <Chip
+                    label={`${activeFiltersCount} active`}
+                    size="small"
+                    color="primary"
+                    variant="filled"
+                    sx={{
+                      fontWeight: 600,
+                      '& .MuiChip-label': { px: 1.5 }
+                    }}
+                  />
+                )}
+              </Box>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  startIcon={<FilterOutlined />}
+                  onClick={() => setShowFilters(!showFilters)}
+                  variant={showFilters ? "contained" : "outlined"}
+                  size="small"
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    px: 2
+                  }}
+                >
+                  {showFilters ? 'Hide' : 'Show'} Filters
+                </Button>
+                {activeFiltersCount > 0 && (
+                  <Button
+                    startIcon={<ClearOutlined />}
+                    onClick={clearAllFilters}
+                    variant="outlined"
+                    size="small"
+                    color="error"
+                    sx={{
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      fontWeight: 500,
+                      px: 2
+                    }}
+                  >
+                    Clear All
+                  </Button>
+                )}
+              </Box>
+            </Box>
+          </Box>
+
+          <Collapse in={showFilters}>
+            <Box sx={{ p: 3 }}>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <Typography variant="subtitle2" sx={{ mb: 2, color: theme.palette.text.secondary, fontWeight: 600 }}>
+                    Status & Payment Filters
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Status</InputLabel>
+                    <Select
+                      value={filters.status}
+                      label="Status"
+                      onChange={(e) => handleFilterChange('status', e.target.value)}
+                      sx={{ borderRadius: 2 }}
+                    >
+                      <MenuItem value="">All Statuses</MenuItem>
+                      {filterOptions.statuses.map(status => (
+                        <MenuItem key={status} value={status}>
+                          <Chip
+                            size="small"
+                            label={titleCase(status)}
+                            color={{
+                              PENDING: 'warning',
+                              CONFIRMED: 'primary',
+                              COMPLETED: 'success',
+                              RESCHEDULED: 'info',
+                              ARCHIVED: 'error'
+                            }[status] || 'default'}
+                          />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Payment Status</InputLabel>
+                    <Select
+                      value={filters.paymentStatus}
+                      label="Payment Status"
+                      onChange={(e) => handleFilterChange('paymentStatus', e.target.value)}
+                      sx={{ borderRadius: 2 }}
+                    >
+                      <MenuItem value="">All Payment Statuses</MenuItem>
+                      <MenuItem value="FULLY_PAID">
+                        <Chip size="small" label="Fully Paid" color="success" />
+                      </MenuItem>
+                      <MenuItem value="PARTIALLY_PAID">
+                        <Chip size="small" label="Partially Paid" color="primary" />
+                      </MenuItem>
+                      <MenuItem value="UNPAID">
+                        <Chip size="small" label="Unpaid" color="error" />
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Date Range</InputLabel>
+                    <Select
+                      value={filters.dateRange}
+                      label="Date Range"
+                      onChange={(e) => handleFilterChange('dateRange', e.target.value)}
+                      sx={{ borderRadius: 2 }}
+                    >
+                      <MenuItem value="all">All Dates</MenuItem>
+                      <MenuItem value="today">Today</MenuItem>
+                      <MenuItem value="thisWeek">This Week</MenuItem>
+                      <MenuItem value="thisMonth">This Month</MenuItem>
+                      <MenuItem value="custom">Custom Range</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Accommodation</InputLabel>
+                    <Select
+                      value={filters.accommodationType}
+                      label="Accommodation"
+                      onChange={(e) => handleFilterChange('accommodationType', e.target.value)}
+                      sx={{ borderRadius: 2 }}
+                    >
+                      <MenuItem value="">All Accommodations</MenuItem>
+                      {filterOptions.accommodationTypes.map(type => (
+                        <MenuItem key={type} value={type}>{type}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Divider sx={{ my: 1 }} />
+                  <Typography variant="subtitle2" sx={{ mb: 2, color: theme.palette.text.secondary, fontWeight: 600 }}>
+                    Additional Filters
+                  </Typography>
+                </Grid>
+
+                {!isCustomer && (
+                  <Grid item xs={12} sm={6} md={4}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      label="Customer Name"
+                      value={filters.customer}
+                      onChange={(e) => handleFilterChange('customer', e.target.value)}
+                      placeholder="Search by customer name"
+                      sx={{
+                        '& .MuiOutlinedInput-root': { borderRadius: 2 }
+                      }}
+                      InputProps={{
+                        startAdornment: <UserOutlined style={{ marginRight: 8, color: theme.palette.text.secondary }} />
+                      }}
+                    />
+                  </Grid>
+                )}
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Min Amount"
+                    type="number"
+                    value={filters.minAmount}
+                    onChange={(e) => handleFilterChange('minAmount', e.target.value)}
+                    placeholder="₱0"
+                    sx={{
+                      '& .MuiOutlinedInput-root': { borderRadius: 2 }
+                    }}
+                    InputProps={{
+                      startAdornment: <DollarOutlined style={{ marginRight: 8, color: theme.palette.text.secondary }} />
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Max Amount"
+                    type="number"
+                    value={filters.maxAmount}
+                    onChange={(e) => handleFilterChange('maxAmount', e.target.value)}
+                    placeholder="₱999999"
+                    sx={{
+                      '& .MuiOutlinedInput-root': { borderRadius: 2 }
+                    }}
+                    InputProps={{
+                      startAdornment: <DollarOutlined style={{ marginRight: 8, color: theme.palette.text.secondary }} />
+                    }}
+                  />
+                </Grid>
+
+                {filters.dateRange === 'custom' && (
+                  <>
+                    <Grid item xs={12}>
+                      <Divider sx={{ my: 1 }} />
+                      <Typography variant="subtitle2" sx={{ mb: 2, color: theme.palette.text.secondary, fontWeight: 600 }}>
+                        Custom Date Range
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="Start Date"
+                        type="date"
+                        value={filters.startDate}
+                        onChange={(e) => handleFilterChange('startDate', e.target.value)}
+                        InputLabelProps={{ shrink: true }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': { borderRadius: 2 }
+                        }}
+                        InputProps={{
+                          startAdornment: <CalendarOutlined style={{ marginRight: 8, color: theme.palette.text.secondary }} />
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="End Date"
+                        type="date"
+                        value={filters.endDate}
+                        onChange={(e) => handleFilterChange('endDate', e.target.value)}
+                        InputLabelProps={{ shrink: true }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': { borderRadius: 2 }
+                        }}
+                        InputProps={{
+                          startAdornment: <CalendarOutlined style={{ marginRight: 8, color: theme.palette.text.secondary }} />
+                        }}
+                      />
+                    </Grid>
+                  </>
+                )}
+              </Grid>
+            </Box>
+          </Collapse>
+        </Paper>
+      )}
+
       <ReusableTable
         searchableColumns={[
           "reservationId",
@@ -236,7 +650,7 @@ const ReservationsTable = () => {
         ]}
         itemsPerPage={5}
         columns={columns}
-        rows={reservations}
+        rows={filteredReservations}
         isLoading={isLoading}
         noMessage="No reservations found."
         settings={{
