@@ -1,4 +1,6 @@
 import React, { useState, useRef } from 'react';
+import gcashLogo from 'assets/gcash.svg';
+import mayaLogo from 'assets/maya.svg';
 import {
   Container,
   Typography,
@@ -26,6 +28,7 @@ import { useGetSinglePolicy } from 'api/policies';
 import LoadingButton from '@mui/lab/LoadingButton';
 import MainCard from 'components/MainCard';
 import Editor from 'components/Editor';
+import formatPeso from 'utils/formatPrice';
 
 const PaymentPage = ({
   totalPaid,
@@ -52,13 +55,13 @@ const PaymentPage = ({
       value: 'gcash',
       label: 'GCash',
       description: 'Pay using your GCash wallet',
-      icon: '💙'
+      icon: <img src={gcashLogo} alt="GCash" style={{ width: 32, height: 32 }} />
     },
     {
       value: 'maya',
       label: 'Maya (PayMaya)',
       description: 'Pay using your Maya account',
-      icon: '🟢'
+      icon: <img src={mayaLogo} alt="Maya" style={{ width: 32, height: 32 }} />
     },
   ];
 
@@ -126,12 +129,12 @@ const PaymentPage = ({
       </Typography>
       {showMinAlert && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          The amount entered is less than the minimum payable. Please enter at least ₱{minPayable}.
+          The amount entered is less than the minimum payable. Please enter at least {formatPeso(minPayable)}.
         </Alert>
       )}
       {showMaxAlert && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          The amount entered is more than the total price. Maximum payable: ₱{maxPayable}.
+          The amount entered is more than the total price. Maximum payable: {formatPeso(maxPayable)}.
         </Alert>
       )}
       <Box mt={2}>
@@ -204,7 +207,7 @@ const PaymentPage = ({
               }}
             />
             <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-              You can only pay the minimum amount or more. Minimum payable: ₱{minPayable}, Maximum payable: ₱{maxPayable}
+              You can only pay the minimum amount or more. Minimum payable: {formatPeso(minPayable)}, Maximum payable: {formatPeso(maxPayable)}
             </Typography>
           </Grid>
         </Grid>
