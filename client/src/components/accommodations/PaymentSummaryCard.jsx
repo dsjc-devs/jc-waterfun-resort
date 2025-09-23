@@ -3,7 +3,7 @@ import React from "react";
 import MainCard from "components/MainCard";
 import formatPeso from "utils/formatPrice";
 
-const PaymentSummaryCard = ({ data }) => {
+const PaymentSummaryCard = ({ data, isDisplayBalance = false }) => {
   const {
     accomName,
     accomPrice,
@@ -15,7 +15,8 @@ const PaymentSummaryCard = ({ data }) => {
     prices = {},
     extraPersonFee = 0,
     guests = 0,
-    capacity = 0
+    capacity = 0,
+    balance
   } = data;
 
   let perPersonFee = 0;
@@ -96,6 +97,15 @@ const PaymentSummaryCard = ({ data }) => {
       <Box sx={{ borderTop: "1px dashed #ddd", my: 2 }} />
 
       <Stack direction="row" justifyContent="space-between" mb={1}>
+        <Typography variant="h5" fontWeight={700}>
+          Minimum Payable Now
+        </Typography>
+        <Typography variant="h5" fontWeight={700} color="success.dark">
+          {formatPeso(minimumPayable)}
+        </Typography>
+      </Stack>
+
+      <Stack direction="row" justifyContent="space-between" mb={1}>
         <Typography variant="h5" fontWeight={600}>
           Total
         </Typography>
@@ -104,14 +114,16 @@ const PaymentSummaryCard = ({ data }) => {
         </Typography>
       </Stack>
 
-      <Stack direction="row" justifyContent="space-between" mb={1}>
-        <Typography variant="h5" fontWeight={700}>
-          Minimum Payable Now
-        </Typography>
-        <Typography variant="h5" fontWeight={700} color="success.dark">
-          {formatPeso(minimumPayable)}
-        </Typography>
-      </Stack>
+      {isDisplayBalance && (
+        <Stack direction="row" justifyContent="space-between" mb={1}>
+          <Typography variant="h5" fontWeight={700}>
+            Balance
+          </Typography>
+          <Typography variant="h5" fontWeight={700} color="error.main">
+            {formatPeso(balance)}
+          </Typography>
+        </Stack>
+      )}
 
       <Alert
         variant="standard"
@@ -126,6 +138,6 @@ const PaymentSummaryCard = ({ data }) => {
       </Alert>
     </MainCard>
   );
-};
+}
 
 export default PaymentSummaryCard;

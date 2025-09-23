@@ -62,6 +62,7 @@ const BookReservation = () => {
     child: 0,
     pwdSenior: 0,
     minimumPayable: 0,
+    extraPersonFee: 0,
     total: 0
   })
 
@@ -82,17 +83,21 @@ const BookReservation = () => {
 
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
+  const calculatedTotal = (amount.accommodationTotal || 0) + (amount.entranceTotal || 0) + (amount.extraPersonFee || 0);
+
   useEffect(() => {
     setBookingData((prev) => ({
       ...prev,
-      amount,
+      amount: {
+        ...amount,
+        total: calculatedTotal
+      },
       accommodationData: data,
       startDate,
       endDate,
       mode,
     }));
-
-  }, [startDate, endDate, mode, data, amount, activeStep]);
+  }, [startDate, endDate, mode, data, amount.accommodationTotal, amount.entranceTotal, amount.extraPersonFee, amount.adult, amount.child, amount.pwdSenior, amount.minimumPayable, activeStep, calculatedTotal]);
 
   const saveBookingData = (data) => {
     sessionStorage.setItem("bookingData", JSON.stringify(data));
@@ -311,13 +316,14 @@ const BookReservation = () => {
             <Grid item xs={12} md={4}>
               <Box sx={{ my: 4, position: 'sticky', top: 120 }}>
                 <PaymentSummaryCard
+                  isDisplayBalance={false}
                   data={{
                     accomName: bookingData?.accommodationData?.name,
                     accomPrice: amount?.accommodationTotal,
                     includeEntrance: bookingData?.includeEntranceFee || bookingData?.accommodationData?.hasPoolAccess,
                     entrances: bookingData?.entrances,
                     entranceTotal: amount?.entranceTotal,
-                    total: amount?.total,
+                    total: calculatedTotal,
                     minimumPayable: amount?.minimumPayable,
                     prices: {
                       adult: amount?.adult,

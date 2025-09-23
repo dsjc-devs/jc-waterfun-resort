@@ -754,6 +754,7 @@ const ReservationForm = () => {
         <Grid item xs={12} md={4}>
           <Box sx={{ position: "sticky", top: 100 }}>
             <PaymentSummaryCard
+              isDisplayBalance
               data={{
                 accomName: name,
                 accomPrice: price,
@@ -769,7 +770,8 @@ const ReservationForm = () => {
                   adult: entranceAmounts.adult,
                   child: entranceAmounts.child,
                   pwdSenior: entranceAmounts.pwdSenior
-                }
+                },
+                balance: total - (formik.values.amount.totalPaid || 0)
               }}
             />
           </Box>
