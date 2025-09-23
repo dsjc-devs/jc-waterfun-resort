@@ -411,7 +411,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
               </Box>
             )}
 
-            {(!isOnPortal && isLoggedIn) && (
+            {(!isOnPortal && isCustomer) && (
               <Box marginBlock={15} id="book_reservation_section">
                 <Typography
                   variant='h2'
@@ -558,7 +558,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
             )}
           </Grid>
 
-          {!isOnPortal && (
+          {(!isOnPortal) && (
             <Grid item xs={12} md={4}>
               <Box
                 sx={{
@@ -572,6 +572,10 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                     variant="contained"
                     sx={{ borderRadius: 2 }}
                     onClick={() => {
+                      if (!isCustomer && isLoggedIn) {
+                        toast.error("Only customers can book a reservation.");
+                      }
+
                       if (isLoggedIn) {
                         const element = document.getElementById("book_reservation_section");
                         if (element) {
