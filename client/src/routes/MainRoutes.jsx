@@ -37,6 +37,7 @@ const ReservationForm = Loadable(lazy(() => import('pages/portal/reservations/fo
 // profile
 const ViewProfile = Loadable(lazy(() => import('pages/portal/profile/view')));
 const EditProfile = Loadable(lazy(() => import('pages/portal/profile/edit')));
+const ChangePassword = Loadable(lazy(() => import('pages/portal/profile/change-password')));
 
 // content management
 const AccommodationType = Loadable(lazy(() => import('pages/portal/accommodation-type')));
@@ -207,7 +208,7 @@ const MainRoutes = {
                 {
                   path: 'form',
                   element: <PolicyForm />
-                }
+                },
               ]
             },
           ]
@@ -223,6 +224,10 @@ const MainRoutes = {
               path: 'edit',
               element: <EditProfile />
             },
+            {
+              path: 'change-password',
+              element: <ChangePassword />
+            }
           ]
         },
       ]

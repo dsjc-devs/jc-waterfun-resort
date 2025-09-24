@@ -52,7 +52,7 @@ export default function ProfileTab() {
         </ListItemIcon>
         <ListItemText primary="Edit Profile" />
       </ListItemButton>
-      <ListItemButton onClick={() => handleClickItem('account/change-password')} >
+  <ListItemButton onClick={() => handleClickItem('profile/change-password')} >
         <ListItemIcon>
           <LockOutlined />
         </ListItemIcon>
