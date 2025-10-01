@@ -27,6 +27,12 @@ const getAllAmenitiesTypes = async () => {
       })
     );
 
+    withCounts.sort((a, b) => {
+      if (a.name === NO_CATEGORY) return 1;
+      if (b.name === NO_CATEGORY) return -1;
+      return 0;
+    });
+
     return withCounts;
   } catch (error) {
     console.error(error.message);

@@ -57,42 +57,46 @@ const AmenityTypeTable = () => {
         disablePadding: true,
         label: '',
         renderCell: (row) => (
-          row.name === NO_CATEGORY ? null : (
-            <Stack direction='row' spacing={2} justifyContent='flex-end' >
-              <Tooltip title="View Amenities">
-                <Button
-                  variant='contained'
-                  startIcon={<EyeOutlined />}
-                  size='small'
-                  onClick={() => navigate(`/portal/amenities?type=${row.slug}`)}
-                >
-                  View
-                </Button>
-              </Tooltip>
-              <Tooltip title="Edit this Amenity Type">
-                <Button
-                  variant='contained'
-                  startIcon={<EditOutlined />}
-                  size='small'
-                  color="info"
-                  onClick={() => setOpenDrawerConfigs({ data: row, open: true })}
-                >
-                  Edit
-                </Button>
-              </Tooltip>
-              <Tooltip title="Delete this Amenity Type">
-                <Button
-                  variant='contained'
-                  startIcon={<DeleteOutlined />}
-                  size='small'
-                  color="error"
-                  onClick={() => setDeleteConfigs({ data: row, open: true })}
-                >
-                  Delete
-                </Button>
-              </Tooltip>
-            </Stack>
-          )
+          <Stack direction='row' spacing={2} justifyContent='flex-end' >
+            <Tooltip title="View Amenities">
+              <Button
+                variant='contained'
+                startIcon={<EyeOutlined />}
+                size='small'
+                onClick={() => navigate(`/portal/amenities?type=${row.slug}`)}
+              >
+                View
+              </Button>
+            </Tooltip>
+
+            {(row.name !== NO_CATEGORY) && (
+              <React.Fragment>
+                <Tooltip title="Edit this Amenity Type">
+                  <Button
+                    variant='contained'
+                    startIcon={<EditOutlined />}
+                    size='small'
+                    color="info"
+                    onClick={() => setOpenDrawerConfigs({ data: row, open: true })}
+                  >
+                    Edit
+                  </Button>
+                </Tooltip>
+
+                <Tooltip title="Delete this Amenity Type">
+                  <Button
+                    variant='contained'
+                    startIcon={<DeleteOutlined />}
+                    size='small'
+                    color="error"
+                    onClick={() => setDeleteConfigs({ data: row, open: true })}
+                  >
+                    Delete
+                  </Button>
+                </Tooltip>
+              </React.Fragment>
+            )}
+          </Stack>
         )
       },
     ],

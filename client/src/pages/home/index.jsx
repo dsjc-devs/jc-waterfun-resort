@@ -27,8 +27,8 @@ const Home = () => {
         }}
       />
       <ContactUsHomePage />
-      <AboutUs />
       <DiscoverSection />
+      <AboutUs />
       <MapSection />
       <FAQs />
     </React.Fragment >

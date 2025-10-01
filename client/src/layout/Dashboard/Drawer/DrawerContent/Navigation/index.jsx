@@ -15,12 +15,8 @@ export default function Navigation() {
   const { user } = useAuth()
   const userRole = user?.position[0]?.value
 
-  const { accomodationTypes: _accomodationTypes } = useGetAccommodationTypes()
-  const { amenityTypes: _amenityTypes } = useGetAmenityTypes()
-
-  const accomodationTypes = _accomodationTypes
-    ?.filter(item => item.title !== NO_CATEGORY)
-    .concat(_accomodationTypes.filter(item => item.title === NO_CATEGORY));
+  const { accomodationTypes } = useGetAccommodationTypes()
+  const { amenityTypes } = useGetAmenityTypes()
 
   const accommodations = accomodationTypes?.map((item, idx) => {
     let icon;
@@ -59,7 +55,7 @@ export default function Navigation() {
     };
   });
 
-  const amenities = _amenityTypes?.map((item, idx) => {
+  const amenities = amenityTypes?.map((item, idx) => {
     let icon;
     switch (item?.slug) {
       case 'swimming_pool':
