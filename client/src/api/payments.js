@@ -50,7 +50,7 @@ const Payments = {
       const response = await axiosServices.post(`/${endpoints.key}/create-payment-with-booking`, payload)
       return response
     } catch (error) {
-      throw new Error(error?.response?.data?.message);
+      throw new Error(error?.response?.data?.error);
     }
   },
 }
