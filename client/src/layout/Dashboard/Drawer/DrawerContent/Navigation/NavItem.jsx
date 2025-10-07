@@ -10,6 +10,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
 
 // project import
 import { handlerActiveItem, useGetMenuMaster } from 'api/menu';
@@ -67,7 +68,7 @@ export default function NavItem({ item, level }) {
   const textColor = 'text.primary';
   const iconSelectedColor = 'primary.main';
 
-  return (
+  const buttonContent = (
     <ListItemButton
       {...listItemProps}
       disabled={item.disabled}
@@ -76,7 +77,9 @@ export default function NavItem({ item, level }) {
       sx={{
         zIndex: 1201,
         pl: drawerOpen ? `${level * 28}px` : 1.5,
+        pr: drawerOpen ? 1.5 : 1.5,
         py: !drawerOpen && level === 1 ? 1.25 : 1,
+        justifyContent: drawerOpen ? 'flex-start' : 'center',
         ...(drawerOpen && {
           '&:hover': {
             bgcolor: 'primary.lighter'
@@ -115,6 +118,8 @@ export default function NavItem({ item, level }) {
               height: 36,
               alignItems: 'center',
               justifyContent: 'center',
+              display: 'flex',
+              margin: '0 auto',
               '&:hover': {
                 bgcolor: 'secondary.lighter'
               }
@@ -151,6 +156,28 @@ export default function NavItem({ item, level }) {
       )}
     </ListItemButton>
   );
+
+  return !drawerOpen && level === 1 ? (
+    <Tooltip
+      title={item.title}
+      placement="right"
+      arrow
+      enterDelay={500}
+      sx={{
+        '& .MuiTooltip-tooltip': {
+          backgroundColor: theme.palette.grey[800],
+          color: theme.palette.common.white,
+          fontSize: '0.75rem',
+          fontWeight: 500
+        },
+        '& .MuiTooltip-arrow': {
+          color: theme.palette.grey[800]
+        }
+      }}
+    >
+      {buttonContent}
+    </Tooltip>
+  ) : buttonContent;
 }
 
 NavItem.propTypes = { item: PropTypes.object, level: PropTypes.number };

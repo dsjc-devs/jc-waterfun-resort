@@ -6,6 +6,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 
 // project import
 import AppBarStyled from './AppBarStyled';
@@ -35,17 +36,28 @@ export default function Header() {
   // common header
   const mainHeader = (
     <Toolbar>
-      <IconButton
-        disableRipple
-        aria-label="open drawer"
-        onClick={() => handlerDrawerOpen(!drawerOpen)}
-        edge="start"
-        color="secondary"
-        variant="light"
-        sx={{ color: 'text.primary', bgcolor: drawerOpen ? iconBackColorOpen : iconBackColor, ml: { xs: 0, lg: -2 } }}
+      <Tooltip
+        title={drawerOpen ? "Collapse Menu" : "Expand Menu"}
+        placement="right"
+        arrow
       >
-        {!drawerOpen ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-      </IconButton>
+        <IconButton
+          disableRipple
+          aria-label="open drawer"
+          onClick={() => handlerDrawerOpen(!drawerOpen)}
+          edge="start"
+          color="secondary"
+          variant="light"
+          sx={{
+            color: 'text.primary',
+            bgcolor: drawerOpen ? iconBackColorOpen : iconBackColor,
+            ml: { xs: 0, lg: -2 },
+            zIndex: 1300 // Ensure button stays above other elements
+          }}
+        >
+          {!drawerOpen ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+        </IconButton>
+      </Tooltip>
       {headerContent}
     </Toolbar>
   );
