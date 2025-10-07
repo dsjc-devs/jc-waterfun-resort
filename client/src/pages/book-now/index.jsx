@@ -1,13 +1,15 @@
 import React from 'react'
 import PageTitle from 'components/PageTitle'
-import UnderConstruction from 'pages/maintenance/under-construction'
+import CheckAvailability from 'sections/landing-pages/book-now/CheckAvailability'
+import MapSection from 'sections/landing-pages/MapSection'
 
 const BookNow = () => {
   return (
     <React.Fragment>
       <PageTitle title='Book Now' isOnportal={false} />
 
-      <UnderConstruction />
+      <CheckAvailability />
+      <MapSection />
     </React.Fragment>
   )
 }

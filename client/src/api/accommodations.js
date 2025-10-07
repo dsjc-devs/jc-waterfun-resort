@@ -38,6 +38,22 @@ export const useGetSingleAccommodation = (id) => {
   return memoizedValue;
 };
 
+export const useCheckAvailability = (queryObj = null) => {
+  const queryParams = queryObj ? new URLSearchParams(queryObj).toString() : null;
+  const apiUrl = queryParams ? `/${endpoints.key}/check-availability?${queryParams}` : null;
+
+  const { data, isLoading, error, mutate } = useSWR(apiUrl, fetcher, OPTIONS);
+
+  const memoizedValue = useMemo(() => ({
+    data,
+    isLoading,
+    mutate,
+    error
+  }), [data, isLoading, mutate, error]);
+
+  return memoizedValue;
+};
+
 const Accommodations = {
   addAccommodation: async (payload) => {
     try {
@@ -58,6 +74,15 @@ const Accommodations = {
   deleteAccommodation: async (id) => {
     try {
       const response = await axiosServices.delete(`/${endpoints.key}/${id}`)
+      return response
+    } catch (error) {
+      throw new Error(error?.response?.data?.message);
+    }
+  },
+  checkAvailability: async (criteria) => {
+    try {
+      const queryParams = new URLSearchParams(criteria).toString();
+      const response = await axiosServices.get(`/${endpoints.key}/check-availability?${queryParams}`)
       return response
     } catch (error) {
       throw new Error(error?.response?.data?.message);

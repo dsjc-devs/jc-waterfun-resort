@@ -20,6 +20,8 @@ const getAllBlockedDates = async () => {
           startDate: 1,
           endDate: 1,
           reason: 1,
+          accommodationId: 1,
+          blockType: 1,
           isFromReservation: { $literal: false }
         }
       }

@@ -6,6 +6,7 @@ import PageTitle from 'components/PageTitle'
 import React from 'react'
 import { useParams } from 'react-router'
 import AccommodationPage from 'sections/dynamic-pages/AccommodationPage'
+import MapSection from 'sections/landing-pages/MapSection'
 import textFormatter from 'utils/textFormatter'
 
 const AccommodationDetails = () => {
@@ -29,6 +30,8 @@ const AccommodationDetails = () => {
           isOnPortal={false}
         />
       </Container>
+
+      <MapSection />
     </React.Fragment>
   )
 }

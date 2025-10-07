@@ -114,10 +114,65 @@ const deleteAccommodation = expressAsync(async (req, res) => {
   }
 });
 
+const checkAvailability = expressAsync(async (req, res) => {
+  try {
+    const { startDate, endDate, guests, minPrice, maxPrice } = req.query;
+
+    // Validate required fields
+    if (!guests || guests < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Number of guests is required and must be at least 1"
+      });
+    }
+
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      // Allow same day for tour bookings (when startDate equals endDate)
+      if (start > end) {
+        return res.status(400).json({
+          success: false,
+          message: "End date cannot be before start date"
+        });
+      }
+
+      if (start < new Date().setHours(0, 0, 0, 0)) {
+        return res.status(400).json({
+          success: false,
+          message: "Tour date cannot be in the past"
+        });
+      }
+    }
+
+    const criteria = {
+      startDate,
+      endDate,
+      guests: parseInt(guests),
+      minPrice: minPrice ? parseFloat(minPrice) : undefined,
+      maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+      page: parseInt(req.query.page) || 1,
+      limit: parseInt(req.query.limit) || 10
+    };
+
+    const result = await accommodationsServices.checkAvailability(criteria);
+
+    res.json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    console.error("Error in checkAvailability controller:", error);
+    throw new Error(error);
+  }
+});
+
 export {
   createAccommodation,
   getAccommodationsByQuery,
   getAccommodationById,
   updateAccommodationById,
   deleteAccommodation,
+  checkAvailability,
 };
