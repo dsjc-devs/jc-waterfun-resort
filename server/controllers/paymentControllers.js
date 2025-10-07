@@ -93,17 +93,18 @@ const payWithMethod = expressAsync(async (req, res) => {
       phone,
       returnUrl,
       paymentMethod,
-      bookingData // New: booking data to store temporarily
+      bookingData
     } = req.body;
 
-    // Map payment methods to PayMongo types
+    const normalizedMethod = paymentMethod?.toLowerCase();
+
     const paymentMethodMap = {
       'gcash': 'gcash',
       'maya': 'paymaya',
-      'bank-transfer': 'dob' // Direct Online Banking for bank transfers
+      'bank-transfer': 'dob'
     };
 
-    const paymongoMethod = paymentMethodMap[paymentMethod];
+    const paymongoMethod = paymentMethodMap[normalizedMethod];
     if (!paymongoMethod) {
       return res.status(400).json({ error: `Unsupported payment method: ${paymentMethod}` });
     }
@@ -111,17 +112,16 @@ const payWithMethod = expressAsync(async (req, res) => {
     const intentRes = await paymentServices.createPaymentIntent({ amount, paymentMethods: [paymongoMethod] });
     const paymentIntentId = intentRes.data.id;
 
-    // Store booking data temporarily with payment intent ID
     if (bookingData) {
       await tempBookingServices.createTempBooking({
         paymentIntentId,
         ...bookingData,
-        paymentMethod
+        paymentMethod: normalizedMethod
       });
     }
 
     const methodRes = await paymentServices.createPaymentMethod({
-      paymentType: paymentMethod,
+      paymentType: normalizedMethod,
       name,
       email,
       phone,
