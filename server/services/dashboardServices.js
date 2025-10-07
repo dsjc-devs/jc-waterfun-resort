@@ -2,7 +2,7 @@ import Reservations from '../models/reservationsModels.js';
 import Accommodations from '../models/accommodationsModels.js';
 import Users from '../models/usersModels.js';
 
-export const getDashboardStats = async () => {
+async function getDashboardStats() {
   try {
     const totalReservations = await Reservations.countDocuments();
 
@@ -30,7 +30,7 @@ export const getDashboardStats = async () => {
   }
 };
 
-export const getUserDashboardStats = async (userId) => {
+async function getUserDashboardStats(userId) {
   try {
     const userReservations = await Reservations.countDocuments({
       userId: userId
@@ -52,7 +52,7 @@ export const getUserDashboardStats = async (userId) => {
 
     const dateThreshold = new Date();
     dateThreshold.setDate(dateThreshold.getDate() - 30);
-    
+
     const userRecentReservations = await Reservations.countDocuments({
       userId: userId,
       createdAt: { $gte: dateThreshold }
@@ -74,7 +74,7 @@ export const getUserDashboardStats = async (userId) => {
   }
 };
 
-export const getDetailedDashboardStats = async () => {
+async function getDetailedDashboardStats() {
   try {
     const basicStats = await getDashboardStats();
 
@@ -178,7 +178,7 @@ export const getDetailedDashboardStats = async () => {
   }
 };
 
-export const getRecentActivityStats = async (days = 7) => {
+async function getRecentActivityStats(days = 7) {
   try {
     const dateThreshold = new Date();
     dateThreshold.setDate(dateThreshold.getDate() - days);
@@ -210,7 +210,7 @@ export const getRecentActivityStats = async (days = 7) => {
   }
 };
 
-export const getMonthlyStats = async () => {
+async function getMonthlyStats() {
   try {
     const currentYear = new Date().getFullYear();
     const startOfYear = new Date(currentYear, 0, 1);
@@ -289,3 +289,13 @@ export const getMonthlyStats = async () => {
     throw new Error(`Error fetching monthly statistics: ${error.message}`);
   }
 };
+
+export default {
+  getDashboardStats,
+  getUserDashboardStats,
+  getDetailedDashboardStats,
+  getRecentActivityStats,
+  getMonthlyStats
+};
+
+export { };
