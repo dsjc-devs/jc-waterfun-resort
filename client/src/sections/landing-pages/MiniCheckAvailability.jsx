@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import TitleTag from 'components/TitleTag2';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -84,19 +85,7 @@ const MiniCheckAvailability = () => {
       >
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
           <Box textAlign="center" mb={4}>
-            <Typography
-              variant="h3"
-              sx={{
-                fontWeight: 700,
-                background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                mb: 2
-              }}
-            >
-              🌊 Quick Availability Check
-            </Typography>
+            <TitleTag title="🌊 Quick Availability Check" />
             <Typography
               variant="h6"
               color="text.secondary"

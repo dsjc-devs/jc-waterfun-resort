@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import React from "react";
 import CarouselSection from "sections/landing-pages/CarouselSection";
 import MiniCheckAvailability from "sections/landing-pages/MiniCheckAvailability";
+import AccommodationSection from "sections/landing-pages/AccommodationSection";
 import RateSection from "sections/landing-pages/RateSection";
 import Hero from "sections/landing-pages/Hero";
 import ContactUsHomePage from "sections/landing-pages/ContactUs";
@@ -20,6 +21,7 @@ const Home = () => {
     <React.Fragment>
       <CarouselSection />
       <MiniCheckAvailability />
+      <AccommodationSection />
       <RateSection />
       <Hero
         backgroundImage={bgImg}

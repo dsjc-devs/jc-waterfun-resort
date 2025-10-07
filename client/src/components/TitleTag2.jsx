@@ -3,7 +3,7 @@ import { useGetResortDetails } from 'api/resort-details';
 import React from 'react';
 
 
-const TitleTag = ({ title, subtitle, icon, color='#634131' }) => {
+const TitleTag = ({ title, subtitle, icon, color = '#634131' }) => {
 
   const { resortDetails } = useGetResortDetails()
 
@@ -13,14 +13,14 @@ const TitleTag = ({ title, subtitle, icon, color='#634131' }) => {
         <Box>
           {icon}
         </Box>
-        <Typography variant="h2" fontSize={50} color={color} fontFamily="Cinzel">
+        <Typography variant="h2" fontSize={40} color={color} fontFamily="Cinzel">
           {title || resortDetails?.companyInfo?.name}
         </Typography>
         <Typography variant="h5" fontFamily="Istok Web" >
           {subtitle}
         </Typography>
       </Box>
-     
+
 
     </React.Fragment>
   );
