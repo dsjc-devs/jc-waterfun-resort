@@ -11,6 +11,7 @@ import AccommodationGrid from 'components/accommodations/AccommodationGrid'
 import EmptyLongCard from 'components/cards/skeleton/EmptyLongCard'
 
 import banner from 'assets/images/upload/banner.jpg'
+import AccommodationTypePage from 'sections/dynamic-pages/AccommodationTypePage'
 
 const Accommodations = () => {
   const location = useLocation()
@@ -33,12 +34,6 @@ const Accommodations = () => {
   const isEmpty = !isLoading && accommodations?.length === 0
 
   useEffect(() => {
-    if (!type) {
-      window.location.href = "*"
-    }
-  }, [location, type])
-
-  useEffect(() => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
@@ -51,86 +46,92 @@ const Accommodations = () => {
 
       <Banner
         image={banner}
-        title={textFormatter.fromSlug(type)}
-        subtitle="Accommodations"
+        title={type ? textFormatter.fromSlug(type) : "Our Accommodations"}
+        subtitle={type ? `Explore our premium ${textFormatter.fromSlug(type)?.toLowerCase()} designed for comfort and luxury.` : "Discover our range of accommodations designed for comfort and luxury."}
       />
 
-      <Box sx={{ minHeight: '70vh', bgcolor: '#fafafa' }}>
-        {isLoading && (
-          <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 4, md: 8 }, px: { xs: 1, sm: 2, md: 3 } }}>
-            <Stack spacing={{ xs: 2, sm: 3, md: 6 }}>
-              {Array.from({ length: 3 }).map((_, idx) => (
-                <EmptyLongCard key={idx} />
-              ))}
-            </Stack>
-          </Container>
-        )}
+      {!type && (
+        <AccommodationTypePage />
+      )}
 
-        {isEmpty && (
-          <Box sx={{ py: { xs: 4, sm: 6, md: 12 }, px: { xs: 2, sm: 3 } }}>
-            <EmptyUserCard
-              title={`No ${textFormatter.fromSlug(type)} found.`}
-            />
-          </Box>
-        )}
+      {type && (
+        <Box sx={{ minHeight: '70vh', bgcolor: '#fafafa' }}>
+          {isLoading && (
+            <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 4, md: 8 }, px: { xs: 1, sm: 2, md: 3 } }}>
+              <Stack spacing={{ xs: 2, sm: 3, md: 6 }}>
+                {Array.from({ length: 3 }).map((_, idx) => (
+                  <EmptyLongCard key={idx} />
+                ))}
+              </Stack>
+            </Container>
+          )}
 
-        {!isEmpty && (
-          <React.Fragment>
-            <Box sx={{ bgcolor: '#fff' }}>
-              {accommodations?.map((acc, idx) => (
-                <AccommodationGrid key={acc.id || idx} accomData={acc} index={idx} />
-              ))}
+          {isEmpty && (
+            <Box sx={{ py: { xs: 4, sm: 6, md: 12 }, px: { xs: 2, sm: 3 } }}>
+              <EmptyUserCard
+                title={`No ${textFormatter.fromSlug(type)} found.`}
+              />
             </Box>
+          )}
 
-            {pageCount > 1 && (
-              <Box sx={{ bgcolor: '#f8f9fa', py: { xs: 2, sm: 3, md: 6 }, px: { xs: 1, sm: 2 } }}>
-                <Stack alignItems="center">
-                  <Pagination
-                    count={pageCount}
-                    page={page}
-                    onChange={(e, value) => setPage(value)}
-                    color="primary"
-                    size="medium"
-                    sx={{
-                      '& .MuiPaginationItem-root': {
-                        fontWeight: 'bold',
-                        borderRadius: { xs: 1, md: 2 },
-                        fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.875rem' },
-                        minWidth: { xs: 28, md: 32 },
-                        height: { xs: 28, md: 32 }
-                      }
-                    }}
-                  />
-                </Stack>
+          {!isEmpty && (
+            <React.Fragment>
+              <Box sx={{ bgcolor: '#fff' }}>
+                {accommodations?.map((acc, idx) => (
+                  <AccommodationGrid key={acc.id || idx} accomData={acc} index={idx} />
+                ))}
               </Box>
-            )}
 
-            <Box sx={{ py: { xs: 1.5, sm: 2, md: 4 }, bgcolor: '#f8f9fa' }}>
-              <Container sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
-                <Stack alignItems="center" spacing={{ xs: 0.5, md: 1 }}>
-                  <Typography
-                    variant="body1"
-                    textAlign='center'
-                    color="text.primary"
-                    fontWeight="medium"
-                    sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' } }}
-                  >
-                    Showing {accommodations.length} of {totalAccommodations} {textFormatter.fromSlug(type)}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    textAlign='center'
-                    color="text.secondary"
-                    sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem', md: '0.875rem' } }}
-                  >
-                    Total: {totalAccommodations} premium {textFormatter.fromSlug(type)} available
-                  </Typography>
-                </Stack>
-              </Container>
-            </Box>
-          </React.Fragment>
-        )}
-      </Box>
+              {pageCount > 1 && (
+                <Box sx={{ bgcolor: '#f8f9fa', py: { xs: 2, sm: 3, md: 6 }, px: { xs: 1, sm: 2 } }}>
+                  <Stack alignItems="center">
+                    <Pagination
+                      count={pageCount}
+                      page={page}
+                      onChange={(e, value) => setPage(value)}
+                      color="primary"
+                      size="medium"
+                      sx={{
+                        '& .MuiPaginationItem-root': {
+                          fontWeight: 'bold',
+                          borderRadius: { xs: 1, md: 2 },
+                          fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.875rem' },
+                          minWidth: { xs: 28, md: 32 },
+                          height: { xs: 28, md: 32 }
+                        }
+                      }}
+                    />
+                  </Stack>
+                </Box>
+              )}
+
+              <Box sx={{ py: { xs: 1.5, sm: 2, md: 4 }, bgcolor: '#f8f9fa' }}>
+                <Container sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+                  <Stack alignItems="center" spacing={{ xs: 0.5, md: 1 }}>
+                    <Typography
+                      variant="body1"
+                      textAlign='center'
+                      color="text.primary"
+                      fontWeight="medium"
+                      sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' } }}
+                    >
+                      Showing {accommodations.length} of {totalAccommodations} {textFormatter.fromSlug(type)}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      textAlign='center'
+                      color="text.secondary"
+                      sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem', md: '0.875rem' } }}
+                    >
+                      Total: {totalAccommodations} premium {textFormatter.fromSlug(type)} available
+                    </Typography>
+                  </Stack>
+                </Container>
+              </Box>
+            </React.Fragment>
+          )}
+        </Box>
+      )}
     </React.Fragment>
   )
 }
