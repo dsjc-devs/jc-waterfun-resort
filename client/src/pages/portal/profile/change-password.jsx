@@ -26,15 +26,18 @@ import {
 } from 'utils/password-validation';
 
 import * as Yup from 'yup';
+import passwordApi from 'api/passwords';
 import agent from 'api'
 import MainCard from 'components/MainCard';
 import IconButton from 'components/@extended/IconButton';
 import useAuth from 'hooks/useAuth';
 
 import emptyUser from 'assets/images/users/empty-user.png';
+import { useNavigate } from 'react-router';
 
 const ChangePassword = () => {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
 
   const {
     avatar,
@@ -114,15 +117,22 @@ const ChangePassword = () => {
             })}
             onSubmit={async (values, { resetForm, setErrors, setStatus, setSubmitting }) => {
               try {
+                await passwordApi.Password.changePassword(user.userId, {
+                  emailAddress: user.emailAddress,
+                  oldPassword: values.old,
+                  newPassword: values.password
+                });
                 toast.success('Password changed successfully');
                 resetForm();
                 setStatus({ success: false });
                 setSubmitting(false);
+                toast.info('Please login again with your new password')
+                await logout()
+                navigate('/login')
               } catch (err) {
-                toast.error(err?.response?.data?.message || 'Something went wrong');
+                toast.error(err?.message || 'Something went wrong');
                 setStatus({ success: false });
-                setErrors({ submit: err.response.data.message });
-                resetForm();
+                setErrors({ submit: err.message });
                 setSubmitting(false);
               }
             }}

@@ -16,7 +16,13 @@ const getCompanyDetails = async () => {
 const emailTemplate = async (body) => {
   const companyDetails = await getCompanyDetails();
 
-  const address = [companyDetails?.streetAddress || '', companyDetails?.city || '', companyDetails?.province || '', companyDetails?.country || ''].join(', ');
+  const addressObj = companyDetails?.address || {};
+  const address = [
+    addressObj.streetAddress || '',
+    addressObj.city || '',
+    addressObj.province || '',
+    addressObj.country || ''
+  ].filter(Boolean).join(', ');
 
   return `
   <!DOCTYPE html>

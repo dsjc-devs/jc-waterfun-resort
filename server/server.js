@@ -36,6 +36,7 @@ import announcementsRoutes from './routes/announcementsRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import webhookRoutes from './routes/webhookRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
+import passwordRoutes from './routes/passwordRoutes.js';
 
 /*  ========== CRON ========== */
 import { startReservationCron } from './cron/reservationCron.js';
@@ -85,6 +86,7 @@ app.use(`/api/${API_VERSION}/policies`, policiesRoutes);
 app.use(`/api/${API_VERSION}/announcements`, announcementsRoutes);
 app.use(`/api/${API_VERSION}/payments`, paymentRoutes);
 app.use(`/api/${API_VERSION}/dashboard`, dashboardRoutes);
+app.use(`/api/${API_VERSION}/password`, passwordRoutes);
 
 // Webhooks
 app.use(`/api/${API_VERSION}/webhooks`, webhookRoutes);
