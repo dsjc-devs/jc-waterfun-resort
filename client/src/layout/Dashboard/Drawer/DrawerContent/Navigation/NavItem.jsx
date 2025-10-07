@@ -31,7 +31,18 @@ export default function NavItem({ item, level }) {
   }
 
   const Icon = item.icon;
-  const itemIcon = item.icon ? <Icon style={{ fontSize: drawerOpen ? '1rem' : '1.25rem' }} /> : false;
+  let itemIcon = false;
+  if (item.icon) {
+    if (typeof item.icon === 'string') {
+      itemIcon = (
+        <Typography fontSize={18} fontWeight={300}>
+          {item.icon}
+        </Typography>
+      );
+    } else {
+      itemIcon = <Icon style={{ fontSize: drawerOpen ? '1rem' : '1.25rem' }} />;
+    }
+  }
 
   const location = useLocation();
   const { pathname, search } = location;

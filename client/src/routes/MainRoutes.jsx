@@ -40,6 +40,7 @@ const EditProfile = Loadable(lazy(() => import('pages/portal/profile/edit')));
 const ChangePassword = Loadable(lazy(() => import('pages/portal/profile/change-password')));
 
 // content management
+const Rates = Loadable(lazy(() => import('pages/portal/content-management/rates')));
 const AccommodationType = Loadable(lazy(() => import('pages/portal/accommodation-type')));
 const AmenityType = Loadable(lazy(() => import('pages/portal/amenity-type')));
 const AboutUs = Loadable(lazy(() => import('pages/portal/content-management/about-us')));
@@ -157,6 +158,10 @@ const MainRoutes = {
         {
           path: 'content-management',
           children: [
+            {
+              path: 'rates',
+              element: <Rates />
+            },
             {
               path: 'accommodation-type',
               element: <AccommodationType />

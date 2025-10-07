@@ -1,4 +1,4 @@
-import { USER_ROLES } from '../constants/constants'
+import { PESO_SIGN, USER_ROLES } from '../constants/constants'
 
 // assets
 import {
@@ -170,6 +170,15 @@ const getModules = ({ accommodations = [], amenities = [] }) => {
       type: 'group',
       access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
       children: [
+        {
+          id: 'resort-rates',
+          title: 'Rates',
+          type: 'item',
+          url: '/portal/content-management/rates',
+          icon: PESO_SIGN,
+          breadcrumbs: false,
+          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
+        },
         {
           id: 'accommodation-type',
           title: 'Accommodation Types',
