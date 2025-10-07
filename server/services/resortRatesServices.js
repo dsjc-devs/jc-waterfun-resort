@@ -19,10 +19,18 @@ const updateResortRates = async (payload) => {
     if (payload?.entranceFee?.adult?.night !== undefined) {
       updateData["entranceFee.adult.night"] = payload.entranceFee.adult.night;
     }
-    if (payload?.entranceFee?.children?.day !== undefined) {
-      updateData["entranceFee.children.night"] = payload.entranceFee.children.night;
+
+    if (payload?.entranceFee?.child?.day !== undefined) {
+      updateData["entranceFee.child.day"] = payload.entranceFee.child.day;
     }
+    if (payload?.entranceFee?.child?.night !== undefined) {
+      updateData["entranceFee.child.night"] = payload.entranceFee.child.night;
+    }
+
     if (payload?.entranceFee?.pwdSenior?.day !== undefined) {
+      updateData["entranceFee.pwdSenior.day"] = payload.entranceFee.pwdSenior.day;
+    }
+    if (payload?.entranceFee?.pwdSenior?.night !== undefined) {
       updateData["entranceFee.pwdSenior.night"] = payload.entranceFee.pwdSenior.night;
     }
 
@@ -37,7 +45,6 @@ const updateResortRates = async (payload) => {
     throw error;
   }
 };
-
 
 export default {
   getResortRates,

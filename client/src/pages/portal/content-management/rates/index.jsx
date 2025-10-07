@@ -1,6 +1,5 @@
 import { APP_DEFAULT_PATH } from 'config/config';
 
-
 import React from 'react'
 import Breadcrumbs from 'components/@extended/Breadcrumbs';
 import PageTitle from 'components/PageTitle';
