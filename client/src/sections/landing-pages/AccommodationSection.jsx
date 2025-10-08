@@ -26,7 +26,7 @@ const AccommodationSection = () => {
   };
 
   const handleViewAccommodation = (id) => {
-    navigate(`/accommodations/${id}`);
+    navigate(`/accommodations/details/${id}`);
   };
 
   return (

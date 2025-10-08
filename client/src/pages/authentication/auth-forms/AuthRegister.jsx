@@ -14,6 +14,15 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Button,
+  Paper,
+  Skeleton
+} from '@mui/material';
+import { ExpandMore, PolicyOutlined, HelpOutlineOutlined, SecurityOutlined } from '@mui/icons-material';
 
 // third party
 import * as Yup from 'yup';
@@ -35,12 +44,19 @@ import AvatarUpload from 'components/dropzone/AvatarUpload';
 import MainCard from 'components/MainCard';
 import { MenuItem, Select } from '@mui/material';
 import { USER_ROLES, USER_TYPES } from 'constants/constants';
+import { useGetPolicies } from 'api/policies';
+import { useGetFAQS } from 'api/faqs';
 
 // ============================|| JWT - REGISTER ||============================ //
 
 export default function AuthRegister({ type = "CUSTOMER", isFromRegister = true, handleClose = () => { } }) {
   const { login, user } = useAuth()
   const navigate = useNavigate()
+  const { data: policiesData, isLoading: policiesLoading } = useGetPolicies()
+  const { data: faqsData, isLoading: faqsLoading } = useGetFAQS({ status: 'POSTED', limit: 5 })
+
+  const policies = policiesData?.policies || []
+  const faqs = faqsData?.faqs || []
 
   const [level, setLevel] = useState();
   const [showPassword, setShowPassword] = useState(false);
@@ -389,6 +405,201 @@ export default function AuthRegister({ type = "CUSTOMER", isFromRegister = true,
                       Create Account
                     </LoadingButton>
                   </AnimateButton>
+                </Grid>
+
+                {/* Policies Section */}
+                <Grid item xs={12}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      mb: { xs: 1.5, sm: 2 },
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                      border: '1px solid',
+                      borderColor: 'primary.100',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        borderColor: 'primary.200',
+                        transform: { xs: 'none', sm: 'translateY(-2px)' },
+                        boxShadow: { xs: 'none', sm: '0 8px 25px rgba(0,0,0,0.1)' }
+                      }
+                    }}
+                  >
+                    <Box sx={{ p: { xs: 1, sm: 1.5 }, bgcolor: 'primary.50', borderBottom: '1px solid', borderColor: 'primary.100' }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: 600,
+                          display: 'flex',
+                          alignItems: 'center',
+                          color: 'primary.main',
+                          fontSize: { xs: '0.85rem', sm: '0.875rem' }
+                        }}
+                      >
+                        <PolicyOutlined sx={{ mr: 1, fontSize: { xs: 16, sm: 18 } }} />
+                        Our Policies
+                      </Typography>
+                    </Box>
+                    <Box sx={{ p: { xs: 1, sm: 1.5 } }}>
+                      {policiesLoading ? (
+                        <Stack spacing={1}>
+                          {[1, 2, 3].map((i) => (
+                            <Skeleton key={i} variant="rectangular" height={32} sx={{ borderRadius: 1 }} />
+                          ))}
+                        </Stack>
+                      ) : (
+                        <Stack spacing={1}>
+                          {policies.length > 0 ? (
+                            <>
+                              {policies.slice(0, 3).map((policy) => (
+                                <AnimateButton key={policy._id} type="scale" scale={{ hover: 1.02, tap: 0.98 }}>
+                                  <Button
+                                    variant="text"
+                                    size="small"
+                                    onClick={() => navigate('/policies')}
+                                    sx={{
+                                      justifyContent: 'flex-start',
+                                      textAlign: 'left',
+                                      width: '100%',
+                                      color: 'text.primary',
+                                      py: { xs: 0.5, sm: 1 },
+                                      px: { xs: 1, sm: 2 },
+                                      borderRadius: 1,
+                                      minHeight: { xs: 36, sm: 44 },
+                                      '&:hover': { bgcolor: 'action.hover' }
+                                    }}
+                                  >
+                                    <Typography variant="body2" noWrap sx={{ flex: 1, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
+                                      {policy.title}
+                                    </Typography>
+                                  </Button>
+                                </AnimateButton>
+                              ))}
+                              <AnimateButton type="scale">
+                                <Button
+                                  variant="outlined"
+                                  size="small"
+                                  fullWidth
+                                  onClick={() => navigate('/policies')}
+                                  sx={{
+                                    mt: { xs: 0.5, sm: 1 },
+                                    fontSize: { xs: '0.75rem', sm: '0.8rem' },
+                                    py: { xs: 0.5, sm: 0.75 }
+                                  }}
+                                >
+                                  View All Policies
+                                </Button>
+                              </AnimateButton>
+                            </>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 2 }}>
+                              No policies available at the moment.
+                            </Typography>
+                          )}
+                        </Stack>
+                      )}
+                    </Box>
+                  </Paper>
+                </Grid>
+
+                {/* FAQ Section */}
+                <Grid item xs={12}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                      border: '1px solid',
+                      borderColor: 'warning.100',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      '&:hover': {
+                        borderColor: 'warning.200',
+                        transform: { xs: 'none', sm: 'translateY(-2px)' },
+                        boxShadow: { xs: 'none', sm: '0 8px 25px rgba(0,0,0,0.1)' }
+                      }
+                    }}
+                  >
+                    <Box sx={{ p: { xs: 1, sm: 1.5 }, bgcolor: 'warning.50', borderBottom: '1px solid', borderColor: 'warning.100' }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: 600,
+                          display: 'flex',
+                          alignItems: 'center',
+                          color: 'warning.dark',
+                          fontSize: { xs: '0.85rem', sm: '0.875rem' }
+                        }}
+                      >
+                        <HelpOutlineOutlined sx={{ mr: 1, fontSize: { xs: 16, sm: 18 } }} />
+                        Frequently Asked Questions
+                      </Typography>
+                    </Box>
+                    <Box>
+                      {faqsLoading ? (
+                        <Box sx={{ p: 2 }}>
+                          <Stack spacing={2}>
+                            {[1, 2, 3].map((i) => (
+                              <Box key={i}>
+                                <Skeleton variant="text" width="80%" height={20} />
+                                <Skeleton variant="text" width="60%" height={16} />
+                              </Box>
+                            ))}
+                          </Stack>
+                        </Box>
+                      ) : faqs.length > 0 ? (
+                        faqs.slice(0, 4).map((faq, index) => (
+                          <Accordion
+                            key={faq._id}
+                            elevation={0}
+                            sx={{
+                              '&:before': { display: 'none' },
+                              '&.Mui-expanded': { margin: 0 },
+                              '&:last-child': { borderBottom: 'none' }
+                            }}
+                          >
+                            <AccordionSummary
+                              expandIcon={<ExpandMore sx={{ color: 'text.secondary', fontSize: 18 }} />}
+                              sx={{
+                                px: 2,
+                                minHeight: 44,
+                                '& .MuiAccordionSummary-content': { my: 0.5 },
+                                '&:hover': { bgcolor: 'action.hover' }
+                              }}
+                            >
+                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.85rem' }}>
+                                {faq.title}
+                              </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails sx={{ px: 2, pt: 0, pb: 1.5 }}>
+                              <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5, fontSize: '0.8rem' }}>
+                                {faq.answer}
+                              </Typography>
+                            </AccordionDetails>
+                          </Accordion>
+                        ))
+                      ) : (
+                        <Box sx={{ p: 3, textAlign: 'center' }}>
+                          <Typography variant="body2" color="text.secondary">
+                            No FAQs available at the moment.
+                          </Typography>
+                        </Box>
+                      )}
+                      <Box sx={{ p: 1.5, textAlign: 'center', borderTop: '1px solid', borderColor: 'divider' }}>
+                        <AnimateButton type="scale">
+                          <Button
+                            variant="text"
+                            size="small"
+                            onClick={() => navigate('/faqs')}
+                            sx={{ fontSize: '0.75rem', fontWeight: 500 }}
+                          >
+                            View All FAQs →
+                          </Button>
+                        </AnimateButton>
+                      </Box>
+                    </Box>
+                  </Paper>
                 </Grid>
               </Grid>
             </form>
