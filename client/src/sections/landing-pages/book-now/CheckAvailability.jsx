@@ -730,7 +730,7 @@ const CheckAvailability = () => {
                   </Typography>
                   <Stack spacing={3}>
                     <TextField
-                      label="👨‍👩‍👧‍👦 Number of Guests"
+                      label="Number of Guests"
                       type="number"
                       value={criteria.guests}
                       onChange={(e) => {
@@ -781,7 +781,7 @@ const CheckAvailability = () => {
                       {/* Price Input Fields */}
                       <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
                         <TextField
-                          label="💸 Min Budget"
+                          label="Min Budget"
                           type="number"
                           value={priceInputs.min}
                           onChange={(e) => {
@@ -820,7 +820,7 @@ const CheckAvailability = () => {
                           }}
                         />
                         <TextField
-                          label="💎 Max Budget"
+                          label="Max Budget"
                           type="number"
                           value={priceInputs.max}
                           onChange={(e) => {

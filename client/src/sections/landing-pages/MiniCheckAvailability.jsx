@@ -26,13 +26,10 @@ const MiniCheckAvailability = () => {
   const navigate = useNavigate();
   const [bookingMode, setBookingMode] = useState('tour');
   const [criteria, setCriteria] = useState({
-    // Tour mode
     tourDate: null,
     tourType: 'day',
-    // Check-in mode
     checkInDate: null,
     checkOutDate: null,
-    // Common
     guests: 2
   });
 
@@ -156,12 +153,12 @@ const MiniCheckAvailability = () => {
               <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
                 {bookingMode === 'tour'
                   ? '⏰ Perfect for day adventures (7AM-5PM) or magical night experiences (7PM-5AM)'
-                  : '🗓️ Traditional resort stays with flexible check-in and check-out dates'
+                  : '🗓️ Overnight stays are limited to 1 night only'
                 }
               </Typography>
             </Box>
 
-            <Grid container spacing={3} alignItems="end">
+            <Grid container spacing={3} alignItems="center">
               <Grid item xs={12} sm={bookingMode === 'tour' ? 4 : 3}>
                 {bookingMode === 'tour' ? (
                   <DatePicker
@@ -219,8 +216,8 @@ const MiniCheckAvailability = () => {
                         background: 'rgba(255, 255, 255, 0.9)'
                       }}
                     >
-                      <MenuItem value="day">☀️ Day Adventure</MenuItem>
-                      <MenuItem value="night">🌙 Night Experience</MenuItem>
+                      <MenuItem value="day">Day Adventure</MenuItem>
+                      <MenuItem value="night">Night Experience</MenuItem>
                     </Select>
                   </FormControl>
                 ) : (
@@ -229,6 +226,7 @@ const MiniCheckAvailability = () => {
                     value={criteria.checkOutDate}
                     onChange={(date) => handleInputChange('checkOutDate', date)}
                     minDate={criteria.checkInDate ? addDays(criteria.checkInDate, 1) : addDays(new Date(), 1)}
+                    maxDate={criteria.checkInDate ? addDays(criteria.checkInDate, 1) : addDays(new Date(), 1)}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -303,7 +301,7 @@ const MiniCheckAvailability = () => {
 
             <Box textAlign="center" mt={3}>
               <Typography variant="body2" color="text.secondary">
-                🎯 Need more options? <Button variant="text" onClick={() => navigate('/book-now')} sx={{ textTransform: 'none', fontWeight: 600 }}>View Advanced Search</Button>
+                Need more options? <Button variant="text" onClick={() => navigate('/book-now')} sx={{ textTransform: 'none', fontWeight: 600 }}>View Advanced Search</Button>
               </Typography>
             </Box>
           </Paper>
