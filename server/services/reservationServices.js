@@ -3,6 +3,9 @@ import generateRandomString from "../utils/generateRandomString.js";
 import reservationDetails from "../templates/reservation-details.js";
 import sendEmail from "../utils/sendNodeMail.js";
 import emailTemplate from "../templates/defaults/index.js";
+import Accommodations from "../models/accommodationsModels.js";
+import Policies from "../models/policiesModels.js";
+import FAQs from "../models/faqsModels.js";
 
 const hasDateConflict = async (accommodationId, newStartDate, newEndDate) => {
   const conflict = await Reservation.findOne({
@@ -17,16 +20,26 @@ const hasDateConflict = async (accommodationId, newStartDate, newEndDate) => {
 
 const sendReservationDetails = async (reservationData) => {
   try {
-    const { reservationId, userData } = reservationData;
+    const { reservationId, userData, accommodationId } = reservationData;
     const { emailAddress, firstName } = userData || {};
 
     if (!emailAddress) return;
 
+    const accommodationData = await Accommodations.findById(accommodationId);
+
+    const [policies, faqs] = await Promise.all([
+      Policies.find({ status: 'POSTED' }).limit(5),
+      FAQs.find({ status: 'POSTED' }).limit(5)
+    ]);
+
     const subject = `Reservation Confirmation - ${reservationId}`;
     const body = reservationDetails({
       ...reservationData,
+      accommodationData,
+      policies,
+      faqs,
       guestName: firstName || "Guest",
-      status: "Confirmed",
+      status: "CONFIRMED",
     });
 
     const emailContent = await emailTemplate(body);
@@ -55,11 +68,11 @@ const createReservation = async (reservationData) => {
 
     const paymentStatus = totalPaid === total ? "FULLY_PAID" : "PARTIALLY_PAID";
 
-    const reservation = await Reservation.create({
-      reservationId,
-      paymentStatus,
-      ...reservationData,
-    });
+    // const reservation = await Reservation.create({
+    //   reservationId,
+    //   paymentStatus,
+    //   ...reservationData,
+    // });
 
     const hasEmailAddress = reservationData?.userData?.emailAddress;
 
@@ -67,7 +80,7 @@ const createReservation = async (reservationData) => {
       await sendReservationDetails({ ...reservationData, reservationId });
     }
 
-    return reservation;
+    return `sent`;
   } catch (error) {
     console.error("Error creating reservation:", error);
     throw new Error(error.message || "Failed to create reservation");
