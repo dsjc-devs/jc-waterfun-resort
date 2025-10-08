@@ -85,8 +85,11 @@ app.use(`/api/${API_VERSION}/payments`, paymentRoutes);
 app.use(`/api/${API_VERSION}/dashboard`, dashboardRoutes);
 app.use(`/api/${API_VERSION}/password`, passwordRoutes);
 
-// Webhooks
 app.use(`/api/${API_VERSION}/webhooks`, webhookRoutes);
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', project: PROJECT_NAME || 'JC Waterfun Resort' });
+});
 
 if (process.env.NODE_ENV === 'production') {
   const __dirname = path.resolve();

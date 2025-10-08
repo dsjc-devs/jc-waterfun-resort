@@ -1,12 +1,15 @@
 {
   "name": "jc-waterfun-resort",
   "version": "1.0.0",
+  "engines": {
+    "node": "18.x"
+  },
   "description": "A full-stack MERN application that modernises bookings and internal operations for John Cezar Waterfun Resort._",
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
     "dev": "concurrently \"npm start --prefix client\" \"npm run server --prefix server\"",
-  "heroku-postbuild": "npm install --prefix client && npm run build --prefix client && npm install --prefix server"
+    "heroku-postbuild": "npm install --prefix client && npm run build --prefix client && npm install --prefix server"
   },
   "repository": {
     "type": "git",
