@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const PROJECT_API = import.meta.env.VITE_APP_API_URL;
+// If VITE_APP_API_URL is not set, use same-origin (empty string) so client will call the server it's served from
+const PROJECT_API = import.meta.env.VITE_APP_API_URL || '';
 
 const axiosServices = axios.create({
   baseURL: PROJECT_API,
