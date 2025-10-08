@@ -91,7 +91,12 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', project: PROJECT_NAME || 'JC Waterfun Resort' });
 });
 
-if (process.env.NODE_ENV === 'production') {
+import fs from 'fs';
+
+const clientDistPath = path.join(__dirname, '../client/dist');
+const forceServeClient = process.env.FORCE_SERVE_CLIENT === 'true';
+
+if (process.env.NODE_ENV === 'production' || forceServeClient || fs.existsSync(clientDistPath)) {
   const __dirname = path.resolve();
 
   app.use(express.static(path.join(__dirname, '../client/dist')));
