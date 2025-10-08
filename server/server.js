@@ -44,9 +44,6 @@ import { startReservationCron } from './cron/reservationCron.js';
 const app = express();
 const __dirname = path.resolve();
 dotenv.config();
-
-connectDB();
-
 const API_VERSION = process.env.API_VERSION
 const PORT = process.env.PORT || 5000;
 const PROJECT_NAME = process.env.PROJECT_NAME;
@@ -92,9 +89,10 @@ app.use(`/api/${API_VERSION}/password`, passwordRoutes);
 app.use(`/api/${API_VERSION}/webhooks`, webhookRoutes);
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'client', 'build')));
-  app.get('/*splat', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  app.use(express.static(path.join(__dirname, '..', 'client', 'dist')));
+
+  app.get('/*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '..', 'client', 'dist', 'index.html'));
   });
 } else {
   app.get(`/api/${API_VERSION}`, (req, res) => {
@@ -109,7 +107,6 @@ app.use(errorHandler);
 const startServer = async () => {
   try {
     await connectDB();
-
     app.listen(PORT, () =>
       console.log(
         colours.fg.yellow,
