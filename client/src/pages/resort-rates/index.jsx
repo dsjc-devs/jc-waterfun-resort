@@ -70,7 +70,7 @@ const ResortRates = () => {
                 <Typography variant="body1" color="#634131" mb={2} sx={{ flexGrow: 1 }}>
                   Multiple pools, water slides, and recreational areas for the whole family.
                 </Typography>
-                <Chip label="Day Tour: 7AM-5PM | Night Tour: 5PM-3AM" color="primary" />
+                <Chip label="Day Tour: 7AM-5PM | Night Tour: 7PM-5AM" color="primary" />
               </Paper>
             </Grid>
 
