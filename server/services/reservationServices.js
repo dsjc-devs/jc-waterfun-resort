@@ -68,11 +68,11 @@ const createReservation = async (reservationData) => {
 
     const paymentStatus = totalPaid === total ? "FULLY_PAID" : "PARTIALLY_PAID";
 
-    // const reservation = await Reservation.create({
-    //   reservationId,
-    //   paymentStatus,
-    //   ...reservationData,
-    // });
+    const reservation = await Reservation.create({
+      reservationId,
+      paymentStatus,
+      ...reservationData,
+    });
 
     const hasEmailAddress = reservationData?.userData?.emailAddress;
 
@@ -80,7 +80,7 @@ const createReservation = async (reservationData) => {
       await sendReservationDetails({ ...reservationData, reservationId });
     }
 
-    return `sent`;
+    return reservation;
   } catch (error) {
     console.error("Error creating reservation:", error);
     throw new Error(error.message || "Failed to create reservation");
