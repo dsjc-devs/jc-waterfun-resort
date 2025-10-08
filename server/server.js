@@ -88,18 +88,20 @@ app.use(`/api/${API_VERSION}/password`, passwordRoutes);
 // Webhooks
 app.use(`/api/${API_VERSION}/webhooks`, webhookRoutes);
 
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV === 'production') {
   const __dirname = path.resolve();
-  app.use(express.static(path.join(__dirname, "../client/dist")));
 
-  app.get("/*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"));
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+
+  app.get(/^\/(?!api).*/, (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../client/dist', 'index.html'));
   });
 } else {
   app.get(`/api/${API_VERSION}`, (req, res) => {
     res.send(`${PROJECT_NAME} API is running...`);
   });
 }
+
 
 
 /** Middleware */
