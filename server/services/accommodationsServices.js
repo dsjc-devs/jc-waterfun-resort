@@ -70,9 +70,15 @@ const getAccommodationById = async (id) => {
 
 const updateAccommodationById = async (id, updateData) => {
   try {
-    const { isUpdateSameType, ...fieldsToUpdate } = updateData;
+    const { isUpdateSameType, isFeatured, ...fieldsToUpdate } = updateData;
 
-    const _isUpdateSameType = isUpdateSameType === "true" ? true : false
+    const _isUpdateSameType = isUpdateSameType === "true" ? true : false;
+    const _isFeatured = isFeatured === "true" ? true : false;
+
+    const finalFieldsToUpdate = {
+      ...fieldsToUpdate,
+      isFeatured: _isFeatured
+    };
 
     let updatedAccommodation;
 
@@ -82,13 +88,13 @@ const updateAccommodationById = async (id, updateData) => {
 
       updatedAccommodation = await Accommodations.updateMany(
         { groupKey: accommodation.groupKey },
-        { $set: fieldsToUpdate },
+        { $set: finalFieldsToUpdate },
         { runValidators: true }
       );
     } else {
       updatedAccommodation = await Accommodations.findByIdAndUpdate(
         id,
-        { $set: fieldsToUpdate },
+        { $set: finalFieldsToUpdate },
         { new: true, runValidators: true }
       );
     }
@@ -216,11 +222,27 @@ const checkAvailability = async (criteria) => {
   }
 };
 
+const getFeaturedAccommodations = async () => {
+  try {
+    const featuredAccommodations = await Accommodations.find({
+      isFeatured: true,
+      status: "POSTED"
+    })
+      .sort({ createdAt: -1 })
+
+    return featuredAccommodations;
+  } catch (error) {
+    console.error("Error fetching featured accommodations:", error.message);
+    throw new Error(error.message || "Failed to fetch featured accommodations");
+  }
+};
+
 export default {
   createAccommodation,
   getAccommodationsByQuery,
   getAccommodationById,
   updateAccommodationById,
   deleteAccommodation,
-  checkAvailability
+  checkAvailability,
+  getFeaturedAccommodations
 };

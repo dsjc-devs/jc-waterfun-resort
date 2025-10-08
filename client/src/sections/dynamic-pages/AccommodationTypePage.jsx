@@ -3,25 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
   Typography,
   Button,
   Stack,
-  Chip,
-  Paper,
+  Card,
   alpha,
-  useTheme,
-  IconButton,
-  Tooltip
+  useTheme
 } from '@mui/material';
-import { ArrowRightOutlined, EyeOutlined } from '@ant-design/icons';
+import { EyeOutlined } from '@ant-design/icons';
 import { useGetAccommodationTypes } from 'api/accomodation-type';
 import { useGetAccommodations } from 'api/accommodations';
-import textFormatter from 'utils/textFormatter';
 import EmptyUserCard from 'components/cards/skeleton/EmptyUserCard';
+import AccommodationTypeCard from 'components/cards/AccommodationTypeCard';
 
 const AccommodationTypePage = () => {
   const theme = useTheme();
@@ -81,272 +74,133 @@ const AccommodationTypePage = () => {
     <Box
       sx={{
         minHeight: '70vh',
-        background: 'linear-gradient(135deg, #e3f2fd 0%, #f1f8e9 50%, #fff3e0 100%)',
-        py: { xs: 4, md: 8 }
+        background: 'linear-gradient(135deg, #87CEEB 0%, #E0F6FF 25%, #FFF8DC 50%, #FFE4B5 75%, #F0E68C 100%)',
+        position: 'relative',
+        py: { xs: 4, md: 8 },
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          opacity: 0.1
+        }
       }}
     >
-      <Container maxWidth="xl">
-        {/* Header Section */}
+      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Box textAlign="center" mb={8}>
           <Typography
             variant="h3"
             sx={{
-              fontWeight: 700,
-              background: 'linear-gradient(45deg, #2196F3 30%, #4CAF50 90%)',
+              fontWeight: 800,
+              background: 'linear-gradient(45deg, #FF6B35 0%, #F7931E 25%, #20B2AA 50%, #4682B4 75%, #1E90FF 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              mb: 2,
-              fontSize: { xs: '2rem', md: '3rem' }
+              mb: 3,
+              fontSize: { xs: '2.5rem', md: '3.5rem' },
+              textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              letterSpacing: '-0.02em'
             }}
           >
-            🏖️ Discover Our Accommodations
+            🏝️ Paradise Accommodations
           </Typography>
           <Typography
             variant="h6"
-            color="text.secondary"
             sx={{
-              maxWidth: 600,
+              maxWidth: 700,
               mx: 'auto',
               fontWeight: 400,
-              fontSize: { xs: '1rem', md: '1.25rem' }
+              fontSize: { xs: '1.1rem', md: '1.3rem' },
+              color: '#2C5F6F',
+              lineHeight: 1.6,
+              fontStyle: 'italic'
             }}
           >
-            Experience paradise with our diverse range of premium accommodations, each designed for your perfect getaway
+            Escape to tropical luxury where crystal-clear waters meet pristine shores.
+            Discover your perfect sanctuary among our world-class resort accommodations 🌺
           </Typography>
         </Box>
 
-        {/* Accommodation Types List */}
         <Stack spacing={6}>
           {filteredTypes.map((type) => {
             const count = type.count || 0;
-            const formattedName = type.title;
             const typeImage = getTypeImage(type.slug);
 
             return (
-              <Card
+              <AccommodationTypeCard
                 key={type._id}
-                sx={{
-                  display: 'flex',
-                  flexDirection: { xs: 'column', md: 'row' },
-                  borderRadius: 4,
-                  overflow: 'hidden',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  position: 'relative',
-                  minHeight: { xs: 'auto', md: 300 },
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
-                    '& .type-image': {
-                      transform: 'scale(1.05)'
-                    },
-                    '& .view-button': {
-                      background: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
-                      transform: 'translateX(4px)'
-                    }
-                  }
-                }}
-              >
-                {/* Type Image */}
-                <Box
-                  sx={{
-                    width: { xs: '100%', md: '45%' },
-                    height: { xs: 250, md: 300 },
-                    position: 'relative',
-                    overflow: 'hidden'
-                  }}
-                >
-                  {typeImage ? (
-                    <CardMedia
-                      component="img"
-                      image={typeImage}
-                      alt={formattedName}
-                      className="type-image"
-                      sx={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        transition: 'transform 0.3s ease'
-                      }}
-                    />
-                  ) : (
-                    <Box
-                      sx={{
-                        width: '100%',
-                        height: '100%',
-                        background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.8)} 0%, ${alpha(theme.palette.secondary.main, 0.8)} 100%)`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <Typography variant="h2" sx={{ color: 'white', opacity: 0.8 }}>
-                        🏖️
-                      </Typography>
-                    </Box>
-                  )}
-
-                  {/* Overlay Gradient */}
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      background: 'linear-gradient(45deg, rgba(25, 118, 210, 0.3) 0%, rgba(76, 175, 80, 0.3) 100%)',
-                      opacity: 0.6
-                    }}
-                  />
-
-                  {/* Count Badge */}
-                  <Chip
-                    label={`${count} Available`}
-                    sx={{
-                      position: 'absolute',
-                      top: 20,
-                      right: 20,
-                      background: 'rgba(255, 255, 255, 0.95)',
-                      backdropFilter: 'blur(10px)',
-                      fontWeight: 700,
-                      fontSize: '0.875rem',
-                      color: theme.palette.primary.main,
-                      border: '1px solid rgba(255, 255, 255, 0.3)',
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                      '& .MuiChip-label': {
-                        px: 2.5,
-                        py: 0.5
-                      }
-                    }}
-                  />
-                </Box>
-
-                {/* Card Content */}
-                <Box
-                  sx={{
-                    width: { xs: '100%', md: '55%' },
-                    display: 'flex',
-                    flexDirection: 'column',
-                    p: { xs: 3, md: 4 }
-                  }}
-                >
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography
-                      variant="h4"
-                      sx={{
-                        fontWeight: 700,
-                        mb: 2,
-                        color: 'primary.main',
-                        fontSize: { xs: '1.75rem', md: '2.125rem' }
-                      }}
-                    >
-                      {formattedName}
-                    </Typography>
-
-                    <Typography
-                      variant="body1"
-                      color="text.secondary"
-                      sx={{
-                        mb: 4,
-                        lineHeight: 1.8,
-                        fontSize: { xs: '1rem', md: '1.125rem' }
-                      }}
-                    >
-                      {type.description || `Discover our premium ${formattedName?.toLowerCase()} designed for comfort and luxury. Perfect for your tropical getaway with world-class amenities and breathtaking views.`}
-                    </Typography>
-
-                    {/* Stats Row */}
-                    <Paper
-                      elevation={0}
-                      sx={{
-                        p: 3,
-                        mb: 4,
-                        background: alpha(theme.palette.primary.main, 0.05),
-                        borderRadius: 3,
-                        border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`
-                      }}
-                    >
-                      <Stack direction="row" spacing={4} justifyContent="center" alignItems="center">
-                        <Box textAlign="center">
-                          <Typography variant="h5" color="primary.main" sx={{ fontWeight: 700, mb: 0.5 }}>
-                            {count}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                            Available Units
-                          </Typography>
-                        </Box>
-                        <Box textAlign="center">
-                          <Typography variant="h5" color="secondary.main" sx={{ fontWeight: 700, mb: 0.5 }}>
-                            ⭐
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                            Premium Quality
-                          </Typography>
-                        </Box>
-                        <Box textAlign="center">
-                          <Typography variant="h5" color="success.main" sx={{ fontWeight: 700, mb: 0.5 }}>
-                            🏖️
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                            Resort Access
-                          </Typography>
-                        </Box>
-                      </Stack>
-                    </Paper>
-                  </Box>
-
-                  {/* Action Button */}
-                  <Button
-                    className="view-button"
-                    variant="contained"
-                    size="large"
-                    endIcon={<ArrowRightOutlined />}
-                    onClick={() => handleViewType(type.slug)}
-                    sx={{
-                      py: 2,
-                      px: 4,
-                      borderRadius: 3,
-                      background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
-                      fontWeight: 600,
-                      fontSize: '1.125rem',
-                      textTransform: 'capitalize',
-                      transition: 'all 0.3s ease',
-                      boxShadow: '0 4px 15px rgba(25, 118, 210, 0.3)',
-                      '&:hover': {
-                        boxShadow: '0 6px 20px rgba(25, 118, 210, 0.4)',
-                      }
-                    }}
-                  >
-                    Explore {formattedName}
-                  </Button>
-                </Box>
-              </Card>
+                type={type}
+                count={count}
+                typeImage={typeImage}
+                onViewType={handleViewType}
+              />
             );
           })}
         </Stack>
 
-        {/* Bottom CTA Section */}
         <Box
           sx={{
-            mt: 10,
-            p: 6,
+            mt: 12,
+            p: 8,
             textAlign: 'center',
-            background: 'rgba(255, 255, 255, 0.9)',
-            backdropFilter: 'blur(15px)',
-            borderRadius: 4,
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 248, 255, 0.9) 50%, rgba(255, 248, 220, 0.95) 100%)',
+            backdropFilter: 'blur(25px)',
+            borderRadius: 6,
+            border: '3px solid rgba(32, 178, 170, 0.2)',
+            boxShadow: '0 15px 50px rgba(32, 178, 170, 0.2), 0 8px 25px rgba(255, 107, 53, 0.1)',
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '5px',
+              background: 'linear-gradient(90deg, #FF6B35 0%, #F7931E 25%, #20B2AA 50%, #4682B4 75%, #1E90FF 100%)'
+            },
+            '&::after': {
+              content: '"🌴"',
+              position: 'absolute',
+              top: 30,
+              left: 30,
+              fontSize: '3rem',
+              opacity: 0.05,
+              transform: 'rotate(-15deg)'
+            }
           }}
         >
-          <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, color: 'primary.main' }}>
-            🌊 Ready for Your Perfect Getaway?
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: 800,
+              mb: 4,
+              background: 'linear-gradient(45deg, #FF6B35 0%, #20B2AA 50%, #1E90FF 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              fontSize: { xs: '2.2rem', md: '2.8rem' }
+            }}
+          >
+            🏖️ Your Paradise Awaits!
           </Typography>
-          <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto', lineHeight: 1.6 }}>
-            Browse our complete selection of accommodations and find your ideal tropical retreat at JC Water Fun Resort.
+          <Typography
+            variant="h6"
+            sx={{
+              mb: 6,
+              maxWidth: 700,
+              mx: 'auto',
+              lineHeight: 1.7,
+              color: '#2C5F6F',
+              fontSize: { xs: '1.2rem', md: '1.4rem' },
+              fontStyle: 'italic'
+            }}
+          >
+            Dive into luxury at JC Water Fun Resort, where tropical dreams become reality.
+            Book your slice of paradise today and create memories that will last a lifetime! 🌺✨
           </Typography>
           <Button
             variant="contained"
@@ -354,22 +208,38 @@ const AccommodationTypePage = () => {
             startIcon={<EyeOutlined />}
             onClick={() => navigate('/book-now')}
             sx={{
-              px: 6,
-              py: 2,
-              borderRadius: 4,
-              background: 'linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%)',
-              fontWeight: 600,
-              fontSize: '1.25rem',
+              px: 8,
+              py: 3,
+              borderRadius: 50,
+              background: 'linear-gradient(135deg, #20B2AA 0%, #FF6B35 50%, #1E90FF 100%)',
+              fontWeight: 800,
+              fontSize: '1.4rem',
               textTransform: 'capitalize',
-              boxShadow: '0 6px 20px rgba(76, 175, 80, 0.3)',
+              boxShadow: '0 8px 30px rgba(32, 178, 170, 0.4)',
+              color: 'white',
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)',
+                transition: 'left 0.8s'
+              },
+              '&:hover::before': {
+                left: '100%'
+              },
               '&:hover': {
-                background: 'linear-gradient(135deg, #388E3C 0%, #4CAF50 100%)',
-                boxShadow: '0 8px 25px rgba(76, 175, 80, 0.4)',
-                transform: 'translateY(-2px)'
+                background: 'linear-gradient(135deg, #FF6B35 0%, #20B2AA 50%, #4682B4 100%)',
+                boxShadow: '0 12px 40px rgba(255, 107, 53, 0.5)',
+                transform: 'translateY(-4px) scale(1.05)'
               }
             }}
           >
-            Check Availability Now
+            🌊 Book Your Dream Getaway
           </Button>
         </Box>
       </Container>

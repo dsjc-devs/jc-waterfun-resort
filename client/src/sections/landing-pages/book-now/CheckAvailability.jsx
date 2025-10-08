@@ -398,7 +398,7 @@ const CheckAvailability = () => {
               window.open(`/accommodations/details/${_id}`);
             }}
           >
-            Select This Room
+            Select This Accommodation
           </Button>
         </CardContent>
       </Card>

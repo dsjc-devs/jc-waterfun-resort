@@ -1,4 +1,4 @@
-import { ArrowRightOutlined, ClockCircleOutlined } from '@ant-design/icons'
+import { ArrowRightOutlined, ClockCircleOutlined, StarFilled } from '@ant-design/icons'
 import { Box, Grid, Typography, Chip, Stack, Button, Container, Card, CardContent, Fade } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { icons } from 'menu-items/modules'
@@ -22,7 +22,8 @@ const AccommodationGrid = ({ accomData = {}, index = 0 }) => {
     capacity,
     maxStayDuration,
     pictures = [],
-    type
+    type,
+    isFeatured
   } = accomData || {}
 
   const _type = textFormatter.fromSlug(type)
@@ -68,6 +69,33 @@ const AccommodationGrid = ({ accomData = {}, index = 0 }) => {
                   minHeight: { xs: 250, sm: 300, md: '100%' }
                 }}
               >
+                {/* Featured Badge */}
+                {isFeatured && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: { xs: 8, sm: 12, md: 16 },
+                      right: { xs: 8, sm: 12, md: 16 },
+                      zIndex: 3,
+                      background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                      color: 'white',
+                      px: { xs: 1, sm: 1.5, md: 2 },
+                      py: { xs: 0.5, sm: 0.75, md: 1 },
+                      borderRadius: { xs: 2, md: 3 },
+                      fontSize: { xs: '0.6rem', sm: '0.65rem', md: '0.75rem' },
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.5,
+                      boxShadow: '0 4px 12px rgba(255, 193, 7, 0.4)',
+                      backdropFilter: 'blur(10px)'
+                    }}
+                  >
+                    <StarFilled style={{ fontSize: '10px' }} />
+                    FEATURED
+                  </Box>
+                )}
+
                 <Chip
                   color="primary"
                   label={_type}

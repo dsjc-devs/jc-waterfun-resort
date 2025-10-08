@@ -101,6 +101,7 @@ const AccommodationForm = ({ data = {}, _type = '', isLoading = false, isEditMod
       count: 1,
       isUpdateSameType: false,
       hasPoolAccess: data?.hasPoolAccess || false,
+      isFeatured: data?.isFeatured || false,
     },
     validationSchema,
     enableReinitialize: true,
@@ -126,6 +127,10 @@ const AccommodationForm = ({ data = {}, _type = '', isLoading = false, isEditMod
         formData.append('maxStayDuration', values.maxStayDuration);
         formData.append('notes', values.notes);
         formData.append("hasPoolAccess", values.hasPoolAccess);
+
+        if (isEditMode) {
+          formData.append("isFeatured", values.isFeatured);
+        }
 
         if (values.thumbnail instanceof File) {
           formData.append('thumbnail', values.thumbnail);
@@ -221,6 +226,27 @@ const AccommodationForm = ({ data = {}, _type = '', isLoading = false, isEditMod
                           </FormHelperText>
                         )}
                         /</FormikTextInput>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={formik.values.isFeatured}
+                            onChange={(e) => formik.setFieldValue("isFeatured", e.target.checked)}
+                            name="isFeatured"
+                            color="warning"
+                          />
+                        }
+                        label={
+                          <Box>
+                            Featured Accommodation
+                            <Typography variant="caption" color="textSecondary" display="block">
+                              Mark as featured to display prominently on the homepage. Only 3 accommodations can be featured at a time.
+                            </Typography>
+                          </Box>
+                        }
+                      />
                     </Grid>
                   </React.Fragment>
                 )}

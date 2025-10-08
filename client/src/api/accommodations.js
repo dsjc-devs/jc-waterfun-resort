@@ -54,6 +54,21 @@ export const useCheckAvailability = (queryObj = null) => {
   return memoizedValue;
 };
 
+export const useGetFeaturedAccommodations = () => {
+  const apiUrl = `/${endpoints.key}/featured`;
+
+  const { data, isLoading, error, mutate } = useSWR(apiUrl, fetcher, OPTIONS);
+
+  const memoizedValue = useMemo(() => ({
+    data,
+    isLoading,
+    mutate,
+    error
+  }), [data, isLoading, mutate, error]);
+
+  return memoizedValue;
+};
+
 const Accommodations = {
   addAccommodation: async (payload) => {
     try {

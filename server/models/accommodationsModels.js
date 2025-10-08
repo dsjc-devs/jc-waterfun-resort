@@ -92,6 +92,10 @@ const accommodationsSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true

@@ -5,7 +5,8 @@ import {
   getAccommodationById,
   updateAccommodationById,
   deleteAccommodation,
-  checkAvailability
+  checkAvailability,
+  getFeaturedAccommodations
 } from "../controllers/accommodationControllers.js";
 import { protect } from "../middleware/authMiddleware.js";
 import createUploadMiddleware from '../middleware/multer/uploadMiddleware.js'
@@ -28,6 +29,7 @@ router.post(
   createAccommodation
 );
 router.get("/", getAccommodationsByQuery);
+router.get("/featured", getFeaturedAccommodations);
 router.get("/check-availability", checkAvailability);
 
 router.get("/:id", getAccommodationById);

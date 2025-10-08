@@ -168,6 +168,20 @@ const checkAvailability = expressAsync(async (req, res) => {
   }
 });
 
+const getFeaturedAccommodations = expressAsync(async (req, res) => {
+  try {
+    const featuredAccommodations = await accommodationsServices.getFeaturedAccommodations();
+    res.json({
+      success: true,
+      count: featuredAccommodations.length,
+      data: featuredAccommodations,
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error(error);
+  }
+});
+
 export {
   createAccommodation,
   getAccommodationsByQuery,
@@ -175,4 +189,5 @@ export {
   updateAccommodationById,
   deleteAccommodation,
   checkAvailability,
+  getFeaturedAccommodations,
 };
