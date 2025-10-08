@@ -15,9 +15,9 @@ router.post(
   "/",
   protect,
   createUploadMiddleware({
-    fields: [{ name: "image", maxCount: 1 }],
+    fields: [{ name: "images", maxCount: 10 }],
     fieldFolders: {
-      image: "gallery_images",
+      images: "gallery_images",
     },
   }),
   createGalleryImage

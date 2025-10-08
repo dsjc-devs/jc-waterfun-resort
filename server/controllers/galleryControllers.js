@@ -3,23 +3,18 @@ import galleryServices from "../services/galleryServices.js";
 
 const createGalleryImage = expressAsync(async (req, res) => {
   try {
-    const image = req.files && req.files['image'] ? req.files['image'][0].path : "";
+    const images = req.files && req.files['images'] ? req.files['images'] : [];
     const { category } = req.body;
-    
-    if (!image) {
-      return res.status(400).json({ message: "Image file is required" });
+
+    if (!images || images.length === 0) {
+      return res.status(400).json({ message: "At least one image file is required" });
     }
 
     if (!category) {
       return res.status(400).json({ message: "Category is required" });
     }
 
-    const payload = {
-      image,
-      category,
-    };
-
-    const response = await galleryServices.createGalleryImage(payload);
+    const response = await galleryServices.createMultipleGalleryImages(images, category);
     res.status(201).json(response);
   } catch (error) {
     console.error(error);

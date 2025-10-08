@@ -29,6 +29,57 @@ const createGalleryImage = async (galleryData) => {
   }
 };
 
+const createMultipleGalleryImages = async (imageFiles, category) => {
+  try {
+    if (!imageFiles || imageFiles.length === 0) {
+      throw new Error("At least one image file is required");
+    }
+
+    if (!category || category.trim() === "") {
+      throw new Error("Category is required and cannot be empty");
+    }
+
+    const galleryImages = [];
+    const errors = [];
+
+    // Process each image file
+    for (let i = 0; i < imageFiles.length; i++) {
+      try {
+        const imageFile = imageFiles[i];
+        const payload = {
+          image: imageFile.path,
+          category: category.trim(),
+        };
+
+        const galleryImage = await Gallery.create(payload);
+        galleryImages.push(galleryImage);
+      } catch (error) {
+        console.error(`Error creating gallery image ${i + 1}:`, error.message);
+        errors.push(`Image ${i + 1}: ${error.message}`);
+      }
+    }
+
+    if (galleryImages.length === 0) {
+      throw new Error(`Failed to create any images. Errors: ${errors.join(', ')}`);
+    }
+
+    const successCount = galleryImages.length;
+    const totalCount = imageFiles.length;
+    const message = successCount === totalCount
+      ? `${successCount} gallery images created successfully`
+      : `${successCount} out of ${totalCount} gallery images created successfully`;
+
+    return {
+      message,
+      data: galleryImages,
+      errors: errors.length > 0 ? errors : undefined
+    };
+  } catch (error) {
+    console.error("Error creating multiple gallery images:", error.message);
+    throw new Error(error);
+  }
+};
+
 const getAllGalleryImages = async (queryObject) => {
   try {
     const { page: _page, limit: _limit, ...filters } = queryObject;
@@ -142,6 +193,7 @@ const deleteGalleryImageById = async (galleryId) => {
 
 export default {
   createGalleryImage,
+  createMultipleGalleryImages,
   getAllGalleryImages,
   getSingleGalleryImageById,
   updateGalleryImageById,

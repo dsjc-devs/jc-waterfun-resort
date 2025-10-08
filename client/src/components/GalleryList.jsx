@@ -36,7 +36,7 @@ import { toast } from 'react-toastify';
 import { useGetGallery, addGallery, deleteGallery } from 'api/gallery';
 
 import ConfirmationDialog from 'components/ConfirmationDialog';
-import SingleFileUpload from 'components/dropzone/FileUpload';
+import MultiFileUpload from 'components/dropzone/MultiFile';
 
 const GalleryList = ({
     isOnPortal = false,
@@ -53,7 +53,7 @@ const GalleryList = ({
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [addOpen, setAddOpen] = useState(false);
     const [saving, setSaving] = useState(false);
-    const [addForm, setAddForm] = useState({ category: '', image: null });
+    const [addForm, setAddForm] = useState({ category: '', files: [] });
     const [categoryError, setCategoryError] = useState('');
 
     const handleViewModeChange = (event, newMode) => {
@@ -70,7 +70,7 @@ const GalleryList = ({
     }, [galleryImages]);
 
     const openAdd = () => {
-        setAddForm({ category: '', image: null });
+        setAddForm({ category: '', files: [] });
         setCategoryError('');
         setAddOpen(true);
     };
@@ -96,23 +96,32 @@ const GalleryList = ({
             setCategoryError('Category is required');
             return;
         }
-        if (!addForm.image) {
-            toast.error('Image is required');
+        if (!addForm.files || addForm.files.length === 0) {
+            toast.error('At least one image is required');
             return;
         }
         setSaving(true);
         try {
-            const file = addForm.image.file || addForm.image;
             const fd = new FormData();
             fd.append('category', category);
-            fd.append('image', file);
+
+            // Add all selected files to FormData
+            addForm.files.forEach((file, index) => {
+                const actualFile = file.file || file;
+                fd.append('images', actualFile);
+            });
+
             const res = await addGallery(fd);
-            const created = res?.data?.data || null;
-            if (!created?._id) {
-                const url = URL.createObjectURL(file);
+
+            // Create temporary URLs for files that weren't uploaded
+            addForm.files.forEach(file => {
+                const actualFile = file.file || file;
+                const url = URL.createObjectURL(actualFile);
                 tempObjectURLsRef.current.push(url);
-            }
-            toast.success('Image added');
+            });
+
+            const successMessage = addForm.files.length === 1 ? 'Image added' : `${addForm.files.length} images added`;
+            toast.success(successMessage);
             setAddOpen(false);
             mutate && (await mutate());
         } catch (err) {
@@ -704,11 +713,15 @@ const GalleryList = ({
                             />
                         </Box>
                         <Box>
-                            <Typography variant="subtitle2" mb={0.5}>Image (Required)</Typography>
-                            <SingleFileUpload
-                                fieldName="image"
-                                file={addForm.image}
-                                setFieldValue={(_, v) => setAddForm(p => ({ ...p, image: v }))}
+                            <Typography variant="subtitle2" mb={0.5}>Images (Required)</Typography>
+                            <MultiFileUpload
+                                files={addForm.files}
+                                setFieldValue={(field, value) => setAddForm(p => ({ ...p, files: value }))}
+                                acceptedFileTypes={{ 'image/*': ['.jpeg', '.png', '.gif', '.jpg', '.svg'] }}
+                                maxFileSize={10}
+                                multiple={true}
+                                showList={true}
+                                hideButton={true}
                             />
                         </Box>
                     </Stack>
