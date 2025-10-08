@@ -466,7 +466,7 @@ const ReservationForm = () => {
                           </ToggleButton>
 
                           <ToggleButton value="night" aria-label="night mode" disabled={startDate && isDateBlocked(startDate, 'night')}>
-                            <MoonOutlined style={{ marginRight: 6 }} /> Night Tour (5 PM - 7 AM)
+                            <MoonOutlined style={{ marginRight: 6 }} /> Night Tour (7 PM - 5 AM)
                           </ToggleButton>
                         </ToggleButtonGroup>
 

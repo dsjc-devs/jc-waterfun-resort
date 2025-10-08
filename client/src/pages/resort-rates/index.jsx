@@ -485,7 +485,7 @@ const ResortRates = () => {
                   <strong>Day Tour:</strong> 7:00 AM - 5:00 PM
                 </Typography>
                 <Typography variant="body2" color="#634131" mb={1}>
-                  <strong>Night Tour:</strong> 5:00 PM - 3:00 AM
+                  <strong>Night Tour:</strong> 7:00 PM - 5:00 AM
                 </Typography>
               </Card>
             </Grid>
@@ -508,7 +508,7 @@ const ResortRates = () => {
                   • Day tour: 7:00 AM - 5:00 PM
                 </Typography>
                 <Typography variant="body1" color="#634131" mb={1}>
-                  • Night tour: 5:00 PM - 3:00 AM
+                  • Night tour: 7:00 PM - 5:00 AM
                 </Typography>
               </Grid>
               <Grid item xs={12} md={6}>
