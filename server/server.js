@@ -37,6 +37,7 @@ import paymentRoutes from './routes/paymentRoutes.js';
 import webhookRoutes from './routes/webhookRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import passwordRoutes from './routes/passwordRoutes.js';
+import { getSitemap } from './controllers/sitemapController.js';
 
 /*  ========== CRON ========== */
 import { startReservationCron } from './cron/reservationCron.js';
@@ -90,6 +91,9 @@ app.use(`/api/${API_VERSION}/webhooks`, webhookRoutes);
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', project: PROJECT_NAME || 'JC Waterfun Resort' });
 });
+
+// Dynamic sitemap.xml
+app.get('/sitemap.xml', getSitemap);
 
 import fs from 'fs';
 
