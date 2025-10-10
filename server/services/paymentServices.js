@@ -1,6 +1,16 @@
 import axios from 'axios';
 import Payment from '../models/paymentModels.js';
 
+const getPaymongoSecretKey = () => {
+  const isProd = process.env.NODE_ENV === 'production';
+  return isProd ? process.env.PAYMONGO_SECRET_KEY_LIVE : process.env.PAYMONGO_SECRET_KEY_TEST;
+};
+
+const authHeader = () => ({
+  Authorization: `Basic ${Buffer.from(getPaymongoSecretKey() + ':').toString('base64')}`,
+  'Content-Type': 'application/json',
+});
+
 const createPaymentIntent = async (data) => {
   const { amount, paymentMethods = ["gcash"] } = data || {};
   try {
@@ -16,12 +26,7 @@ const createPaymentIntent = async (data) => {
           },
         },
       },
-      {
-        headers: {
-          Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY + ":").toString("base64")}`,
-          "Content-Type": "application/json",
-        },
-      }
+      { headers: authHeader() }
     );
 
     return response.data;
@@ -47,12 +52,7 @@ const createGCashPaymentMethod = async (data) => {
           }
         }
       },
-      {
-        headers: {
-          Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY + ":").toString("base64")}`,
-          "Content-Type": "application/json",
-        },
-      }
+      { headers: authHeader() }
     );
 
     return response.data;
@@ -79,12 +79,7 @@ const createMayaPaymentMethod = async (data) => {
           }
         }
       },
-      {
-        headers: {
-          Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY + ":").toString("base64")}`,
-          "Content-Type": "application/json",
-        },
-      }
+      { headers: authHeader() }
     );
 
     return response.data;
@@ -122,12 +117,7 @@ const createPaymentMethod = async (data) => {
           }
         }
       },
-      {
-        headers: {
-          Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY + ":").toString("base64")}`,
-          "Content-Type": "application/json",
-        },
-      }
+      { headers: authHeader() }
     );
 
     return response.data;
@@ -154,12 +144,7 @@ const createBankTransferPaymentMethod = async (data) => {
           }
         }
       },
-      {
-        headers: {
-          Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY + ":").toString("base64")}`,
-          "Content-Type": "application/json",
-        },
-      }
+      { headers: authHeader() }
     );
 
     return response.data;
@@ -181,12 +166,7 @@ const attachPaymentMethod = async (paymentIntentId, paymentMethodId, returnUrl) 
           }
         }
       },
-      {
-        headers: {
-          Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY + ":").toString("base64")}`,
-          "Content-Type": "application/json",
-        },
-      }
+      { headers: authHeader() }
     );
 
     return response.data;
