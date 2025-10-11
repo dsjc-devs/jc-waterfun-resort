@@ -115,6 +115,7 @@ const ReservationForm = () => {
       setSubmitting(true);
       try {
         const payload = {
+          isWalkIn: true,
           userId: values.userData?.userId,
           userData: values.userData,
           accommodationId: values.accommodationId,

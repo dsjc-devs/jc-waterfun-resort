@@ -65,6 +65,10 @@ const reservationSchema = new mongoose.Schema(
       type: String,
       enum: ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED", "RESCHEDULED", "ARCHIVED"],
     },
+    isWalkIn: {
+      type: Boolean,
+      default: false
+    },
     entrances: entrancesSchema,
     amount: amountSchema,
     guests: {
