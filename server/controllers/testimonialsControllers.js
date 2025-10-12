@@ -7,7 +7,8 @@ const createTestimonial = expressAsync(async (req, res) => {
     res.status(201).json(response);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: error.message });
+    const status = error.statusCode || 500;
+    res.status(status).json({ message: error.message });
   }
 });
 
@@ -40,6 +41,12 @@ const updateTestimonialStatus = expressAsync(async (req, res) => {
       });
     }
 
+    // Ensure message/rating cannot be edited via this endpoint
+    const { remarks, rating } = req.body;
+    if (remarks !== undefined || rating !== undefined) {
+      return res.status(400).json({ message: 'Only status can be updated by admin.' });
+    }
+
     const response = await testimonialsServices.updateTestimonialStatus(
       req.params.testimonialId, 
       req.body.isPosted
@@ -47,7 +54,8 @@ const updateTestimonialStatus = expressAsync(async (req, res) => {
     res.json(response);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: error.message });
+    const status = error.statusCode || 500;
+    res.status(status).json({ message: error.message });
   }
 });
 

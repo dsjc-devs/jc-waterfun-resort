@@ -1,15 +1,29 @@
 import Testimonials from "../models/testimonialsModels.js";
+import Reservation from "../models/reservationsModels.js";
 import { v4 as uuidv4 } from "uuid";
 
 const createTestimonial = async (testimonialData) => {
-  const { firstName, lastName, emailAddress, remarks, rating } =
+  const { userId, firstName, lastName, emailAddress, remarks, rating } =
     testimonialData || {};
 
   const testimonialId = uuidv4();
 
   try {
+    if (!userId) {
+      const err = new Error("Missing userId. Only customers with reservations can submit testimonials.");
+      err.statusCode = 400;
+      throw err;
+    }
+    const hasReservation = await Reservation.exists({ userId });
+    if (!hasReservation) {
+      const err = new Error("Not eligible to post a testimonial. A completed or existing reservation is required.");
+      err.statusCode = 400;
+      throw err;
+    }
+
     const testimonial = await Testimonials.create({
       testimonialId,
+      userId,
       firstName,
       lastName,
       emailAddress,
@@ -20,6 +34,10 @@ const createTestimonial = async (testimonialData) => {
     return `Testimonial with ID ${testimonial.testimonialId} successfully created.`;
   } catch (error) {
     console.error("Error creating testimonial:", error.message);
+    // bubble up status code if set
+    if (error.statusCode) {
+      throw error;
+    }
     throw new Error(error);
   }
 };
@@ -90,7 +108,7 @@ const deleteTestimonial = async (testimonialId) => {
     const testimonial = await getSingleTestimonial(testimonialId);
     const deletedTestimonial = await Testimonials.findOneAndDelete({ testimonialId: testimonial.testimonialId });
 
-    if (!deleteTestimonial) {
+    if (!deletedTestimonial) {
       throw new Error("Testimonial not found");
     }
 

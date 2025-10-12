@@ -595,6 +595,14 @@ const Dashboard = () => {
           >
             Reservations
           </Button>
+          <Button
+            variant="contained"
+            color="success"
+            component={RouterLink}
+            to="/portal/testimonial"
+          >
+            Add Testimonial
+          </Button>
         </Stack>
         <Grid container spacing={3}>
           <Grid item xs={12}>

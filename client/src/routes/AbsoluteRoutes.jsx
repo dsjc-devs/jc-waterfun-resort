@@ -4,6 +4,7 @@ import { lazy } from 'react';
 import Loadable from 'components/Loadable';
 import PageWrapper from '../layout/Wrapper'
 
+
 // render - absolute pages
 const Home = Loadable(lazy(() => import('pages/home')));
 const AboutUs = Loadable(lazy(() => import('pages/about-us')));
@@ -34,6 +35,9 @@ const ResortRates = Loadable(lazy(() => import('pages/resort-rates')));
 
 // gallery
 const Gallery = Loadable(lazy(() => import('pages/gallery')));
+
+// testimonials
+const Testimonials = Loadable(lazy(() => import('pages/testimonials')));
 
 const NotFoundPage = Loadable(lazy(() => import('pages/maintenance/404')));
 
@@ -140,6 +144,17 @@ const AbsoluteRoutes = {
         {
           index: true,
           element: <PageWrapper hasBanner={true} children={<Gallery />} />
+        },
+      ]
+    },
+
+    // testimonials
+    {
+      path: '/testimonials',
+      children: [
+        {
+          index: true,
+          element: <PageWrapper hasBanner={true} children={<Testimonials />} />
         },
       ]
     },
