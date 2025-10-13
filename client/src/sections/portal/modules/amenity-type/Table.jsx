@@ -150,12 +150,12 @@ const AmenityTypeTable = () => {
       />
 
       <ConfirmationDialog
-        title={`Delete "${deleteConfigs.data.title}"`}
+        title={`Delete "${deleteConfigs.data.name}"`}
         sx={{ width: 500 }}
         description={
           <Box>
             <Typography>
-              Are you sure you want to delete <Box component='span' color='error.main'>{deleteConfigs.data.title}</Box>?
+              Are you sure you want to delete <Box component='span' color='error.main'>{deleteConfigs.data.name}</Box>?
             </Typography>
           </Box>
         }

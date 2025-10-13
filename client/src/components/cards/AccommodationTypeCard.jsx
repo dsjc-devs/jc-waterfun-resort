@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
-  CardContent,
   CardMedia,
   Typography,
   Button,
@@ -24,7 +23,7 @@ const AccommodationTypeCard = ({
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const formattedName = type.title;
+  const formattedName = type.title || type?.name
 
   const handleViewType = () => {
     if (onViewType) {
@@ -274,14 +273,6 @@ const AccommodationTypeCard = ({
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 600, color: '#2C5F6F' }}>
                   Luxury Experience
-                </Typography>
-              </Box>
-              <Box textAlign="center">
-                <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
-                  🌊
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600, color: '#2C5F6F' }}>
-                  Ocean Paradise
                 </Typography>
               </Box>
             </Stack>
