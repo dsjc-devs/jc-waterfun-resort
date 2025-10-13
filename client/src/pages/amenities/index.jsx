@@ -55,7 +55,7 @@ const Amenities = () => {
         subtitle="Amenities"
       />
 
-      <Box sx={{ minHeight: '70vh', bgcolor: '#fafafa' }}>
+      <Box sx={{ bgcolor: '#fafafa' }}>
         {isLoading && (
           <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 4, md: 8 }, px: { xs: 1, sm: 2, md: 3 } }}>
             <Stack spacing={{ xs: 2, sm: 3, md: 6 }}>

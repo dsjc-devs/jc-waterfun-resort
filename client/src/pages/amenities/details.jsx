@@ -5,7 +5,7 @@ import { useParams } from 'react-router'
 import React from 'react'
 import Banner from 'components/Banner'
 import PageTitle from 'components/PageTitle'
-import AmenityPage from 'sections/dynamic-pages/AmenityPage'
+import AmenityPage from 'sections/portal/AmenityPage'
 import textFormatter from 'utils/textFormatter'
 
 const AmenityDetails = () => {
