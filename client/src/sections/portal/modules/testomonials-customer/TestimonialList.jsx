@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Container,
@@ -18,6 +18,7 @@ import {
   InputLabel,
   Fab,
   Pagination,
+  Chip,
 } from '@mui/material';
 import { Add as AddIcon, FormatQuote } from '@mui/icons-material';
 import { useGetTestimonials } from 'api/testimonials';
@@ -40,10 +41,33 @@ const TestimonialsDetails = () => {
   const [open, setOpen] = useState(false);
   const [selectedTestimonial, setSelectedTestimonial] = useState(null);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const { data, isLoading, mutate } = useGetTestimonials({ isPosted: true, page, limit });
-  const testimonials = data?.testimonials || [];
-  const totalPages = data?.totalPages || 1;
+  const [limit] = useState(10);
+
+  const userId = useMemo(() => user?.userId || user?._id || user?.id, [user]);
+
+  const { data: userTestimonialsData, isLoading: isLoadingUser, mutate: mutateUser } = useGetTestimonials({
+    userId,
+    page,
+    limit
+  });
+
+  const testimonials = useMemo(() => {
+    const userTestimonials = userTestimonialsData?.testimonials || [];
+
+    return userTestimonials
+      .filter(t => {
+        const testimonialUserId = t.userId || t.user?._id || t.user?.userId;
+        return testimonialUserId === userId;
+      })
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }, [userTestimonialsData, userId]);
+
+  const isLoading = isLoadingUser;
+  const totalPages = userTestimonialsData?.totalPages || 1;
+
+  const mutate = () => {
+    mutateUser();
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -54,10 +78,14 @@ const TestimonialsDetails = () => {
     const fullName = `${t.firstName} ${t.lastName}`;
     const initials = `${t.firstName?.[0] || ''}${t.lastName?.[0] || ''}`;
     const isTruncated = t.remarks && t.remarks.length > 200;
-    
+    const userId = user?.userId || user?._id || user?.id;
+    const testimonialUserId = t.userId || t.user?._id || t.user?.userId;
+    const isOwnTestimonial = testimonialUserId === userId;
+    const isPending = !t.isPosted;
+
     return (
       <Paper
-        key={t.testimonialId}
+        key={t.testimonialId || t._id}
         elevation={0}
         sx={{
           p: 3,
@@ -68,8 +96,8 @@ const TestimonialsDetails = () => {
           borderColor: 'divider',
           transition: 'all .25s',
           cursor: 'pointer',
-          '&:hover': { 
-            boxShadow: '0 6px 18px rgba(0,0,0,0.12)', 
+          '&:hover': {
+            boxShadow: '0 6px 18px rgba(0,0,0,0.12)',
             borderColor: 'primary.main'
           }
         }}
@@ -78,6 +106,14 @@ const TestimonialsDetails = () => {
         <Stack direction="row" spacing={2}>
           <Avatar sx={{ width: 56, height: 56, bgcolor: '#0B4F71', fontWeight: 600 }}>{initials}</Avatar>
           <Box flex={1} pt={0.5}>
+            {isOwnTestimonial && (
+              <Chip
+                label={isPending ? "Pending Approval" : "Approved"}
+                size="small"
+                color={isPending ? "warning" : "success"}
+                sx={{ mb: 1, fontWeight: 600 }}
+              />
+            )}
             <Typography variant="body1" color="text.primary" sx={{ mb: 1, lineHeight: 1.5 }}>
               {isTruncated
                 ? `${t.remarks.slice(0, 200)}...`
@@ -101,20 +137,47 @@ const TestimonialsDetails = () => {
     );
   };
 
+  const hasPendingTestimonials = useMemo(() => {
+    return testimonials.some(t => !t.isPosted);
+  }, [testimonials]);
+
   return (
     <React.Fragment>
       <Container maxWidth="lg" sx={{ mt: 3, mb: 8 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
-          <Box>
+          <Box sx={{ mr: 2, width: 'fit-content' }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                bgcolor: '#f0f7ff',
+                border: '1px solid',
+                borderColor: 'primary.light',
+                display: 'inline-block'
+              }}
+            >
+              <Typography variant="body2" color="primary.dark">
+                Note: Pending testimonials are subject to staff approval before they become visible.
+              </Typography>
+            </Paper>
           </Box>
           <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpen(true)} sx={{ display: { xs: 'none', sm: 'inline-flex' } }}>
             Add Testimonial
           </Button>
         </Stack>
 
+        {hasPendingTestimonials && (
+          <Box sx={{ p: 2, mb: 3, bgcolor: '#FFF9E6', borderLeft: '4px solid #FFA726' }}>
+            <Typography variant="body2" sx={{ color: '#8B6914' }}>
+              You have testimonial(s) pending approval. They will be visible once approved by staff.
+            </Typography>
+          </Box>
+        )}
+
         {isLoading ? (
-          <Stack>{[1,2,3].map(i => (
-            <Paper key={i} elevation={0} sx={{ p:3, mb:2, borderRadius:2, bgcolor:'#fff' }}>
+          <Stack>{[1, 2, 3].map(i => (
+            <Paper key={i} elevation={0} sx={{ p: 3, mb: 2, borderRadius: 2, bgcolor: '#fff' }}>
               <Stack direction="row" spacing={2}>
                 <Skeleton variant="circular" width={56} height={56} />
                 <Box flex={1}>
@@ -125,7 +188,7 @@ const TestimonialsDetails = () => {
             </Paper>))}
           </Stack>
         ) : testimonials.length === 0 ? (
-          <Paper elevation={0} sx={{ p:6, textAlign:'center', bgcolor:'#fff', borderRadius:2 }}>
+          <Paper elevation={0} sx={{ p: 6, textAlign: 'center', bgcolor: '#fff', borderRadius: 2 }}>
             <Typography variant="h6" color="text.secondary" gutterBottom>No testimonials yet</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>Be the first to share your experience.</Typography>
             <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpen(true)}>Add Testimonial</Button>
@@ -139,9 +202,9 @@ const TestimonialsDetails = () => {
           </>
         )}
 
-        <Fab color="primary" onClick={() => setOpen(true)} sx={{ position:'fixed', bottom: 32, right: 32, display:{ xs:'flex', sm:'none' } }}><AddIcon /></Fab>
+        <Fab color="primary" onClick={() => setOpen(true)} sx={{ position: 'fixed', bottom: 32, right: 32, display: { xs: 'flex', sm: 'none' } }}><AddIcon /></Fab>
 
-        <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx:{ borderRadius:2 } }}>
+        <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 2 } }}>
           <DialogTitle>
             <Typography variant="h5" fontWeight={700}>Share Your Experience</Typography>
             <Typography variant="body2" color="text.secondary">Your review helps future guests.</Typography>
@@ -166,7 +229,7 @@ const TestimonialsDetails = () => {
                 mutate();
               } catch (e) {
                 toast.error(e?.message || 'Submission failed');
-              } finally { setSubmitting(false);} 
+              } finally { setSubmitting(false); }
             }}
           >
             {({ values, handleChange, handleSubmit, isSubmitting, touched, errors, setFieldValue }) => (
@@ -212,7 +275,7 @@ const TestimonialsDetails = () => {
                       />
                     </Grid>
                     <Grid item xs={12}>
-                      <Paper elevation={0} sx={{ p:2, bgcolor:'info.lighter', borderLeft: '4px solid', borderColor: 'info.main' }}>
+                      <Paper elevation={0} sx={{ p: 2, bgcolor: 'info.lighter', borderLeft: '4px solid', borderColor: 'info.main' }}>
                         <Typography variant="caption" color="info.main">Reviews appear after staff approval.</Typography>
                       </Paper>
                     </Grid>
@@ -229,7 +292,6 @@ const TestimonialsDetails = () => {
           </Formik>
         </Dialog>
 
-        {/* Full Testimonial Modal */}
         <Dialog
           open={Boolean(selectedTestimonial)}
           onClose={() => setSelectedTestimonial(null)}
@@ -242,89 +304,108 @@ const TestimonialsDetails = () => {
             }
           }}
         >
-          {selectedTestimonial && (
-            <>
-              <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
-                <Stack alignItems="center" spacing={2}>
-                  <Avatar
-                    sx={{
-                      width: 80,
-                      height: 80,
-                      bgcolor: '#0B4F71',
-                      fontSize: 28,
-                      fontWeight: 600
-                    }}
-                  >
-                    {`${selectedTestimonial.firstName?.[0] || ''}${selectedTestimonial.lastName?.[0] || ''}`}
-                  </Avatar>
-                  <Box>
-                    <Typography variant="h6" fontWeight={700}>
-                      {`${selectedTestimonial.firstName} ${selectedTestimonial.lastName}`}
-                    </Typography>
-                    {selectedTestimonial.emailAddress && (
-                      <Typography variant="body2" color="text.secondary">
-                        {selectedTestimonial.emailAddress}
+          {selectedTestimonial && (() => {
+            const testimonialUserId = selectedTestimonial.userId || selectedTestimonial.user?._id || selectedTestimonial.user?.userId;
+            const isOwnTestimonial = testimonialUserId === userId;
+            const isPending = !selectedTestimonial.isPosted;
+
+            return (
+              <>
+                <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
+                  <Stack alignItems="center" spacing={2}>
+                    <Avatar
+                      sx={{
+                        width: 80,
+                        height: 80,
+                        bgcolor: '#0B4F71',
+                        fontSize: 28,
+                        fontWeight: 600
+                      }}
+                    >
+                      {`${selectedTestimonial.firstName?.[0] || ''}${selectedTestimonial.lastName?.[0] || ''}`}
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h6" fontWeight={700}>
+                        {`${selectedTestimonial.firstName} ${selectedTestimonial.lastName}`}
                       </Typography>
-                    )}
-                    <Stack direction="row" justifyContent="center" mt={1}>
-                      <Rating
-                        value={selectedTestimonial.rating}
-                        readOnly
-                        size="small"
-                        sx={{ '& .MuiRating-iconFilled': { color: '#f6b600' } }}
-                      />
-                    </Stack>
+                      {selectedTestimonial.emailAddress && (
+                        <Typography variant="body2" color="text.secondary">
+                          {selectedTestimonial.emailAddress}
+                        </Typography>
+                      )}
+                      <Stack direction="row" justifyContent="center" mt={1} spacing={1}>
+                        <Rating
+                          value={selectedTestimonial.rating}
+                          readOnly
+                          size="small"
+                          sx={{ '& .MuiRating-iconFilled': { color: '#f6b600' } }}
+                        />
+                      </Stack>
+                      {isOwnTestimonial && (
+                        <Box mt={1}>
+                          <Chip
+                            label={isPending ? "Pending Approval" : "Approved"}
+                            size="small"
+                            color={isPending ? "warning" : "success"}
+                            sx={{ fontWeight: 600 }}
+                          />
+                        </Box>
+                      )}
+                    </Box>
+                  </Stack>
+                </DialogTitle>
+                <DialogContent dividers sx={{ py: 3 }}>
+                  <Box sx={{ position: 'relative' }}>
+                    <FormatQuote
+                      sx={{
+                        fontSize: 40,
+                        color: 'primary.main',
+                        opacity: 0.2,
+                        position: 'absolute',
+                        top: -10,
+                        left: -10
+                      }}
+                    />
+                    <Typography
+                      variant="body1"
+                      color="text.secondary"
+                      sx={{
+                        px: 3,
+                        py: 2,
+                        lineHeight: 1.8,
+                        textAlign: 'center',
+                        wordBreak: 'break-word',
+                        overflowWrap: 'break-word',
+                        whiteSpace: 'pre-wrap'
+                      }}
+                    >
+                      {selectedTestimonial.remarks}
+                    </Typography>
+                    <FormatQuote
+                      sx={{
+                        fontSize: 40,
+                        color: 'primary.main',
+                        opacity: 0.2,
+                        position: 'absolute',
+                        bottom: -10,
+                        right: -10,
+                        transform: 'rotate(180deg)'
+                      }}
+                    />
                   </Box>
-                </Stack>
-              </DialogTitle>
-              <DialogContent dividers sx={{ py: 3 }}>
-                <Box sx={{ position: 'relative' }}>
-                  <FormatQuote
-                    sx={{
-                      fontSize: 40,
-                      color: 'primary.main',
-                      opacity: 0.2,
-                      position: 'absolute',
-                      top: -10,
-                      left: -10
-                    }}
-                  />
-                  <Typography
-                    variant="body1"
-                    color="text.secondary"
-                    sx={{
-                      px: 3,
-                      py: 2,
-                      lineHeight: 1.8,
-                      textAlign: 'center'
-                    }}
+                </DialogContent>
+                <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+                  <Button
+                    onClick={() => setSelectedTestimonial(null)}
+                    variant="contained"
+                    sx={{ px: 4 }}
                   >
-                    {selectedTestimonial.remarks}
-                  </Typography>
-                  <FormatQuote
-                    sx={{
-                      fontSize: 40,
-                      color: 'primary.main',
-                      opacity: 0.2,
-                      position: 'absolute',
-                      bottom: -10,
-                      right: -10,
-                      transform: 'rotate(180deg)'
-                    }}
-                  />
-                </Box>
-              </DialogContent>
-              <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
-                <Button
-                  onClick={() => setSelectedTestimonial(null)}
-                  variant="contained"
-                  sx={{ px: 4 }}
-                >
-                  Close
-                </Button>
-              </DialogActions>
-            </>
-          )}
+                    Close
+                  </Button>
+                </DialogActions>
+              </>
+            );
+          })()}
         </Dialog>
       </Container>
     </React.Fragment>

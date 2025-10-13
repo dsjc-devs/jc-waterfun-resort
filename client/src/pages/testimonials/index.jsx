@@ -4,7 +4,7 @@ import gallery from 'assets/images/upload/banner2.jpg'
 import PageTitle from 'components/PageTitle'
 import Testimonials from 'sections/landing-pages/Testimonials'
 
-const index = () => {
+const TestimonialsPage = () => {
   return (
     <React.Fragment>
       <PageTitle title="Testimonials" />
@@ -15,10 +15,9 @@ const index = () => {
         image={gallery}
       />
 
-
         <Testimonials isHomepage={false} />
     </React.Fragment>
   )
 }
 
-export default index
+export default TestimonialsPage

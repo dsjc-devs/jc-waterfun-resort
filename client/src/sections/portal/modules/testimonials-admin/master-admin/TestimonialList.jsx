@@ -36,6 +36,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import FormatQuote from '@mui/icons-material/FormatQuote';
 import useAuth from 'hooks/useAuth';
 import testimonialsApi from 'api/testimonials';
+import ConfirmationDialog from 'components/ConfirmationDialog';
 
 const TabPanel = ({ value, index, children }) => {
     if (value !== index) return null;
@@ -53,12 +54,12 @@ const TestimonialRow = ({ t, onApprove, onUnpublish, onDelete, onView }) => {
     const isTruncated = t.remarks && t.remarks.length > 200;
 
     return (
-        <Paper 
-            elevation={0} 
-            sx={{ 
-                p: 2.5, 
-                border: '1px solid', 
-                borderColor: 'divider', 
+        <Paper
+            elevation={0}
+            sx={{
+                p: 2.5,
+                border: '1px solid',
+                borderColor: 'divider',
                 borderRadius: 2,
                 cursor: 'pointer',
                 transition: 'all 0.2s',
@@ -75,42 +76,51 @@ const TestimonialRow = ({ t, onApprove, onUnpublish, onDelete, onView }) => {
             }}
         >
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'flex-start', sm: 'center' }}>
-                <Stack direction="row" spacing={2} alignItems="center" sx={{ minWidth: 220 }}>
+                <Stack direction="row" spacing={2} alignItems="center" sx={{ minWidth: { sm: 220 }, flexShrink: 0 }}>
                     <Avatar sx={{ width: 48, height: 48, bgcolor: '#0B4F71', fontWeight: 600 }}>{initials}</Avatar>
-                    <Box>
-                        <Typography variant="subtitle1" fontWeight={700}>{fullName}</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
+                    <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="subtitle1" fontWeight={700} noWrap>{fullName}</Typography>
+                        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                             <Rating value={t.rating} readOnly size="small" sx={{ '& .MuiRating-iconFilled': { color: '#f6b600' } }} />
-                            <Typography variant="caption" color="text.secondary">{formatDate(t.createdAt)}</Typography>
+                            <Typography variant="caption" color="text.secondary" noWrap>{formatDate(t.createdAt)}</Typography>
                         </Stack>
                     </Box>
                 </Stack>
 
-                <Box flex={1}>
-                    <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
-                        {isTruncated
-                            ? `${t.remarks.slice(0, 200)}...`
-                            : t.remarks}
+                <Box flex={1} sx={{ minWidth: 0, overflow: 'hidden' }}>
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            wordBreak: 'break-word'
+                        }}
+                    >
+                        {t.remarks && t.remarks.length > 200 ? `${t.remarks.slice(0, 200)}...` : t.remarks}
                     </Typography>
                 </Box>
 
-                <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 220, justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ flexShrink: 0, justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
                     <Chip label={t.isPosted ? 'Published' : 'Pending'} size="small" color={t.isPosted ? 'success' : 'warning'} variant="outlined" />
                     {t.isPosted ? (
                         <Tooltip title="Unpublish">
-                            <IconButton color="warning" onClick={(e) => { e.stopPropagation(); onUnpublish(t); }}>
+                            <IconButton color="warning" size="small" onClick={(e) => { e.stopPropagation(); onUnpublish(t); }}>
                                 <UndoIcon />
                             </IconButton>
                         </Tooltip>
                     ) : (
                         <Tooltip title="Approve & Publish">
-                            <IconButton color="success" onClick={(e) => { e.stopPropagation(); onApprove(t); }}>
+                            <IconButton color="success" size="small" onClick={(e) => { e.stopPropagation(); onApprove(t); }}>
                                 <CheckCircleOutlineIcon />
                             </IconButton>
                         </Tooltip>
                     )}
                     <Tooltip title="Delete">
-                        <IconButton color="error" onClick={(e) => { e.stopPropagation(); onDelete(t); }}>
+                        <IconButton color="error" size="small" onClick={(e) => { e.stopPropagation(); onDelete(t); }}>
                             <DeleteOutlineIcon />
                         </IconButton>
                     </Tooltip>
@@ -207,6 +217,11 @@ const TestimonialsAdmin = () => {
             toast.success('Testimonial deleted');
             closeConfirm();
             mutate();
+            setSelected((prev) => {
+                const next = new Set(prev);
+                next.delete(t.testimonialId);
+                return next;
+            });
         } catch (e) {
             toast.error(e?.message || 'Failed to delete');
         }
@@ -356,10 +371,10 @@ const TestimonialsAdmin = () => {
                                             label=""
                                         />
                                         <Box flex={1}>
-                                            <TestimonialRow 
-                                                t={t} 
-                                                onApprove={handleApprove} 
-                                                onUnpublish={handleUnpublish} 
+                                            <TestimonialRow
+                                                t={t}
+                                                onApprove={handleApprove}
+                                                onUnpublish={handleUnpublish}
                                                 onDelete={handleDelete}
                                                 onView={setSelectedTestimonial}
                                             />
@@ -375,18 +390,14 @@ const TestimonialsAdmin = () => {
                 </TabPanel>
             )}
 
-            <Dialog open={confirm.open} onClose={closeConfirm}>
-                <DialogTitle>Delete testimonial?</DialogTitle>
-                <DialogContent>
-                    <Typography variant="body2">This action cannot be undone.</Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={closeConfirm}>Cancel</Button>
-                    <Button color="error" variant="contained" onClick={confirmDelete}>Delete</Button>
-                </DialogActions>
-            </Dialog>
+            <ConfirmationDialog
+                open={confirm.open}
+                handleClose={closeConfirm}
+                title="Delete Testimonial?"
+                description="This action cannot be undone. Are you sure you want to delete this testimonial?"
+                handleConfirm={confirmDelete}
+            />
 
-            {/* Full Testimonial Modal */}
             <Dialog
                 open={Boolean(selectedTestimonial)}
                 onClose={() => setSelectedTestimonial(null)}
@@ -430,11 +441,11 @@ const TestimonialsAdmin = () => {
                                             size="small"
                                             sx={{ '& .MuiRating-iconFilled': { color: '#f6b600' } }}
                                         />
-                                        <Chip 
-                                            label={selectedTestimonial.isPosted ? 'Published' : 'Pending'} 
-                                            size="small" 
-                                            color={selectedTestimonial.isPosted ? 'success' : 'warning'} 
-                                            variant="outlined" 
+                                        <Chip
+                                            label={selectedTestimonial.isPosted ? 'Published' : 'Pending'}
+                                            size="small"
+                                            color={selectedTestimonial.isPosted ? 'success' : 'warning'}
+                                            variant="outlined"
                                         />
                                     </Stack>
                                 </Box>
@@ -459,7 +470,10 @@ const TestimonialsAdmin = () => {
                                         px: 3,
                                         py: 2,
                                         lineHeight: 1.8,
-                                        textAlign: 'center'
+                                        textAlign: 'center',
+                                        wordBreak: 'break-word',
+                                        overflowWrap: 'break-word',
+                                        whiteSpace: 'pre-wrap'
                                     }}
                                 >
                                     {selectedTestimonial.remarks}

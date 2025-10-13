@@ -155,7 +155,7 @@ const getModules = ({ accommodations = [], amenities = [] }) => {
         },
         {
           id: 'testimonial',
-          title: 'Add Testimonial',
+          title: 'Testimonial',
           type: 'item',
           url: '/portal/testimonial',
           icon: icons.StarIcon,

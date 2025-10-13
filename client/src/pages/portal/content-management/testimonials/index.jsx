@@ -9,7 +9,7 @@ let breadcrumbLinks = [
     { title: 'Testimonials' }
 ];
 
-const TestimonialsPage = () => {
+const TestimonialsAdminPage = () => {
     return (
         <React.Fragment>
             <PageTitle title="Testimonials" />
@@ -26,4 +26,4 @@ const TestimonialsPage = () => {
     )
 }
 
-export default TestimonialsPage
+export default TestimonialsAdminPage
