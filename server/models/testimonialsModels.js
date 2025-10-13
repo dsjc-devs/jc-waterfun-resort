@@ -15,7 +15,11 @@ const testimonialSchema = new mongoose.Schema(
         type: String,
         required: true
         },
-        emailAddress: {
+    userId: {
+    type: String,
+    required: false
+    },
+    emailAddress: {
         type: String,
         required: true
         },

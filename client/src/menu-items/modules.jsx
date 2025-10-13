@@ -154,6 +154,15 @@ const getModules = ({ accommodations = [], amenities = [] }) => {
           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value, USER_ROLES.CUSTOMER.value],
         },
         {
+          id: 'testimonial',
+          title: 'Testimonial',
+          type: 'item',
+          url: '/portal/testimonial',
+          icon: icons.StarIcon,
+          breadcrumbs: false,
+          access: [USER_ROLES.CUSTOMER.value],
+        },
+        {
           id: 'calendar',
           title: 'Booking Calendar',
           type: 'item',
@@ -178,6 +187,15 @@ const getModules = ({ accommodations = [], amenities = [] }) => {
           icon: PESO_SIGN,
           breadcrumbs: false,
           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
+        },
+        {
+          id: 'testimonials-admin',
+          title: 'Testimonials',
+          type: 'item',
+          url: '/portal/content-management/testimonials',
+          icon: icons.StarIcon,
+          breadcrumbs: false,
+          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
         },
         {
           id: 'accommodation-type',

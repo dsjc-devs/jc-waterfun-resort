@@ -34,6 +34,9 @@ const Reservations = Loadable(lazy(() => import('pages/portal/reservations')));
 const ReservationDetails = Loadable(lazy(() => import('pages/portal/reservations/details')));
 const ReservationForm = Loadable(lazy(() => import('pages/portal/reservations/form')));
 
+// testimonial
+const AddTestimonial = Loadable(lazy(() => import('pages/portal/testimonial')));
+
 // profile
 const ViewProfile = Loadable(lazy(() => import('pages/portal/profile/view')));
 const EditProfile = Loadable(lazy(() => import('pages/portal/profile/edit')));
@@ -52,6 +55,7 @@ const ArticleForm = Loadable(lazy(() => import('pages/portal/content-management/
 const Policies = Loadable(lazy(() => import('pages/portal/content-management/policies')));
 const PolicyForm = Loadable(lazy(() => import('pages/portal/content-management/policies/form')));
 const Gallery = Loadable(lazy(() => import('pages/portal/content-management/gallery')));
+const TestimonialsAdmin = Loadable(lazy(() => import('pages/portal/content-management/testimonials')));
 
 const MainRoutes = {
   path: '/',
@@ -140,6 +144,10 @@ const MainRoutes = {
           ]
         },
         {
+          path: 'testimonial',
+          element: <AddTestimonial />
+        },
+        {
           path: 'calendar',
           element: <BookingCalendar />
         },
@@ -158,6 +166,10 @@ const MainRoutes = {
         {
           path: 'content-management',
           children: [
+            {
+              path: 'testimonials',
+              element: <TestimonialsAdmin />
+            },
             {
               path: 'rates',
               element: <Rates />

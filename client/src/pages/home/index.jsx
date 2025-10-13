@@ -13,6 +13,7 @@ import MapSection from "sections/landing-pages/MapSection";
 import FAQs from "sections/landing-pages/FAQs";
 
 import bgImg from "assets/images/upload/our-mission.jpg";
+import Testimonials from "sections/landing-pages/Testimonials";
 
 const Home = () => {
   const navigate = useNavigate()
@@ -35,6 +36,7 @@ const Home = () => {
       <ContactUsHomePage />
       <DiscoverSection />
       <AboutUs />
+      <Testimonials isHomepage={true} />
       <MapSection />
       <FAQs />
     </React.Fragment >

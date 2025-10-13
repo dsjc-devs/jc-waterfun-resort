@@ -41,6 +41,8 @@ const getDropdownNavItems = ({ accomodationTypes = [], amenityTypes = [] }) => [
     sublinks: [
       { title: "Resort Gallery", link: "/gallery" },
       { title: "Articles", link: "/articles" },
+      { title: "Testimonials", link: "/testimonials" },
+
     ]
   },
   {
