@@ -37,6 +37,7 @@ import FormatQuote from '@mui/icons-material/FormatQuote';
 import useAuth from 'hooks/useAuth';
 import testimonialsApi from 'api/testimonials';
 import ConfirmationDialog from 'components/ConfirmationDialog';
+import EmptyUserCard from 'components/cards/skeleton/EmptyUserCard';
 
 const TabPanel = ({ value, index, children }) => {
     if (value !== index) return null;
@@ -69,7 +70,6 @@ const TestimonialRow = ({ t, onApprove, onUnpublish, onDelete, onView }) => {
                 }
             }}
             onClick={(e) => {
-                // Don't trigger if clicking action buttons
                 if (!e.target.closest('button') && !e.target.closest('input[type="checkbox"]')) {
                     onView(t);
                 }
@@ -157,8 +157,20 @@ const TestimonialsAdmin = () => {
     }, [page, limit, tab]);
 
     const { data, isLoading, mutate } = useGetTestimonials(serverQuery);
+    const { data: pendingStats, mutate: mutatePending } = useGetTestimonials({ page: 1, limit: 1, isPosted: false });
+    const { data: publishedStats, mutate: mutatePublished } = useGetTestimonials({ page: 1, limit: 1, isPosted: true });
+    const { data: allStats, mutate: mutateAll } = useGetTestimonials({ page: 1, limit: 1 });
     const items = data?.testimonials || [];
     const totalPages = data?.totalPages || 1;
+    const pendingCount = pendingStats?.totalTestimonials ?? 0;
+    const publishedCount = publishedStats?.totalTestimonials ?? 0;
+    const allCount = allStats?.totalTestimonials ?? 0;
+
+    const mutateCounts = () => {
+        mutatePending();
+        mutatePublished();
+        mutateAll();
+    };
 
     const filtered = useMemo(() => {
         const matches = (t) => {
@@ -192,6 +204,7 @@ const TestimonialsAdmin = () => {
             await testimonialsApi.TESTIMONIALS.editTestimonial(t.testimonialId, { isPosted: true });
             toast.success('Testimonial published');
             mutate();
+            mutateCounts();
         } catch (e) {
             toast.error(e?.message || 'Failed to publish');
         }
@@ -202,6 +215,7 @@ const TestimonialsAdmin = () => {
             await testimonialsApi.TESTIMONIALS.editTestimonial(t.testimonialId, { isPosted: false });
             toast.info('Testimonial unpublished');
             mutate();
+            mutateCounts();
         } catch (e) {
             toast.error(e?.message || 'Failed to unpublish');
         }
@@ -217,6 +231,7 @@ const TestimonialsAdmin = () => {
             toast.success('Testimonial deleted');
             closeConfirm();
             mutate();
+            mutateCounts();
             setSelected((prev) => {
                 const next = new Set(prev);
                 next.delete(t.testimonialId);
@@ -243,6 +258,7 @@ const TestimonialsAdmin = () => {
             toast.success('Selected testimonials published');
             clearSelection();
             mutate();
+            mutateCounts();
         } catch (e) { toast.error(e?.message || 'Bulk publish failed'); }
     };
     const bulkUnpublish = async () => {
@@ -252,6 +268,7 @@ const TestimonialsAdmin = () => {
             toast.info('Selected testimonials unpublished');
             clearSelection();
             mutate();
+            mutateCounts();
         } catch (e) { toast.error(e?.message || 'Bulk unpublish failed'); }
     };
     const bulkDelete = async () => {
@@ -261,6 +278,7 @@ const TestimonialsAdmin = () => {
             toast.success('Selected testimonials deleted');
             clearSelection();
             mutate();
+            mutateCounts();
         } catch (e) { toast.error(e?.message || 'Bulk delete failed'); }
     };
 
@@ -280,9 +298,9 @@ const TestimonialsAdmin = () => {
                 aria-label="testimonial tabs"
                 sx={{ mb: 2 }}
             >
-                <Tab label={`Pending (${items.filter(i => !i.isPosted).length})`} />
-                <Tab label={`Published (${items.filter(i => i.isPosted).length})`} />
-                <Tab label={`All (${items.length})`} />
+                <Tab label={`Pending (${pendingCount})`} />
+                <Tab label={`Published (${publishedCount})`} />
+                <Tab label={`All (${allCount})`} />
             </Tabs>
 
             <Paper elevation={0} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2, mb: 2 }}>
@@ -359,9 +377,7 @@ const TestimonialsAdmin = () => {
                 <TabPanel value={tab} index={tab}>
                     <Stack spacing={1.5}>
                         {filtered.length === 0 ? (
-                            <Paper elevation={0} sx={{ p: 4, textAlign: 'center', border: '1px dashed', borderColor: 'divider', borderRadius: 2 }}>
-                                <Typography variant="body2" color="text.secondary">No items found in this view.</Typography>
-                            </Paper>
+                            <EmptyUserCard title="No testimonials found in this view." />
                         ) : (
                             filtered.map(t => (
                                 <Box key={t.testimonialId}>
