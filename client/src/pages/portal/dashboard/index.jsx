@@ -603,6 +603,14 @@ const Dashboard = () => {
           >
             Add Testimonial
           </Button>
+          <Button
+              variant="contained"
+              color="primary"
+              component={RouterLink}
+              to="/book-now"
+            >
+              Book Now
+            </Button>
         </Stack>
         <Grid container spacing={3}>
           <Grid item xs={12}>
