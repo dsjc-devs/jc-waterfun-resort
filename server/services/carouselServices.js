@@ -1,25 +1,18 @@
 import Carousel from "../models/carouselModels.js";
 
 const createCarousel = async (carouselData) => {
-  const { image, title, subtitle } = carouselData || {};
+  const { image, title = '', subtitle = '', isPosted } = carouselData || {};
 
   try {
     if (!image || image.trim() === "") {
       throw new Error("Image is required and cannot be empty");
     }
 
-    if (!title || title.trim() === "") {
-      throw new Error("Title is required and cannot be empty");
-    }
-
-    if (!subtitle || subtitle.trim() === "") {
-      throw new Error("Subtitle is required and cannot be empty");
-    }
-
     const payload = {
       image,
       title,
       subtitle,
+      isPosted: typeof isPosted === 'boolean' ? isPosted : false,
     };
 
     const carousel = await Carousel.create(payload);
@@ -78,7 +71,7 @@ const getSingleCarouselById = async (carouselId) => {
 
 const updateCarouselById = async (carouselId, carouselData) => {
   try {
-    const { image, title, subtitle } = carouselData || {};
+  const { image, title, subtitle, isPosted } = carouselData || {};
 
     const existingCarousel = await getSingleCarouselById(carouselId);
 
@@ -100,6 +93,12 @@ const updateCarouselById = async (carouselId, carouselData) => {
         throw new Error("Subtitle cannot be empty");
       }
       updateData.subtitle = subtitle;
+    }
+    if (isPosted !== undefined) {
+      if (typeof isPosted !== 'boolean') {
+        throw new Error('isPosted must be a boolean value');
+      }
+      updateData.isPosted = isPosted;
     }
 
     if (Object.keys(updateData).length === 0) {
