@@ -65,6 +65,7 @@
     "react-dom": "^18.2.0",
     "react-draft-wysiwyg": "^1.15.0",
     "react-dropzone": "^14.3.8",
+    "react-google-recaptcha": "^2.1.0",
     "react-helmet": "^6.1.0",
     "react-material-ui-carousel": "^3.4.2",
     "react-number-format": "^5.3.3",
