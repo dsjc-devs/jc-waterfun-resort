@@ -34,7 +34,26 @@ const Policies = () => {
       setActiveIndex(idx)
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+
+    // Auto-scroll to section if hash is present
+    const scrollToHash = () => {
+      const hash = window.location.hash
+      if (hash === '#policy-section-privacy' || hash === '#policy-section-terms') {
+        const el = document.getElementById(hash.replace('#', ''))
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }
+    }
+    // On mount
+    setTimeout(scrollToHash, 300)
+    // On hash change
+    window.addEventListener('hashchange', scrollToHash)
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('hashchange', scrollToHash)
+    }
   }, [policies, isLoading])
 
   const handleSidebarClick = idx => {
@@ -167,73 +186,82 @@ const Policies = () => {
                   </Paper>
                 </Box>
               ))
-              : policies.map((policy, idx) => (
-                <Box
-                  ref={el => (sectionRefs.current[idx] = el)}
-                  sx={{
-                    mb: 6,
-                    scrollMarginTop: '128px'
-                  }}
-                  id={`policy-section-${policy._id}`}
-                  data-aos="fade-up"
-                  data-aos-delay={idx * 100}
-                  key={policy._id}
-                >
-                  <Paper
-                    elevation={2}
-                    sx={{
-                      p: { xs: 2, md: 4 },
-                      borderRadius: 4,
-                      boxShadow: '0 4px 24px rgba(0,0,0,0.07)',
-                      bgcolor: 'background.paper',
-                      transition: 'box-shadow 0.2s',
-                      ...(activeIndex === idx && {
-                        boxShadow: '0 8px 32px rgba(25,118,210,0.12)'
-                      })
-                    }}
-                  >
-                    <Box sx={{ mb: 2 }}>
-                      <Typography
-                        variant="h4"
-                        fontWeight={800}
-                        color={activeIndex === idx ? 'primary.main' : 'text.primary'}
-                        sx={{ fontSize: { xs: 22, md: 28 }, letterSpacing: 0.2 }}
-                      >
-                        {policy.title}
-                      </Typography>
-                    </Box>
-                    <Divider sx={{ mb: 2 }} />
+              : policies.map((policy, idx) => {
+                  let sectionId = `policy-section-${policy._id}`;
+                  if (policy.title?.toLowerCase().includes('privacy')) {
+                    sectionId = 'policy-section-privacy';
+                  }
+                  if (policy.title?.toLowerCase().includes('terms')) {
+                    sectionId = 'policy-section-terms';
+                  }
+                  return (
                     <Box
-                      dangerouslySetInnerHTML={{ __html: policy.content }}
+                      ref={el => (sectionRefs.current[idx] = el)}
                       sx={{
-                        fontSize: 17,
-                        color: 'text.secondary',
-                        lineHeight: 1.85,
-                        '& h1, & h2, & h3, & h4': {
-                          color: 'primary.main',
-                          fontWeight: 800,
-                          mt: 2,
-                          mb: 1,
-                          fontSize: { xs: 20, md: 24 }
-                        },
-                        '& ul': {
-                          pl: 3,
-                          mb: 2
-                        },
-                        '& li': {
-                          mb: 1
-                        },
-                        '& p': {
-                          mb: 2
-                        },
-                        '& strong': {
-                          color: 'primary.dark'
-                        }
+                        mb: 6,
+                        scrollMarginTop: '128px'
                       }}
-                    />
-                  </Paper>
-                </Box>
-              ))}
+                      id={sectionId}
+                      data-aos="fade-up"
+                      data-aos-delay={idx * 100}
+                      key={policy._id}
+                    >
+                      <Paper
+                        elevation={2}
+                        sx={{
+                          p: { xs: 2, md: 4 },
+                          borderRadius: 4,
+                          boxShadow: '0 4px 24px rgba(0,0,0,0.07)',
+                          bgcolor: 'background.paper',
+                          transition: 'box-shadow 0.2s',
+                          ...(activeIndex === idx && {
+                            boxShadow: '0 8px 32px rgba(25,118,210,0.12)'
+                          })
+                        }}
+                      >
+                        <Box sx={{ mb: 2 }}>
+                          <Typography
+                            variant="h4"
+                            fontWeight={800}
+                            color={activeIndex === idx ? 'primary.main' : 'text.primary'}
+                            sx={{ fontSize: { xs: 22, md: 28 }, letterSpacing: 0.2 }}
+                          >
+                            {policy.title}
+                          </Typography>
+                        </Box>
+                        <Divider sx={{ mb: 2 }} />
+                        <Box
+                          dangerouslySetInnerHTML={{ __html: policy.content }}
+                          sx={{
+                            fontSize: 17,
+                            color: 'text.secondary',
+                            lineHeight: 1.85,
+                            '& h1, & h2, & h3, & h4': {
+                              color: 'primary.main',
+                              fontWeight: 800,
+                              mt: 2,
+                              mb: 1,
+                              fontSize: { xs: 20, md: 24 }
+                            },
+                            ul: {
+                              paddingLeft: 24,
+                              marginBottom: 16
+                            },
+                            li: {
+                              marginBottom: 8
+                            },
+                            p: {
+                              marginBottom: 16
+                            },
+                            strong: {
+                              color: 'primary.dark'
+                            }
+                          }}
+                        />
+                      </Paper>
+                    </Box>
+                  );
+                })}
           </Grid>
         </Grid>
       </Container>
