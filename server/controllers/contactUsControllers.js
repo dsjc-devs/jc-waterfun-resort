@@ -7,7 +7,8 @@ const createContact = expressAsync(async (req, res) => {
     res.status(201).json(response);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: error.message });
+    const isCaptchaError = error?.message?.toLowerCase()?.includes('captcha');
+    res.status(isCaptchaError ? 400 : 500).json({ message: error.message });
   }
 });
 
@@ -33,7 +34,7 @@ const getSingleContactById = expressAsync(async (req, res) => {
 
 
 export {
-    createContact,
-    getAllContacts,
-    getSingleContactById,
+  createContact,
+  getAllContacts,
+  getSingleContactById,
 }

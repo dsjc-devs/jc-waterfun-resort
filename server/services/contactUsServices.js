@@ -1,41 +1,99 @@
 import ContactUs from '../models/contactUsModels.js';
+import ResortDetails from '../models/resortDetailsModels.js';
+import sendEmail from '../utils/sendNodeMail.js';
+import emailTemplate from '../templates/defaults/index.js';
+import {
+  contactAcknowledgementTemplate,
+  contactNotificationTemplate
+} from '../templates/contact-us.js';
+import verifyRecaptcha from '../utils/verifyRecaptcha.js';
+
+const sanitizePhoneNumber = (phoneNumber) => {
+  if (!phoneNumber) return undefined;
+
+  const trimmed = phoneNumber.trim();
+  if (!trimmed) return undefined;
+
+  const digitsOnly = trimmed.replace(/[^0-9]/g, '');
+
+  if (digitsOnly.length > 11) {
+    throw new Error('Phone number cannot exceed 11 digits.');
+  }
+
+  if (digitsOnly.length < 7) {
+    throw new Error('Phone number must include at least 7 digits.');
+  }
+
+  return digitsOnly;
+};
+
+const getNotificationRecipient = async () => {
+  const resortDetails = await ResortDetails.findOne();
+  return resortDetails?.companyInfo?.emailAddress
+    || process.env.CONTACT_NOTIFICATION_EMAIL
+    || process.env.MAIL_CONFIGS_EMAIL;
+};
+
+const dispatchContactEmails = async (payload) => {
+  try {
+    // const notificationRecipient = await getNotificationRecipient();
+    const notificationRecipient = `johncezar.waterfun.mail@gmail.com`
+
+    if (notificationRecipient) {
+      const adminBody = contactNotificationTemplate(payload);
+      const adminEmailContent = await emailTemplate(adminBody);
+      const subject = `New Inquiry: ${payload.subject || 'Contact Us Message'}`;
+      await sendEmail(notificationRecipient, subject, adminEmailContent);
+    }
+
+    if (payload.emailAddress) {
+      const guestBody = contactAcknowledgementTemplate(payload);
+      const guestEmailContent = await emailTemplate(guestBody);
+      await sendEmail(payload.emailAddress, 'We received your inquiry', guestEmailContent);
+    }
+  } catch (error) {
+    console.error('Error sending contact emails:', error?.message || error);
+  }
+};
 
 const createContact = async (contactData) => {
-  const { firstName, lastName, emailAddress, phoneNumber, subject, remarks } = contactData || {};
+  const {
+    recaptchaToken,
+    firstName,
+    lastName,
+    emailAddress,
+    phoneNumber,
+    subject,
+    remarks
+  } = contactData || {};
 
   try {
-    // Build payload conditionally
+    await verifyRecaptcha(recaptchaToken);
+
+    const sanitizedPhone = sanitizePhoneNumber(phoneNumber);
+
     const payload = {
-      firstName,
-      lastName,
-      emailAddress,
-      subject,
-      remarks
+      firstName: firstName?.trim(),
+      lastName: lastName?.trim(),
+      emailAddress: emailAddress?.trim(),
+      subject: subject?.trim(),
+      remarks: remarks?.trim()
     };
 
-    // Only add phoneNumber if it exists and is not empty
-    if (phoneNumber && phoneNumber.trim()) {
-        if (phoneNumber.length > 11) {
-            throw new Error("Phone number cannot exceed 11 characters.");
-        }else if (phoneNumber.length < 11) {
-            throw new Error("Phone number must be at least 7 characters.");
-        }
-        else if (!/^\d+$/.test(phoneNumber)) {
-            throw new Error("Phone number must contain only digits.");
-        }
-        else{
-            payload.phoneNumber = phoneNumber;
-        }
+    if (sanitizedPhone) {
+      payload.phoneNumber = sanitizedPhone;
     }
 
     const contact = await ContactUs.create(payload);
 
+    await dispatchContactEmails(payload);
+
     return `Contact message with ID ${contact._id} successfully created.`;
   } catch (error) {
-    console.error("Error creating contact message:", error.message);
-    throw new Error(error);
+    console.error('Error creating contact message:', error?.message || error);
+    throw new Error(error?.message || 'Failed to create contact message.');
   }
-}
+};
 
 const getAllContacts = async (queryObject) => {
   try {
