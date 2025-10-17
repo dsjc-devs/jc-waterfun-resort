@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import Loadable from 'components/Loadable';
 import DashboardLayout from 'layout/Dashboard';
+import Carousel from 'api/carousel';
 
 
 // Lazy-loaded components
@@ -56,6 +57,7 @@ const Policies = Loadable(lazy(() => import('pages/portal/content-management/pol
 const PolicyForm = Loadable(lazy(() => import('pages/portal/content-management/policies/form')));
 const Gallery = Loadable(lazy(() => import('pages/portal/content-management/gallery')));
 const TestimonialsAdmin = Loadable(lazy(() => import('pages/portal/content-management/testimonials')));
+const CarouselAdmin = Loadable(lazy(() => import('pages/portal/content-management/carousel')));
 
 const MainRoutes = {
   path: '/',
@@ -169,6 +171,10 @@ const MainRoutes = {
             {
               path: 'testimonials',
               element: <TestimonialsAdmin />
+            },
+            {
+              path: 'carousel',
+              element: <CarouselAdmin />
             },
             {
               path: 'rates',

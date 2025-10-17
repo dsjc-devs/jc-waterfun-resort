@@ -1,10 +1,10 @@
-import { Box, Container, Typography, Grid, Card, CardContent, Avatar, Stack, Skeleton, Rating, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, Pagination } from '@mui/material';
-import { FormatQuote, ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
-import { useGetTestimonials } from 'api/testimonials';
-import { Link as RouterLink } from 'react-router-dom';
-
 import React, { useState } from 'react';
+import { Box, Container, Grid, Card, CardContent, Avatar, Typography, Stack, Skeleton, Rating, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, Pagination } from '@mui/material';
+import { FormatQuote, ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
 import Slider from 'react-slick';
+import { Link as RouterLink } from 'react-router-dom';
+import { useGetTestimonials } from 'api/testimonials';
+import EmptyUserCard from 'components/cards/skeleton/EmptyUserCard';
 import TitleTag from 'components/TitleTag2';
 
 const NextArrow = ({ onClick }) => (
@@ -66,7 +66,9 @@ const Testimonials = ({ isHomepage = true }) => {
   const totalPages = data?.totalPages || 1;
   const [selectedTestimonial, setSelectedTestimonial] = useState(null);
 
-  if (!isLoading && testimonials.length === 0) {
+  const hasNoData = !isLoading && testimonials.length === 0;
+
+  if (isHomepage && hasNoData) {
     return null;
   }
 
@@ -131,6 +133,12 @@ const Testimonials = ({ isHomepage = true }) => {
               </Grid>
             ))}
           </Grid>
+        ) : hasNoData ? (
+          isHomepage ? null : (
+            <Box sx={{ width: '100%' }}>
+              <EmptyUserCard title="No testimonials available yet." />
+            </Box>
+          )
         ) : isHomepage ? (
           canCarousel ? (
             <Box sx={{ position: 'relative' }}>

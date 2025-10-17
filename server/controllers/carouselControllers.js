@@ -4,24 +4,22 @@ import carouselServices from "../services/carouselServices.js";
 const createCarousel = expressAsync(async (req, res) => {
   try {
     const image = req.files && req.files['image'] ? req.files['image'][0].path : "";
-    const { title, subtitle } = req.body;
+    const { title = "", subtitle = "", isPosted } = req.body;
     
     if (!image) {
       return res.status(400).json({ message: "Image file is required" });
     }
 
-    if (!title) {
-      return res.status(400).json({ message: "Title is required" });
-    }
-
-    if (!subtitle) {
-      return res.status(400).json({ message: "Subtitle is required" });
-    }
+    const parsedIsPosted =
+      isPosted === undefined
+        ? undefined
+        : [true, 'true', '1', 'on', 'yes'].includes(isPosted);
 
     const payload = {
       image,
       title,
       subtitle,
+      ...(parsedIsPosted !== undefined && { isPosted: parsedIsPosted })
     };
 
     const response = await carouselServices.createCarousel(payload);
@@ -56,7 +54,12 @@ const updateCarouselById = expressAsync(async (req, res) => {
   try {
     const imageFile = req.files && req.files['image'] ? req.files['image'][0] : null;
     const image = imageFile ? imageFile.path : req.body.image;
-    const { title, subtitle } = req.body;
+    const { title, subtitle, isPosted } = req.body;
+
+    const parsedIsPosted =
+      isPosted === undefined
+        ? undefined
+        : [true, 'true', '1', 'on', 'yes'].includes(isPosted);
 
     const payload = {};
     if (image) {
@@ -67,6 +70,9 @@ const updateCarouselById = expressAsync(async (req, res) => {
     }
     if (subtitle !== undefined) {
       payload.subtitle = subtitle;
+    }
+    if (parsedIsPosted !== undefined) {
+      payload.isPosted = parsedIsPosted;
     }
 
     const response = await carouselServices.updateCarouselById(req.params.carouselId, payload);

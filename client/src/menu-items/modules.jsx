@@ -198,6 +198,15 @@ const getModules = ({ accommodations = [], amenities = [] }) => {
           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
         },
         {
+          id: 'carousel',
+          title: 'Carousel',
+          type: 'item',
+          url: '/portal/content-management/carousel',
+          icon: icons.ImageIcon,
+          breadcrumbs: false,
+          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
+        },
+        {
           id: 'accommodation-type',
           title: 'Accommodation Types',
           type: 'item',

@@ -55,6 +55,7 @@ const AboutUs = () => {
                                     marginBlock: 5,
                                 }}
                                 data-aos="fade-up"
+                                onClick={() => window.location.href = '/gallery'}
                             >
                                 View More Photos
                             </Button>

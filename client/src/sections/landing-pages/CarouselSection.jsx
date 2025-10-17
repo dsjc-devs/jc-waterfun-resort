@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import Carousel from 'react-material-ui-carousel'
 import banner from 'assets/images/upload/banner.jpg'
 import banner2 from 'assets/images/upload/banner2.jpg'
@@ -9,9 +9,10 @@ import banner6 from 'assets/images/upload/accom3.jpg'
 import banner7 from 'assets/images/upload/accom4.jpg'
 import banner8 from 'assets/images/upload/banner4.jpg'
 import { Box } from '@mui/material'
+import { useGetCarousels } from 'api/carousel'
 
 const CarouselSection = () => {
-  const items = [
+  const defaultSlides = [
     banner,
     banner2,
     banner3,
@@ -21,6 +22,17 @@ const CarouselSection = () => {
     banner7,
     banner8
   ]
+
+  const { data } = useGetCarousels({ page: 1, limit: 50 })
+  const uploadedSlides = useMemo(
+    () =>
+      (data?.carousels || [])
+        .filter((carousel) => carousel?.isPosted && carousel?.image)
+        .map((carousel) => carousel.image),
+    [data]
+  )
+
+  const items = uploadedSlides.length > 0 ? uploadedSlides : defaultSlides
 
   return (
     <Carousel

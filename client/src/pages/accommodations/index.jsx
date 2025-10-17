@@ -25,7 +25,8 @@ const Accommodations = () => {
     type,
     page,
     limit,
-    sort: "name"
+    sort: "name",
+    status: "POSTED"
   })
 
   const { accommodations = [], totalPages = 0, totalAccommodations } = data || {}
@@ -42,7 +43,7 @@ const Accommodations = () => {
 
   return (
     <React.Fragment>
-      <PageTitle title={`Accommodations - ${textFormatter.fromSlug(type)}`} />
+      <PageTitle title={`Accommodations `} />
 
       <Banner
         image={banner}

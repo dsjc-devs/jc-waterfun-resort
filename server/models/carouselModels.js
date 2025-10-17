@@ -7,11 +7,15 @@ const carouselSchema = new mongoose.Schema({
     },
     title: {
         type: String,
-        required: true,
+        default: '',
     },
     subtitle: {
         type: String,
-        required: true,
+        default: '',
+    },
+    isPosted: {
+        type: Boolean,
+        default: false,
     }
 }, { timestamps: true });
 

@@ -30,6 +30,7 @@ import useAuth from 'hooks/useAuth';
 import AnimateButton from 'components/@extended/AnimateButton';
 import LoadingButton from 'components/@extended/LoadingButton';
 import testimonialsApi from 'api/testimonials';
+import EmptyUserCard from 'components/cards/skeleton/EmptyUserCard';
 
 const validationSchema = Yup.object().shape({
   remarks: Yup.string().required('Message is required').min(20, 'Min 20 characters').max(500, 'Max 500 characters'),
@@ -167,14 +168,6 @@ const TestimonialsDetails = () => {
           </Button>
         </Stack>
 
-        {hasPendingTestimonials && (
-          <Box sx={{ p: 2, mb: 3, bgcolor: '#FFF9E6', borderLeft: '4px solid #FFA726' }}>
-            <Typography variant="body2" sx={{ color: '#8B6914' }}>
-              You have testimonial(s) pending approval. They will be visible once approved by staff.
-            </Typography>
-          </Box>
-        )}
-
         {isLoading ? (
           <Stack>{[1, 2, 3].map(i => (
             <Paper key={i} elevation={0} sx={{ p: 3, mb: 2, borderRadius: 2, bgcolor: '#fff' }}>
@@ -188,11 +181,9 @@ const TestimonialsDetails = () => {
             </Paper>))}
           </Stack>
         ) : testimonials.length === 0 ? (
-          <Paper elevation={0} sx={{ p: 6, textAlign: 'center', bgcolor: '#fff', borderRadius: 2 }}>
-            <Typography variant="h6" color="text.secondary" gutterBottom>No testimonials yet</Typography>
-            <Typography variant="body2" color="text.secondary" mb={3}>Be the first to share your experience.</Typography>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpen(true)}>Add Testimonial</Button>
-          </Paper>
+          <Stack spacing={3} alignItems="center">
+            <EmptyUserCard title="No testimonials yet. Be the first to share your experience." />
+          </Stack>
         ) : (
           <>
             <Box>{testimonials.map(renderCard)}</Box>

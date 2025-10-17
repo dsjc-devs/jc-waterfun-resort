@@ -11,6 +11,8 @@ import {
 import { useGetResortDetails } from 'api/resort-details';
 import { EnvironmentFilled, MailFilled, PhoneFilled } from '@ant-design/icons';
 import { useTheme } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
+import Hero from 'sections/landing-pages/Hero';
 
 import PageTitle from 'components/PageTitle';
 import MainCard from 'components/MainCard';
@@ -18,9 +20,11 @@ import Banner from 'components/Banner';
 import Logo from 'components/logo/LogoMain';
 import contactUs from 'assets/images/upload/contact-us-header.jpg';
 import MapSection from 'sections/landing-pages/MapSection';
+import contactUsCTA from 'assets/images/upload/contact-us-cta.jpg';
 
 const ContactUs = () => {
   const theme = useTheme()
+  const navigate = useNavigate()
 
   const { resortDetails } = useGetResortDetails()
   const { companyInfo } = resortDetails || {}
@@ -157,6 +161,26 @@ const ContactUs = () => {
             </Grid>
           </Grid>
         </Container>
+      </Box>
+       <Box sx={{ my: 8 }}>
+        <Hero
+          backgroundImage={contactUsCTA}
+          title="Start Your Paradise Journey Today"
+          subtitle="Make Your Dream Vacation a Reality"
+          caption="Let us help you plan your perfect stay at JC Waterfun Resort - where every moment becomes a cherished memory."
+          buttonConfigs={{
+            label: "Book Now",
+            action: () => navigate('/book-now'),
+            sx: {
+              background: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)',
+              color: '#ffffff',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: '0 8px 25px rgba(67,206,162,0.25)',
+              }
+            }
+          }}  
+        />
       </Box>
       <MapSection />
     </React.Fragment>
