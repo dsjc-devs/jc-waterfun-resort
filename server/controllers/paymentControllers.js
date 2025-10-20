@@ -144,10 +144,54 @@ const payWithMethod = expressAsync(async (req, res) => {
   }
 });
 
+const checkPaymentStatus = expressAsync(async (req, res) => {
+  const { paymentIntentId } = req.params;
+
+  if (!paymentIntentId) {
+    return res.status(400).json({
+      success: false,
+      message: 'paymentIntentId is required'
+    });
+  }
+
+  try {
+    const paymentRecord = await paymentServices.getPaymentByIntentId(paymentIntentId);
+
+    if (paymentRecord) {
+      return res.status(200).json({
+        success: true,
+        status: 'succeeded',
+        reservationId: paymentRecord.reservationId
+      });
+    }
+
+    const pendingBooking = await tempBookingServices.getTempBookingByPaymentIntent(paymentIntentId);
+
+    if (pendingBooking) {
+      return res.status(200).json({
+        success: true,
+        status: 'processing'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      status: 'failed'
+    });
+  } catch (error) {
+    console.error('Error checking payment status:', error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to verify payment status'
+    });
+  }
+});
+
 export {
   createPaymentIntent,
   payWithGCash,
   payWithMaya,
   payWithBankTransfer,
-  payWithMethod
+  payWithMethod,
+  checkPaymentStatus
 };

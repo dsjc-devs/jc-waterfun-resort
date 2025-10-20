@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -11,39 +11,103 @@ import {
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
+import agent from 'api';
 
 const PaymentResult = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [status, setStatus] = useState('processing');
   const [message, setMessage] = useState('Processing your payment...');
+  const pollTimerRef = useRef(null);
 
   useEffect(() => {
+    let isMounted = true;
+    const MAX_ATTEMPTS = 5;
+    const POLL_INTERVAL = 3000;
+    let attempts = 0;
+
     const urlParams = new URLSearchParams(location.search);
-    const paymentIntentId = urlParams.get('payment_intent');
+    const paymentIntentId = urlParams.get('payment_intent') || sessionStorage.getItem('paymentIntentId');
     const paymentStatus = urlParams.get('redirect_status');
 
-    if (paymentStatus === 'succeeded') {
-      setStatus('success');
-      setMessage('Payment successful! Your reservation has been confirmed.');
-    } else if (paymentStatus === 'failed') {
-      setStatus('failed');
-      setMessage('Payment failed. Please try again.');
-    } else {
-      const storedPaymentIntentId = sessionStorage.getItem('paymentIntentId');
+    const clearStoredIntent = () => {
+      sessionStorage.removeItem('paymentIntentId');
+    };
 
-      if (paymentIntentId || storedPaymentIntentId) {
-        setTimeout(() => {
-          setStatus('success');
-          setMessage('Payment successful! Your reservation has been confirmed.');
-          sessionStorage.removeItem('paymentIntentId');
-        }, 3000);
-      } else {
-        setStatus('failed');
-        setMessage('No payment information found.');
+    const finalize = (nextStatus, nextMessage) => {
+      if (!isMounted) {
+        return;
       }
+      setStatus(nextStatus);
+      setMessage(nextMessage);
+      clearStoredIntent();
+    };
+
+    if (paymentStatus === 'succeeded') {
+      finalize('success', 'Payment successful! Your reservation has been confirmed.');
+      return () => {
+        isMounted = false;
+      };
     }
-  }, [location]);
+
+    if (paymentStatus === 'failed') {
+      finalize('failed', 'Payment failed. Please try again.');
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    if (!paymentIntentId) {
+      finalize('failed', 'No payment information found.');
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    setStatus('processing');
+    setMessage('Verifying your payment. This may take a moment...');
+
+    const pollStatus = async () => {
+      attempts += 1;
+      try {
+        const response = await agent.Payments.checkPaymentStatus(paymentIntentId);
+        if (!isMounted) {
+          return;
+        }
+
+        const backendStatus = response?.status;
+
+        if (backendStatus === 'succeeded') {
+          finalize('success', 'Payment successful! Your reservation has been confirmed.');
+          return;
+        }
+
+        if (backendStatus === 'failed') {
+          finalize('failed', 'Payment failed or was cancelled. Please try again.');
+          return;
+        }
+
+        if (attempts >= MAX_ATTEMPTS) {
+          finalize('failed', 'We could not confirm your payment. Please contact support if you were charged.');
+          return;
+        }
+
+        pollTimerRef.current = setTimeout(pollStatus, POLL_INTERVAL);
+      } catch (error) {
+        finalize('failed', error.message || 'Unable to verify payment status. Please try again.');
+      }
+    };
+
+    pollStatus();
+
+    return () => {
+      isMounted = false;
+      if (pollTimerRef.current) {
+        clearTimeout(pollTimerRef.current);
+        pollTimerRef.current = null;
+      }
+    };
+  }, [location.search]);
 
   const handleGoHome = () => {
     navigate('/');
