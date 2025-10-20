@@ -227,12 +227,10 @@ const PaymentPage = ({
           sx={{ borderRadius: 2 }}
           loading={loading}
           disableElevation
-          disabled={
-            loading ||
-            !totalPaid ||
-            Number(totalPaid) < minPayable ||
-            Number(totalPaid) > maxPayable
-          }
+          // disabled={loading || !totalPaid ||
+          //   Number(totalPaid) < minPayable ||
+          //   Number(totalPaid) > maxPayable
+          // }
           loadingPosition="start"
           style={{ width: '150px' }}
         >
