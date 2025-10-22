@@ -4,10 +4,28 @@ import Users from '../models/usersModels.js';
 
 async function getDashboardStats() {
   try {
-    const totalReservations = 245;
-    const totalAccommodations = 50;
-    const totalStaff = 12;
-    const totalCustomers = 180;
+    const staffFilter = {
+      position: {
+        $elemMatch: {
+          value: { $ne: 'CUSTOMER' }
+        }
+      }
+    };
+
+    const customerFilter = {
+      position: {
+        $elemMatch: {
+          value: 'CUSTOMER'
+        }
+      }
+    };
+
+    const [totalReservations, totalAccommodations, totalStaff, totalCustomers] = await Promise.all([
+      Reservations.countDocuments(),
+      Accommodations.countDocuments(),
+      Users.countDocuments(staffFilter),
+      Users.countDocuments(customerFilter)
+    ]);
 
     return {
       success: true,
@@ -69,50 +87,92 @@ async function getCustomerDashboardStats(userId) {
 
 async function getDetailedDashboardStats() {
   try {
-    const basicStats = await getDashboardStats();
+    const [
+      basicStats,
+      reservationCounts,
+      occupancyRate,
+      staffAndCustomerStats,
+      financialStats,
+      usersByStatusAggregate,
+      customersByStatusAggregate,
+      staffByStatusAggregate
+    ] = await Promise.all([
+      getDashboardStats(),
+      getReservationCounts(),
+      getCurrentOccupancyRate(),
+      getStaffAndCustomerStats(),
+      getFinancialAnalytics(),
+      Users.aggregate([
+        {
+          $group: {
+            _id: '$status',
+            count: { $sum: 1 }
+          }
+        }
+      ]),
+      Users.aggregate([
+        {
+          $match: {
+            position: {
+              $elemMatch: {
+                value: 'CUSTOMER'
+              }
+            }
+          }
+        },
+        {
+          $group: {
+            _id: '$status',
+            count: { $sum: 1 }
+          }
+        }
+      ]),
+      Users.aggregate([
+        {
+          $match: {
+            position: {
+              $elemMatch: {
+                value: { $ne: 'CUSTOMER' }
+              }
+            }
+          }
+        },
+        {
+          $group: {
+            _id: '$status',
+            count: { $sum: 1 }
+          }
+        }
+      ])
+    ]);
 
-    const staticReservationsByStatus = {
-      'confirmed': 98,
-      'pending': 45,
-      'completed': 87,
-      'cancelled': 15
-    };
+    const toCountMap = (items) => items.reduce((acc, item) => {
+      if (!item) {
+        return acc;
+      }
+      const key = item._id || 'UNKNOWN';
+      acc[key] = item.count;
+      return acc;
+    }, {});
 
-    const staticStaffByPosition = {
-      'MASTER_ADMIN': 1,
-      'ADMIN': 3,
-      'RECEPTIONIST': 8
-    };
+    const staffByPosition = Object.entries(staffAndCustomerStats.staffMembers.byPosition || {})
+      .reduce((acc, [position, metrics]) => {
+        acc[position] = metrics.total || 0;
+        return acc;
+      }, {});
 
-    const staticOccupancyRate = {
-      currentOccupancy: 75,
-      totalCapacity: 100,
-      occupancyPercentage: 75,
-      availableRooms: 25,
-      occupiedRooms: 75
-    };
-
-    const staticRevenue = {
-      totalRevenue: 1250000,
-      monthlyRevenue: 185000,
-      dailyRevenue: 6200,
-      averageRevenuePerReservation: 2500,
+    const revenueSnapshot = financialStats?.data ? {
+      totalRevenue: financialStats.data.monthlyRevenue?.totalRevenue ?? 0,
+      monthlyRevenue: financialStats.data.monthlyRevenue?.earnings ?? 0,
+      dailyRevenue: financialStats.data.summary?.averageDailyRevenue ?? 0,
+      averageRevenuePerReservation: financialStats.data.summary?.averageRevenuePerReservation ?? 0,
+      currency: financialStats.data.summary?.currency || 'PHP'
+    } : {
+      totalRevenue: 0,
+      monthlyRevenue: 0,
+      dailyRevenue: 0,
+      averageRevenuePerReservation: 0,
       currency: 'PHP'
-    };
-
-    const staticUsersByStatus = {
-      'active': 165,
-      'inactive': 27
-    };
-
-    const staticCustomersByStatus = {
-      'active': 152,
-      'inactive': 28
-    };
-
-    const staticStaffByStatus = {
-      'active': 11,
-      'inactive': 1
     };
 
     return {
@@ -120,13 +180,16 @@ async function getDetailedDashboardStats() {
       data: {
         ...basicStats.data,
         breakdowns: {
-          reservationsByStatus: staticReservationsByStatus,
-          staffByPosition: staticStaffByPosition,
-          occupancyRate: staticOccupancyRate,
-          revenue: staticRevenue,
-          usersByStatus: staticUsersByStatus,
-          customersByStatus: staticCustomersByStatus,
-          staffByStatus: staticStaffByStatus
+          reservationsByStatus: reservationCounts.reservationsByStatus,
+          staffByPosition,
+          occupancyRate: {
+            overall: occupancyRate.overall,
+            byAccommodationType: occupancyRate.byAccommodationType
+          },
+          revenue: revenueSnapshot,
+          usersByStatus: toCountMap(usersByStatusAggregate),
+          customersByStatus: toCountMap(customersByStatusAggregate),
+          staffByStatus: toCountMap(staffByStatusAggregate)
         }
       }
     };
@@ -137,17 +200,34 @@ async function getDetailedDashboardStats() {
 
 async function getRecentActivityStats(days = 7) {
   try {
-    const staticRecentReservations = Math.max(1, Math.floor(days * 2.5));
-    const staticRecentUsers = Math.max(1, Math.floor(days * 1.2));
-    const staticRecentCustomers = Math.max(1, Math.floor(days * 1.0)); 
+    const periodStart = new Date();
+    periodStart.setHours(0, 0, 0, 0);
+    periodStart.setDate(periodStart.getDate() - (Math.max(days, 1) - 1));
+
+    const [recentReservations, recentUsers, recentCustomers] = await Promise.all([
+      Reservations.countDocuments({
+        createdAt: { $gte: periodStart }
+      }),
+      Users.countDocuments({
+        createdAt: { $gte: periodStart }
+      }),
+      Users.countDocuments({
+        createdAt: { $gte: periodStart },
+        position: {
+          $elemMatch: {
+            value: 'CUSTOMER'
+          }
+        }
+      })
+    ]);
 
     return {
       success: true,
       data: {
         period: `Last ${days} days`,
-        recentReservations: staticRecentReservations,
-        recentUsers: staticRecentUsers,
-        recentCustomers: staticRecentCustomers
+        recentReservations,
+        recentUsers,
+        recentCustomers
       }
     };
   } catch (error) {
@@ -158,23 +238,65 @@ async function getRecentActivityStats(days = 7) {
 async function getMonthlyStats() {
   try {
     const currentYear = new Date().getFullYear();
+    const startOfYear = new Date(currentYear, 0, 1);
+    const endOfYear = new Date(currentYear + 1, 0, 1);
 
     const monthNames = [
       'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
-    const staticMonthlyReservationsData = [18, 22, 28, 35, 42, 38, 45, 48, 40, 32, 25, 20];
-    const staticMonthlyUsersData = [12, 15, 18, 22, 28, 25, 30, 32, 28, 20, 16, 14];
+    const [monthlyReservationsAggregate, monthlyUsersAggregate] = await Promise.all([
+      Reservations.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: startOfYear, $lt: endOfYear }
+          }
+        },
+        {
+          $group: {
+            _id: { month: { $month: '$createdAt' } },
+            count: { $sum: 1 }
+          }
+        }
+      ]),
+      Users.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: startOfYear, $lt: endOfYear }
+          }
+        },
+        {
+          $group: {
+            _id: { month: { $month: '$createdAt' } },
+            count: { $sum: 1 }
+          }
+        }
+      ])
+    ]);
+
+    const reservationCountByMonth = monthlyReservationsAggregate.reduce((acc, item) => {
+      if (item?._id?.month) {
+        acc[item._id.month] = item.count;
+      }
+      return acc;
+    }, {});
+
+    const usersCountByMonth = monthlyUsersAggregate.reduce((acc, item) => {
+      if (item?._id?.month) {
+        acc[item._id.month] = item.count;
+      }
+      return acc;
+    }, {});
 
     const formattedReservations = monthNames.map((month, index) => ({
       month,
-      count: staticMonthlyReservationsData[index]
+      count: reservationCountByMonth[index + 1] || 0
     }));
 
     const formattedUsers = monthNames.map((month, index) => ({
       month,
-      count: staticMonthlyUsersData[index]
+      count: usersCountByMonth[index + 1] || 0
     }));
 
     return {
@@ -192,7 +314,7 @@ async function getMonthlyStats() {
 
 async function getReservationCounts() {
   const totalReservations = await Reservations.countDocuments();
-  
+
   const reservationsByStatus = await Reservations.aggregate([
     {
       $group: {
@@ -204,7 +326,7 @@ async function getReservationCounts() {
 
   const dateThreshold = new Date();
   dateThreshold.setDate(dateThreshold.getDate() - 7);
-  
+
   const recentReservations = await Reservations.countDocuments({
     createdAt: { $gte: dateThreshold }
   });
@@ -245,10 +367,10 @@ async function getWalkInReservationCounts() {
 
 async function getTimePeriodReservationCounts() {
   const now = new Date();
-  
+
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-  
+
   const todayReservations = await Reservations.countDocuments({
     createdAt: { $gte: startOfDay, $lt: endOfDay }
   });
@@ -258,24 +380,24 @@ async function getTimePeriodReservationCounts() {
   const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
   startOfWeek.setDate(now.getDate() - daysToMonday);
   startOfWeek.setHours(0, 0, 0, 0);
-  
+
   const endOfWeek = new Date(startOfWeek);
   endOfWeek.setDate(startOfWeek.getDate() + 7);
-  
+
   const thisWeekReservations = await Reservations.countDocuments({
     createdAt: { $gte: startOfWeek, $lt: endOfWeek }
   });
 
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-  
+
   const thisMonthReservations = await Reservations.countDocuments({
     createdAt: { $gte: startOfMonth, $lt: endOfMonth }
   });
 
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
-  
+
   const thisYearReservations = await Reservations.countDocuments({
     createdAt: { $gte: startOfYear, $lt: endOfYear }
   });
@@ -290,12 +412,12 @@ async function getTimePeriodReservationCounts() {
 
 async function getCurrentOccupancyRate() {
   const totalAccommodations = await Accommodations.countDocuments();
-  
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const endOfToday = new Date(today);
   endOfToday.setDate(today.getDate() + 1);
-  
+
   const currentlyOccupied = await Reservations.countDocuments({
     status: 'CONFIRMED',
     startDate: { $lte: today },
@@ -354,17 +476,17 @@ async function getCurrentOccupancyRate() {
       }
     }
   ]);
-  
+
   const occupancyByAccommodationType = accommodationsByType.map(typeInfo => {
     const occupiedInfo = occupancyByType.find(
       item => item.accommodationType === typeInfo.accommodationType
     );
-    
+
     const occupied = occupiedInfo ? occupiedInfo.occupiedCount : 0;
     const total = typeInfo.totalCount;
     const available = total - occupied;
     const occupancyPercentage = total > 0 ? Math.round((occupied / total) * 100) : 0;
-    
+
     return {
       accommodationType: typeInfo.accommodationType,
       totalCount: total,
@@ -398,7 +520,7 @@ async function getStaffAndCustomerStats() {
 
     // Process staff by position
     const positionBreakdown = {};
-    
+
     allStaff.forEach(user => {
       if (user.position && user.position.length > 0) {
         const primaryPosition = user.position[0].value;
@@ -473,10 +595,10 @@ async function getFinancialAnalytics(month = null, year = null) {
         $group: {
           _id: null,
           totalEarnings: { $sum: '$amount.totalPaid' },
-          totalPendingPayments: { 
-            $sum: { 
-              $subtract: ['$amount.total', '$amount.totalPaid'] 
-            } 
+          totalPendingPayments: {
+            $sum: {
+              $subtract: ['$amount.total', '$amount.totalPaid']
+            }
           },
           totalRevenue: { $sum: '$amount.total' },
           totalReservations: { $sum: 1 },
@@ -492,7 +614,7 @@ async function getFinancialAnalytics(month = null, year = null) {
           partiallyPaidReservations: {
             $sum: {
               $cond: [
-                { 
+                {
                   $and: [
                     { $gt: ['$amount.totalPaid', 0] },
                     { $lt: ['$amount.totalPaid', '$amount.total'] }
@@ -599,6 +721,30 @@ async function getAdminDashboardStats(financialMonth = null, financialYear = nul
     const occupancyRate = await getCurrentOccupancyRate();
     const staffAndCustomerStats = await getStaffAndCustomerStats();
     const financialStats = await getFinancialAnalytics(financialMonth, financialYear);
+    const defaultFinancialStatistics = {
+      month: null,
+      year: null,
+      monthName: '',
+      monthlyRevenue: {
+        earnings: 0,
+        pendingPayments: 0,
+        totalRevenue: 0
+      },
+      reservationStats: {
+        totalReservations: 0,
+        fullyPaidReservations: 0,
+        partiallyPaidReservations: 0,
+        unpaidReservations: 0
+      },
+      summary: {
+        totalEarningsThisMonth: 0,
+        averageDailyRevenue: 0,
+        averageRevenuePerReservation: 0,
+        pendingPayments: 0,
+        currency: 'PHP'
+      }
+    };
+    const financialStatistics = financialStats?.data || defaultFinancialStatistics;
 
     return {
       success: true,
@@ -616,7 +762,7 @@ async function getAdminDashboardStats(financialMonth = null, financialYear = nul
         recentWalkInReservations: walkInCounts.recentWalkInReservations,
         staffMembers: staffAndCustomerStats.staffMembers,
         totalCustomers: staffAndCustomerStats.totalCustomers,
-        financialStatistics: financialStats.data
+        financialStatistics
       }
     };
   } catch (error) {
@@ -667,12 +813,14 @@ async function getRoleBasedDashboardStats(role, userId = null, financialMonth = 
 }
 
 export default {
+  getDashboardStats,
   getCustomerDashboardStats,
   getReceptionistDashboardStats,
   getAdminDashboardStats,
   getRoleBasedDashboardStats,
   getStaffAndCustomerStats,
-  getFinancialAnalytics
+  getFinancialAnalytics,
+  getDetailedDashboardStats,
+  getRecentActivityStats,
+  getMonthlyStats
 };
-
-export { };
