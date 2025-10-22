@@ -6,6 +6,14 @@ const createResortDetails = expressAsync(async (req, res) => {
     const logo = req.files && req.files['logo'] ? req.files['logo'][0].path : "";
     const payload = { ...req.body };
 
+    if (payload.socials && typeof payload.socials === 'string') {
+      try {
+        payload.socials = JSON.parse(payload.socials);
+      } catch (parseError) {
+        return res.status(400).json({ message: "Invalid socials format. Must be a valid JSON array." });
+      }
+    }
+
     if (logo) {
       if (!payload.companyInfo) {
         payload.companyInfo = {};
@@ -42,6 +50,15 @@ const updateResortDetails = expressAsync(async (req, res) => {
       ...req.body,
       logo,
     };
+
+    // Parse socials if it's a string
+    if (payload.socials && typeof payload.socials === 'string') {
+      try {
+        payload.socials = JSON.parse(payload.socials);
+      } catch (parseError) {
+        return res.status(400).json({ message: "Invalid socials format. Must be a valid JSON array." });
+      }
+    }
 
     const response = await resortDetailsServices.updateResortDetails(payload);
     res.json(response);
