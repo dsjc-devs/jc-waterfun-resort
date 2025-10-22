@@ -42,6 +42,11 @@ const resortDetailsSchema = new mongoose.Schema(
       type: String,
       default: RESORT_DETAILS.companyHashtag
     },
+    socials: [{
+      title: { type: String, required: true },
+      link: { type: String, required: true },
+      _id: false
+    }]
   },
   { timestamps: true }
 );

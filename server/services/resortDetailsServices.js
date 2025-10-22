@@ -1,7 +1,7 @@
 import ResortDetails from '../models/resortDetailsModels.js';
 
 const createResortDetails = async (resortData) => {
-  const { aboutUs, companyInfo, companyHashtag } = resortData || {};
+  const { aboutUs, companyInfo, companyHashtag, socials } = resortData || {};
 
   try {
     const existingResort = await ResortDetails.findOne();
@@ -50,6 +50,13 @@ const createResortDetails = async (resortData) => {
       payload.companyHashtag = companyHashtag;
     }
 
+    if (socials && Array.isArray(socials)) {
+      payload.socials = socials.map(social => ({
+        title: social.title,
+        link: social.link
+      }));
+    }
+
     const resort = await ResortDetails.create(payload);
 
     return `Resort details with ID ${resort._id} successfully created.`;
@@ -75,6 +82,10 @@ const updateResortDetails = async (updateData) => {
       updateData.address = JSON.parse(updateData.address);
     }
 
+    if (typeof updateData.socials === 'string') {
+      updateData.socials = JSON.parse(updateData.socials);
+    }
+
     const updatePayload = {
       'companyInfo.name': updateData.name,
       'companyInfo.emailAddress': updateData.emailAddress,
@@ -90,6 +101,13 @@ const updateResortDetails = async (updateData) => {
       'aboutUs.goals': updateData.goals,
       'companyHashtag': updateData.companyHashtag,
     };
+
+    if (updateData.socials && Array.isArray(updateData.socials)) {
+      updatePayload.socials = updateData.socials.map(social => ({
+        title: social.title,
+        link: social.link
+      }));
+    }
 
     Object.keys(updatePayload).forEach(key => {
       if (updatePayload[key] === undefined) {

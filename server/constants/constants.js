@@ -61,23 +61,29 @@ const USER_STATUSSES = ["ACTIVE", "INACTIVE", "ARCHIVED", "BANNED"]
 
 const RESORT_DETAILS = {
   aboutUs: {
-    mission: "To provide exceptional water recreation experiences while promoting family fun, safety, and environmental stewardship.",
-    vision: "To be the premier water resort destination known for innovation, sustainability, and unforgettable memories.",
-    goals: "Creating magical moments for families, maintaining world-class safety standards, and building a sustainable future for water recreation."
+    mission: "Our mission is to provide families and guests with memorable experiences by combining quality facilities with a smooth and reliable reservation process. We strive to create a welcoming environment where every visitor feels valued and cared for.",
+    vision: "Our vision is to become a trusted destination for fun, relaxation, and convenience, supported by modern digital solutions that make planning and booking effortless. We aim to be recognized as a resort that grows with the needs of our guests.",
+    goals: "Our goal is to make every visit enjoyable by ensuring efficient booking, excellent customer service, and continuous improvement of our amenities. We are dedicated to offering a resort experience that leaves lasting impressions on every guest."
   },
   companyInfo: {
     logo: "/images/jc-waterfun-logo.png",
-    name: "JC Waterfun Resort",
-    emailAddress: "info@jcwaterfun.com",
-    phoneNumber: "09123456789",
+    name: "John Cezar Waterfun Resort",
+    emailAddress: "johncezar.waterfun@gmail.com",
+    phoneNumber: "09171224128",
     address: {
-      streetAddress: "Langkaan",
-      city: "Dasmarinas City",
+      streetAddress: "Rotonda Phase 3 Valle Verde Brgy Langkaan 2",
+      city: "Dasmarinas",
       province: "Cavite",
       country: "Philippines"
     }
   },
-  companyHashtag: "#JCWaterfun"
+  companyHashtag: "#WatermazingExperience",
+  socials: [
+    {
+      title: "Facebook",
+      link: "https://www.facebook.com/johncezarwaterfunresort/"
+    }
+  ]
 }
 
 const NO_CATEGORY = "No Category"
