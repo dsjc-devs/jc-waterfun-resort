@@ -53,6 +53,15 @@ const Payments = {
       throw new Error(error?.response?.data?.error);
     }
   },
+  checkPaymentStatus: async (paymentIntentId) => {
+    try {
+      const response = await axiosServices.get(`/${endpoints.key}/status/${paymentIntentId}`);
+      return response?.data;
+    } catch (error) {
+      const message = error?.response?.data?.message || 'Failed to verify payment status.';
+      throw new Error(message);
+    }
+  }
 }
 
 export default {

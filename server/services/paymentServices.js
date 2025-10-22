@@ -186,6 +186,20 @@ const createPaymentDB = async (paymentData) => {
   }
 }
 
+const getPaymentByIntentId = async (paymentIntentId) => {
+  try {
+    if (!paymentIntentId) {
+      return null;
+    }
+
+    const payment = await Payment.findOne({ paymentIntentId });
+    return payment;
+  } catch (error) {
+    console.error("Error fetching payment record:", error.message);
+    throw new Error("Failed to retrieve payment record");
+  }
+};
+
 export default {
   createPaymentIntent,
   createGCashPaymentMethod,
@@ -193,5 +207,6 @@ export default {
   createBankTransferPaymentMethod,
   createPaymentMethod,
   attachPaymentMethod,
-  createPaymentDB
+  createPaymentDB,
+  getPaymentByIntentId
 };
