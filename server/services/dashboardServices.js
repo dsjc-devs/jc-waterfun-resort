@@ -420,19 +420,19 @@ async function getCurrentOccupancyRate() {
 
   const currentlyOccupied = await Reservations.countDocuments({
     status: 'CONFIRMED',
-    startDate: { $lte: today },
-    endDate: { $gte: endOfToday }
+    startDate: { $lt: endOfToday },
+    endDate: { $gt: today }
   });
 
   const availableRooms = Math.max(0, totalAccommodations - currentlyOccupied);
-  const occupancyPercentage = totalAccommodations > 0 ? Math.round((currentlyOccupied / totalAccommodations) * 100) : 0;
+  const occupancyPercentage = totalAccommodations > 0 ? Math.round((currentlyOccupied / totalAccommodations) * 100 * 100) / 100 : 0;
 
   const occupancyByType = await Reservations.aggregate([
     {
       $match: {
         status: 'CONFIRMED',
-        startDate: { $lte: today },
-        endDate: { $gte: endOfToday }
+        startDate: { $lt: endOfToday },
+        endDate: { $gt: today }
       }
     },
     {
@@ -485,7 +485,7 @@ async function getCurrentOccupancyRate() {
     const occupied = occupiedInfo ? occupiedInfo.occupiedCount : 0;
     const total = typeInfo.totalCount;
     const available = total - occupied;
-    const occupancyPercentage = total > 0 ? Math.round((occupied / total) * 100) : 0;
+    const occupancyPercentage = total > 0 ? Math.round((occupied / total) * 100 * 100) / 100 : 0;
 
     return {
       accommodationType: typeInfo.accommodationType,
@@ -510,7 +510,6 @@ async function getCurrentOccupancyRate() {
 
 async function getStaffAndCustomerStats() {
   try {
-    // Simple approach - get all non-customer users first
     const allStaff = await Users.find({
       'position.value': { $ne: 'CUSTOMER' }
     }, { position: 1, status: 1 });
@@ -518,7 +517,6 @@ async function getStaffAndCustomerStats() {
     const totalStaff = allStaff.length;
     const activeStaff = allStaff.filter(user => user.status === 'ACTIVE').length;
 
-    // Process staff by position
     const positionBreakdown = {};
 
     allStaff.forEach(user => {
@@ -578,12 +576,10 @@ async function getFinancialAnalytics(month = null, year = null) {
     const targetMonth = month ? month - 1 : currentDate.getMonth(); // month - 1 because JS months are 0-indexed
     const targetYear = year || currentDate.getFullYear();
 
-    // Get start and end of the specified month
     const startOfMonth = new Date(targetYear, targetMonth, 1);
     const endOfMonth = new Date(targetYear, targetMonth + 1, 0);
     const daysInMonth = endOfMonth.getDate();
 
-    // Get aggregated payments for the entire month
     const monthlyPayments = await Reservations.aggregate([
       {
         $match: {
@@ -638,7 +634,6 @@ async function getFinancialAnalytics(month = null, year = null) {
       }
     ]);
 
-    // Extract data from aggregation result
     const monthData = monthlyPayments[0] || {
       totalEarnings: 0,
       totalPendingPayments: 0,
@@ -657,7 +652,7 @@ async function getFinancialAnalytics(month = null, year = null) {
     return {
       success: true,
       data: {
-        month: targetMonth + 1, // Convert back to 1-indexed
+        month: targetMonth + 1,
         year: targetYear,
         monthName: new Date(targetYear, targetMonth, 1).toLocaleString('default', { month: 'long' }),
         monthlyRevenue: {
