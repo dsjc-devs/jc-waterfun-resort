@@ -1,17 +1,22 @@
 import { Box, Container } from '@mui/material'
 import { useGetMarketingMaterials } from 'api/marketing-materials'
+import { useNavigate } from 'react-router'
 
 import Banner from 'components/Banner'
 import PageTitle from 'components/PageTitle'
 import React from 'react'
 import ArticleList from 'sections/dynamic-pages/ArticleList'
 import banner from 'assets/images/upload/faqs-header.jpg'
+import Hero from 'sections/landing-pages/Hero'
+import bgImg from "assets/images/upload/our-mission.jpg";
+
 
 const Articles = () => {
   const { data, isLoading } = useGetMarketingMaterials({ status: "POSTED" })
   const articles = data?.marketingMaterials || []
 
-  console.log(data);
+  const navigate = useNavigate()
+
 
   return (
     <React.Fragment>
@@ -28,6 +33,16 @@ const Articles = () => {
           <ArticleList articles={articles} isOnPortal={false} />
         </Box>
       </Container>
+
+      <Hero
+        backgroundImage={bgImg}
+        buttonConfigs={{
+          label: "Book Now",
+          action: () => {
+            navigate('/book-now')
+          }
+        }}
+      />
     </React.Fragment>
   )
 }
