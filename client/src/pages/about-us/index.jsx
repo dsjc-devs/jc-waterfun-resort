@@ -12,6 +12,8 @@ import FlagIcon from '@mui/icons-material/Flag'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import Hero from 'sections/landing-pages/Hero'
+import MapSection from 'sections/landing-pages/MapSection'
+import FAQs from 'sections/landing-pages/FAQs'
 
 const AboutUs = () => {
   const navigate = useNavigate()
@@ -177,12 +179,12 @@ const AboutUs = () => {
                   zIndex: 2
                 }}
               >
-                <FlagIcon 
-                  sx={{ 
-                    fontSize: '2rem', 
+                <FlagIcon
+                  sx={{
+                    fontSize: '2rem',
                     color: '#43cea2',
                     mb: 1.5
-                  }} 
+                  }}
                 />
                 <Typography
                   variant="h3"
@@ -199,11 +201,11 @@ const AboutUs = () => {
                   Our Mission
                 </Typography>
                 <Box sx={{ width: 64, height: 6, bgcolor: 'primary.main', borderRadius: 3, mb: 2, opacity: 0.95 }} />
-                <Typography 
-                  variant="body1" 
-                  sx={{ 
-                    color: '#111', 
-                    fontSize: { xs: "1rem", md: "1.1rem" }, 
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: '#111',
+                    fontSize: { xs: "1rem", md: "1.1rem" },
                     lineHeight: 1.8,
                     fontWeight: 600,
                     letterSpacing: '0.4px',
@@ -353,12 +355,12 @@ const AboutUs = () => {
                   zIndex: 2
                 }}
               >
-                <VisibilityIcon 
-                  sx={{ 
-                    fontSize: '2rem', 
+                <VisibilityIcon
+                  sx={{
+                    fontSize: '2rem',
                     color: '#185a9d',
                     mb: 1.5
-                  }} 
+                  }}
                 />
                 <Typography
                   variant="h3"
@@ -375,11 +377,11 @@ const AboutUs = () => {
                   Our Vision
                 </Typography>
                 <Box sx={{ width: 64, height: 6, bgcolor: 'primary.main', borderRadius: 3, mb: 2, opacity: 0.95 }} />
-                <Typography 
-                  variant="body1" 
-                  sx={{ 
-                    color: '#111', 
-                    fontSize: { xs: "1rem", md: "1.1rem" }, 
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: '#111',
+                    fontSize: { xs: "1rem", md: "1.1rem" },
                     lineHeight: 1.8,
                     fontWeight: 600,
                     letterSpacing: '0.4px'
@@ -538,12 +540,12 @@ const AboutUs = () => {
                   zIndex: 2
                 }}
               >
-                <EmojiEventsIcon 
-                  sx={{ 
-                    fontSize: '2rem', 
+                <EmojiEventsIcon
+                  sx={{
+                    fontSize: '2rem',
                     color: '#43cea2',
                     mb: 1.5
-                  }} 
+                  }}
                 />
                 <Typography
                   variant="h3"
@@ -560,11 +562,11 @@ const AboutUs = () => {
                   Our Goals
                 </Typography>
                 <Box sx={{ width: 64, height: 6, bgcolor: 'primary.main', borderRadius: 3, mb: 2, opacity: 0.95 }} />
-                <Typography 
-                  variant="body1" 
-                  sx={{ 
-                    color: '#111', 
-                    fontSize: { xs: "1rem", md: "1.1rem" }, 
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: '#111',
+                    fontSize: { xs: "1rem", md: "1.1rem" },
                     lineHeight: 1.8,
                     fontWeight: 600,
                     letterSpacing: '0.4px'
@@ -598,6 +600,9 @@ const AboutUs = () => {
           }}
         />
       </Box>
+
+      <MapSection />
+      <FAQs />
     </React.Fragment>
   )
 }

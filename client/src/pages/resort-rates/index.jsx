@@ -18,6 +18,8 @@ import React from 'react';
 import TitleTag2 from 'components/TitleTag2';
 import RateSection from 'sections/landing-pages/RateSection';
 import { useGetResortDetails } from 'api/resort-details';
+import FAQs from 'sections/landing-pages/FAQs';
+import MapSection from 'sections/landing-pages/MapSection';
 
 const ResortRates = () => {
   const { isLoading } = useGetResortRates();
@@ -526,6 +528,9 @@ const ResortRates = () => {
           </Card>
         </Container>
       </Box>
+
+      <MapSection />
+      <FAQs />
     </React.Fragment>
   );
 };
