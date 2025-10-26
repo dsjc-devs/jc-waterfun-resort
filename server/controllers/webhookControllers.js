@@ -1,15 +1,16 @@
 import expressAsync from 'express-async-handler';
-import crypto from 'crypto';
 import reservationServices from '../services/reservationServices.js';
 import paymentServices from '../services/paymentServices.js';
 import tempBookingServices from '../services/tempBookingServices.js';
 
 const handlePaymongoWebhook = expressAsync(async (req, res) => {
   try {
-    const signature = req.headers['paymongo-signature'];
-    const body = req.body;
+    const maybeRaw = req.body;
+    const body = Buffer.isBuffer(maybeRaw)
+      ? JSON.parse(maybeRaw.toString('utf8'))
+      : maybeRaw;
 
-    console.log('Webhook received:', body);
+    console.log('Webhook received. Parsed body type:', typeof body);
 
     const { data } = body;
     const eventType = data.attributes.type;
