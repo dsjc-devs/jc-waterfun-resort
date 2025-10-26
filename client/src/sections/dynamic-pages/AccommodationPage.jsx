@@ -45,7 +45,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const { isLoggedIn } = useAuth()
 
   const { data: blockedDates = [] } = useGetBlockedDates()
-  const { data: reservationData } = useGetReservations({ accommodationId: "68ac20f35d77b5085f81fd8d" })
+  const { data: reservationData } = useGetReservations(isOnPortal ? { accommodationId: data?._id } : {})
   const { reservations = [] } = reservationData || {}
 
   const bookedRanges = blockedDates?.filter((f) => f.accommodationId === data?._id)?.map((d) => ({

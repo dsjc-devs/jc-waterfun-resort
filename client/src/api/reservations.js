@@ -10,7 +10,7 @@ export const endpoints = {
 
 export const useGetReservations = (queryObj = {}) => {
   const queryParams = new URLSearchParams(queryObj).toString();
-  const apiURL = `/${endpoints.key}?${queryParams}`;
+  const apiURL = queryParams && `/${endpoints.key}?${queryParams}`;
 
   const { data, isLoading, error, mutate } = useSWR(apiURL, fetcher, OPTIONS);
 
