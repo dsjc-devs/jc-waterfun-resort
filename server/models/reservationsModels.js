@@ -65,6 +65,21 @@ const reservationSchema = new mongoose.Schema(
       type: String,
       enum: ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED", "RESCHEDULED", "ARCHIVED"],
     },
+    rescheduleRequest: {
+      oldStartDate: { type: Date },
+      oldEndDate: { type: Date },
+      newStartDate: { type: Date },
+      newEndDate: { type: Date },
+      status: {
+        type: String,
+        enum: ["PENDING", "APPROVED", "REJECTED"],
+      },
+      requestedBy: { type: String },
+      requestedAt: { type: Date },
+      decidedBy: { type: String },
+      decidedAt: { type: Date },
+      reason: { type: String },
+    },
     isWalkIn: {
       type: Boolean,
       default: false

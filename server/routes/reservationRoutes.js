@@ -3,7 +3,9 @@ import {
   getReservationsByQuery,
   getSingleReservationById,
   updateReservationById,
-  deleteReservationById
+  deleteReservationById,
+  requestReschedule,
+  decideReschedule
 } from '../controllers/reservationControllers.js';
 import { createReservationValidator } from '../middleware/validations/reservationValidator.js';
 import { protect } from '../middleware/authMiddleware.js'
@@ -17,5 +19,9 @@ router.get('/', protect, getReservationsByQuery);
 router.get('/:id', protect, getSingleReservationById);
 router.patch('/:id', protect, updateReservationById);
 router.delete('/:id', protect, deleteReservationById);
+
+// Reschedule routes
+router.post('/:id/reschedule', protect, requestReschedule);
+router.patch('/:id/reschedule', protect, decideReschedule);
 
 export default router;

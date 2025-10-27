@@ -35,6 +35,24 @@ const createPaymentIntent = async (data) => {
   }
 };
 
+// Retrieve a payment intent from PayMongo (used for webhook fallback)
+const getPaymentIntent = async (paymentIntentId) => {
+  try {
+    if (!paymentIntentId) {
+      throw new Error('paymentIntentId is required');
+    }
+
+    const response = await axios.get(
+      `https://api.paymongo.com/v1/payment_intents/${paymentIntentId}`,
+      { headers: authHeader() }
+    );
+
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.errors?.[0]?.detail || error.message || 'Failed to retrieve payment intent');
+  }
+};
+
 const createGCashPaymentMethod = async (data) => {
   const { name, email, phone, returnUrl } = data;
 
@@ -208,5 +226,6 @@ export default {
   createPaymentMethod,
   attachPaymentMethod,
   createPaymentDB,
-  getPaymentByIntentId
+  getPaymentByIntentId,
+  getPaymentIntent
 };

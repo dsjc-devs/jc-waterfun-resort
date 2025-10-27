@@ -18,7 +18,9 @@ const PaymentResult = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState('processing');
   const [message, setMessage] = useState('Processing your payment...');
+  const [reservationId, setReservationId] = useState(null);
   const pollTimerRef = useRef(null);
+  const [countdown, setCountdown] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -27,7 +29,12 @@ const PaymentResult = () => {
     let attempts = 0;
 
     const urlParams = new URLSearchParams(location.search);
-    const paymentIntentId = urlParams.get('payment_intent') || sessionStorage.getItem('paymentIntentId');
+    // PayMongo returns payment_intent_id (and sometimes payment_intent)
+    const intentFromUrl =
+      urlParams.get('payment_intent_id') ||
+      urlParams.get('payment_intent') ||
+      urlParams.get('pi');
+    const paymentIntentId = intentFromUrl || sessionStorage.getItem('paymentIntentId');
     const paymentStatus = urlParams.get('redirect_status');
 
     const clearStoredIntent = () => {
@@ -76,8 +83,13 @@ const PaymentResult = () => {
         }
 
         const backendStatus = response?.status;
+        const backendReservationId = response?.reservationId;
 
         if (backendStatus === 'succeeded') {
+          if (backendReservationId) {
+            setReservationId(backendReservationId);
+            setCountdown(5); // Start countdown for auto-redirect
+          }
           finalize('success', 'Payment successful! Your reservation has been confirmed.');
           return;
         }
@@ -114,8 +126,38 @@ const PaymentResult = () => {
   };
 
   const handleViewReservations = () => {
-    navigate('/portal/reservations');
+    if (reservationId) {
+      navigate(`/portal/reservations/details/${reservationId}`);
+    } else {
+      navigate('/portal/reservations');
+    }
   };
+
+  // Auto-redirect to reservation details when successful (with a short countdown)
+  useEffect(() => {
+    let intervalId = null;
+    if (status === 'success' && reservationId && countdown === null) {
+      setCountdown(5);
+    }
+
+    if (countdown !== null) {
+      intervalId = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev === null) return null;
+          if (prev <= 1) {
+            clearInterval(intervalId);
+            navigate(`/portal/reservations/details/${reservationId}`);
+            return null;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [status, reservationId, countdown, navigate]);
 
   const renderContent = () => {
     switch (status) {
@@ -142,10 +184,27 @@ const PaymentResult = () => {
             <Typography variant="body1" sx={{ mb: 3 }}>
               {message}
             </Typography>
+            {reservationId && (
+              <>
+                <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                  Reservation ID: <strong>{reservationId}</strong>
+                </Typography>
+                {countdown !== null && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    Redirecting to your reservation in {countdown}s...
+                  </Typography>
+                )}
+              </>
+            )}
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
               <Button variant="contained" onClick={handleViewReservations}>
-                View My Reservations
+                {reservationId ? 'View Reservation' : 'View My Reservations'}
               </Button>
+              {countdown !== null && (
+                <Button variant="text" onClick={() => setCountdown(null)}>
+                  Stay on this page
+                </Button>
+              )}
               <Button variant="outlined" onClick={handleGoHome}>
                 Go to Homepage
               </Button>

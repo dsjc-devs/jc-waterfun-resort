@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { useGetReservations } from 'api/reservations';
+import reservationsApi, { useGetReservations } from 'api/reservations';
 import {
   Box,
   Button,
@@ -45,21 +45,25 @@ import IconButton from 'components/@extended/IconButton';
 import useGetPosition from 'hooks/useGetPosition';
 import AnimateButton from 'components/@extended/AnimateButton';
 import textFormatter from 'utils/textFormatter';
+import ConfirmationDialog from 'components/ConfirmationDialog';
+import { toast } from 'react-toastify';
 
 const ReservationsTable = () => {
   const theme = useTheme()
   const { user } = useAuth()
   const { isCustomer, isAdmin, isMasterAdmin } = useGetPosition()
 
-  const { data = {}, isLoading } = useGetReservations(isCustomer ? { userId: user?.userId } : {})
+  const { data = {}, isLoading, mutate } = useGetReservations(isCustomer ? { userId: user?.userId } : {})
   const { reservations = [] } = data || {}
 
   const [openMenu, setOpenMenu] = useState({ anchorEl: null, reservationId: '' })
+  const [selectedReservationId, setSelectedReservationId] = useState('')
   const [showFilters, setShowFilters] = useState(false)
 
   const [filters, setFilters] = useState({
     status: '',
     paymentStatus: '',
+    rescheduleStatus: '',
     startDate: '',
     endDate: '',
     customer: '',
@@ -73,10 +77,38 @@ const ReservationsTable = () => {
 
   const handleMenuClick = (event, reservationId) => {
     setOpenMenu({ anchorEl: event.currentTarget, reservationId })
+    setSelectedReservationId(reservationId)
   }
 
   const handleMenuClose = () => {
     setOpenMenu({ anchorEl: null, reservationId: '' })
+  }
+
+  const [isMarkingPaid, setIsMarkingPaid] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+
+  const handleMarkFullyPaid = async () => {
+    try {
+      const row = reservations.find(r => r.reservationId === selectedReservationId)
+      if (!row) return
+      const alreadyFull = (row?.amount?.totalPaid || 0) >= (row?.amount?.total || 0)
+      if (alreadyFull) {
+        setConfirmOpen(false)
+        return handleMenuClose()
+      }
+      setIsMarkingPaid(true)
+      const newAmount = { ...(row.amount || {}), totalPaid: row?.amount?.total || 0 }
+      await reservationsApi.Reservations.editReservation(row.reservationId, { amount: newAmount })
+      await mutate()
+      toast.success('Marked as fully paid.')
+    } catch (e) {
+      console.error('Failed to mark as fully paid:', e)
+      toast.error(e?.message || 'Failed to mark as fully paid.')
+    } finally {
+      setIsMarkingPaid(false)
+      setConfirmOpen(false)
+      handleMenuClose()
+    }
   }
 
   const handleFilterChange = (field, value) => {
@@ -87,6 +119,7 @@ const ReservationsTable = () => {
     setFilters({
       status: '',
       paymentStatus: '',
+      rescheduleStatus: '',
       startDate: '',
       endDate: '',
       customer: '',
@@ -101,8 +134,9 @@ const ReservationsTable = () => {
     const statuses = [...new Set(reservations.map(r => r.status))].filter(Boolean)
     const accommodationTypes = [...new Set(reservations.map(r => r.accommodationData?.name))].filter(Boolean)
     const customers = [...new Set(reservations.map(r => `${r.userData?.firstName} ${r.userData?.lastName}`))].filter(Boolean)
+    const rescheduleStatuses = [...new Set(reservations.map(r => r?.rescheduleRequest?.status || 'NONE'))]
 
-    return { statuses, accommodationTypes, customers }
+    return { statuses, accommodationTypes, customers, rescheduleStatuses }
   }, [reservations])
 
   const filteredReservations = useMemo(() => {
@@ -121,6 +155,11 @@ const ReservationsTable = () => {
       }
 
       if (filters.accommodationType && reservation.accommodationData?.name !== filters.accommodationType) return false
+
+      if (filters.rescheduleStatus) {
+        const current = reservation?.rescheduleRequest?.status || 'NONE'
+        if (current !== filters.rescheduleStatus) return false
+      }
 
       if (filters.minAmount && reservation.amount?.total < parseFloat(filters.minAmount)) return false
       if (filters.maxAmount && reservation.amount?.total > parseFloat(filters.maxAmount)) return false
@@ -317,6 +356,23 @@ const ReservationsTable = () => {
       }
     };
 
+    const rescheduleColumn = {
+      id: 'reschedule',
+      label: 'Reschedule',
+      align: 'center',
+      renderCell: (row) => {
+        const status = row?.rescheduleRequest?.status || 'NONE'
+        const label = status === 'NONE' ? 'None' : titleCase(status)
+        const color = {
+          PENDING: 'warning',
+          APPROVED: 'success',
+          REJECTED: 'error',
+          NONE: 'default'
+        }[status] || 'default'
+        return <Chip size='small' label={label} color={color} />
+      }
+    }
+
     const actionsColumn = {
       id: 'actions',
       align: 'center',
@@ -350,9 +406,9 @@ const ReservationsTable = () => {
     }
 
     if (isCustomer) {
-      return [reservationColumn, reservationDatesColumn, dateCreatedColumn, guestsColumns, statusColumn, financialsColumn, actionsColumn];
+      return [reservationColumn, reservationDatesColumn, dateCreatedColumn, guestsColumns, statusColumn, rescheduleColumn, financialsColumn, actionsColumn];
     } else {
-      return [reservationColumn, customerColumn, reservationDatesColumn, dateCreatedColumn, guestsColumns, statusColumn, financialsColumn, actionsColumn];
+      return [reservationColumn, customerColumn, reservationDatesColumn, dateCreatedColumn, guestsColumns, statusColumn, rescheduleColumn, financialsColumn, actionsColumn];
     }
   }, [isCustomer]);
 
@@ -487,6 +543,33 @@ const ReservationsTable = () => {
                     <MenuItem value="UNPAID">
                       <Chip size="small" label="Unpaid" color="error" />
                     </MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Reschedule</InputLabel>
+                  <Select
+                    value={filters.rescheduleStatus}
+                    label="Reschedule"
+                    onChange={(e) => handleFilterChange('rescheduleStatus', e.target.value)}
+                    sx={{ borderRadius: 2 }}
+                  >
+                    <MenuItem value="">All</MenuItem>
+                    {filterOptions.rescheduleStatuses.map(status => (
+                      <MenuItem key={status} value={status}>
+                        {status === 'NONE' ? (
+                          <Chip size="small" label="None" variant="outlined" />
+                        ) : (
+                          <Chip
+                            size="small"
+                            label={titleCase(status)}
+                            color={{ PENDING: 'warning', APPROVED: 'success', REJECTED: 'error' }[status] || 'default'}
+                          />
+                        )}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>
@@ -645,6 +728,7 @@ const ReservationsTable = () => {
           "userData.emailAddress",
           "accommodationData.name",
           "status",
+          "rescheduleRequest.status",
         ]}
         itemsPerPage={5}
         columns={columns}
@@ -696,7 +780,26 @@ const ReservationsTable = () => {
             Edit
           </MenuItem>
         )}
+
+        {(isAdmin || isMasterAdmin) && (() => {
+          const row = reservations.find(r => r.reservationId === openMenu.reservationId)
+          const canMark = row && (row?.amount?.totalPaid || 0) < (row?.amount?.total || 0)
+          return canMark ? (
+            <MenuItem onClick={() => { setConfirmOpen(true); }} disabled={isMarkingPaid}>
+              <DollarOutlined style={{ marginRight: 8 }} />
+              Mark as Fully Paid
+            </MenuItem>
+          ) : null
+        })()}
       </Menu>
+
+      <ConfirmationDialog
+        open={confirmOpen}
+        handleClose={() => setConfirmOpen(false)}
+        title="Mark as Fully Paid"
+        description={`Are you sure you want to mark reservation #${selectedReservationId} as fully paid? This will set Total Paid equal to Total.`}
+        handleConfirm={handleMarkFullyPaid}
+      />
 
     </React.Fragment>
   )

@@ -23,7 +23,7 @@ import titleCase from 'utils/titleCaseFormatter'
 const Details = ({ mutate }) => {
   const queryParams = new URLSearchParams(window.location.search)
   const userId = queryParams.get("userId")
-  const isEditMode = queryParams.get('isEditMode')
+  const isEditModeQuery = queryParams.get('isEditMode') === 'true'
 
   const { user: loggedInUser } = useAuth()
   const { user: viewUser, isLoading, mutate: userMutate } = useGetSingleUser(userId) ?? {}
@@ -91,11 +91,37 @@ const Details = ({ mutate }) => {
     status
   } = viewUser || {}
 
+  // ----- Permission logic (align with Table.jsx) -----
+  const currentRole = loggedInUser?.position?.[0]?.value
+  const targetRole = viewUser?.position?.[0]?.value
+  const isSameUser = loggedInUser?.userId && viewUser?.userId && (loggedInUser.userId === viewUser.userId)
+  const isTargetMasterAdmin = targetRole === USER_ROLES.MASTER_ADMIN.value
+  const isSameRole = !!targetRole && !!currentRole && targetRole === currentRole
+
+  const roleCanManage = currentRole === USER_ROLES.MASTER_ADMIN.value || currentRole === USER_ROLES.ADMIN.value
+  const canEdit = Boolean(
+    isSameUser || (roleCanManage && !isSameRole && !isTargetMasterAdmin)
+  )
+  const canDelete = Boolean(
+    roleCanManage && !isSameUser && !isSameRole && !isTargetMasterAdmin
+  )
+
+  // Final edit mode is gated by permissions
+  const isEditMode = Boolean(isEditModeQuery && canEdit)
+
   useEffect(() => {
     if (userId) {
       setOpen(true)
     }
-  }, [userId, isEditMode])
+  }, [userId])
+
+  // Prevent unauthorized edit mode via URL
+  useEffect(() => {
+    if (!isLoading && userId && isEditModeQuery && !canEdit) {
+      toast.info('You are not authorized to edit this user.', { autoClose: 3000 })
+      navigate(`/portal/staffs?userId=${userId}`)
+    }
+  }, [isLoading, userId, isEditModeQuery, canEdit, navigate])
 
   const handleClose = () => {
     setOpen(false)
@@ -125,8 +151,7 @@ const Details = ({ mutate }) => {
     }
   };
 
-  const isSameRole = loggedInUser && loggedInUser?.position[0].value === viewUser?.position[0].value
-  const hasAccess = !isSameRole && loggedInUser?.position[0].value === USER_ROLES.MASTER_ADMIN.value
+  // Deprecated local access flags; replaced by canEdit/canDelete above
 
   return (
     <React.Fragment>
@@ -335,7 +360,7 @@ const Details = ({ mutate }) => {
               spacing={2}
               sx={{ mt: 4 }}
             >
-              {!isEditMode && (
+              {!isEditMode && canEdit && (
                 <Button
                   variant="outlined"
                   startIcon={<CardAccountDetailsOutline />}
@@ -346,7 +371,7 @@ const Details = ({ mutate }) => {
                   Edit
                 </Button>
               )}
-              {hasAccess && !isEditMode && (
+              {canDelete && !isEditMode && (
                 <Button
                   variant="outlined"
                   color="error"

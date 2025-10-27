@@ -29,7 +29,7 @@ const getAllBlockedDates = async () => {
 
     const confirmedReservations = await Reservation.aggregate([
       {
-        $match: { status: "CONFIRMED" }
+        $match: { status: { $in: ["CONFIRMED", "RESCHEDULED"] } }
       },
       {
         $lookup: {

@@ -48,6 +48,22 @@ const Reservations = {
       throw new Error(error?.response?.data?.message);
     }
   },
+  requestReschedule: async (reservationId, payload) => {
+    try {
+      const response = await axiosServices.post(`/${endpoints.key}/${reservationId}/reschedule`, payload);
+      return response;
+    } catch (error) {
+      throw new Error(error?.response?.data?.message);
+    }
+  },
+  decideReschedule: async (reservationId, payload) => {
+    try {
+      const response = await axiosServices.patch(`/${endpoints.key}/${reservationId}/reschedule`, payload);
+      return response;
+    } catch (error) {
+      throw new Error(error?.response?.data?.message);
+    }
+  },
   editReservation: async (reservationId, payload) => {
     try {
       const response = await axiosServices.patch(`/${endpoints.key}/${reservationId}`, payload)
