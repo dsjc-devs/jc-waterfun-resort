@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import MainCard from "components/MainCard";
 import {
   MailOutlined,
@@ -8,7 +8,13 @@ import {
   PhoneOutlined,
   EditOutlined,
 } from "@ant-design/icons";
-import { Grid, Chip, Stack, Button } from "@mui/material";
+import { Grid, Chip, Stack, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert, ToggleButtonGroup, ToggleButton } from "@mui/material";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { SunOutlined, MoonOutlined } from '@ant-design/icons';
+import { addHours } from 'date-fns';
 import { PESO_SIGN } from "constants/constants";
 import { useNavigate } from "react-router";
 
@@ -20,28 +26,140 @@ import useGetPosition from "hooks/useGetPosition";
 import ConvertDate from "components/ConvertDate";
 import textFormatter from "utils/textFormatter";
 import AnimateButton from "components/@extended/AnimateButton";
+import reservationsApi, { useGetSingleReservation } from "api/reservations";
+
 
 const Details = ({ reservationData = {} }) => {
-  const { isCustomer } = useGetPosition()
+  const { isCustomer } = useGetPosition();
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
+  // Always call hooks first
+  const reservationId = reservationData?.reservationId;
+  const { mutate } = useGetSingleReservation(reservationId);
 
-  if (!reservationData || !reservationData.userData) return null;
+  const userData = reservationData?.userData;
+  const accommodationData = reservationData?.accommodationData;
+  const startDate = reservationData?.startDate;
+  const endDate = reservationData?.endDate;
+  const status = reservationData?.status;
+  const entrances = reservationData?.entrances;
+  const amount = reservationData?.amount;
+  const guests = reservationData?.guests;
+  const rescheduleRequest = reservationData?.rescheduleRequest;
 
-  const {
-    userData,
-    accommodationData,
-    reservationId,
-    startDate,
-    endDate,
-    status,
-    entrances,
-    amount,
-    guests
-  } = reservationData;
+  const paymentsStatus = amount?.totalPaid >= amount?.total;
+  const paymentsStatusLabel = paymentsStatus ? 'FULLY_PAID' : (amount?.totalPaid > 0 ? 'PARTIALLY_PAID' : 'UNPAID');
 
-  const paymentsStatus = amount?.totalPaid >= amount?.total
-  const paymentsStatusLabel = paymentsStatus ? 'FULLY_PAID' : (amount?.totalPaid > 0 ? 'PARTIALLY_PAID' : 'UNPAID')
+  // Reschedule UI state
+  const [openResched, setOpenResched] = useState(false);
+  const [openReject, setOpenReject] = useState(false);
+  // Reschedule inputs using MUI pickers
+  const isGuestHouse = accommodationData?.type === 'guest_house';
+  const initialMode = useMemo(() => {
+    if (!endDate) return 'day';
+    const endHour = new Date(endDate).getHours();
+    return endHour === 17 ? 'day' : 'night';
+  }, [endDate]);
+  const [reschedMode, setReschedMode] = useState(initialMode);
+  useEffect(() => setReschedMode(initialMode), [initialMode]);
+  const [reschedDate, setReschedDate] = useState(startDate ? new Date(startDate) : null); // for day/night
+  const [reschedDateTime, setReschedDateTime] = useState(startDate ? new Date(startDate) : null); // for guest house
+  const [rejectReason, setRejectReason] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+
+  // Only return null after all hooks are called
+  if (!reservationData || !userData) return null;
+
+  const isAtLeast2DaysBefore = (dateStr) => {
+    const now = new Date();
+    const start = new Date(dateStr);
+    const diff = start.getTime() - now.getTime();
+    return diff >= 2 * 24 * 60 * 60 * 1000;
+  };
+
+  const hasPendingResched = rescheduleRequest?.status === 'PENDING';
+  const canRequestReschedule = isCustomer && status === 'CONFIRMED' && isAtLeast2DaysBefore(startDate) && !hasPendingResched;
+
+  // Helpers similar to Reservation Form
+  const applyModeStartTime = (dateLike, mode) => {
+    if (!dateLike) return null;
+    const d = new Date(dateLike);
+    if (mode === 'day') d.setHours(7, 0, 0, 0);
+    else d.setHours(17, 0, 0, 0);
+    return d;
+  };
+  const computeModeEnd = (start, mode) => {
+    if (!start) return null;
+    const e = new Date(start);
+    if (mode === 'day') {
+      e.setHours(17, 0, 0, 0);
+    } else {
+      e.setDate(e.getDate() + 1);
+      e.setHours(7, 0, 0, 0);
+    }
+    return e;
+  };
+
+  const handleSubmitReschedule = async () => {
+    try {
+      setSubmitting(true);
+      setErrorMsg("");
+      setSuccessMsg("");
+      let s, e;
+      if (isGuestHouse) {
+        if (!reschedDateTime) throw new Error('Please select a new start date and time.');
+        s = new Date(reschedDateTime);
+        e = addHours(s, accommodationData?.maxStayDuration || 10);
+      } else {
+        if (!reschedDate) throw new Error('Please select a new date.');
+        s = applyModeStartTime(reschedDate, reschedMode);
+        e = computeModeEnd(s, reschedMode);
+      }
+      await reservationsApi.Reservations.requestReschedule(reservationId, { newStartDate: s.toISOString(), newEndDate: e.toISOString() });
+      setSuccessMsg("Reschedule request sent. Please wait for staff confirmation.");
+      setOpenResched(false);
+      setRejectReason("");
+      await mutate();
+    } catch (e) {
+      setErrorMsg(e.message || "Failed to submit reschedule request.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleApprove = async () => {
+    try {
+      setSubmitting(true);
+      setErrorMsg("");
+      setSuccessMsg("");
+      await reservationsApi.Reservations.decideReschedule(reservationId, { action: 'APPROVE' });
+      setSuccessMsg("Reschedule approved.");
+      await mutate();
+    } catch (e) {
+      setErrorMsg(e.message || "Failed to approve reschedule.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleReject = async () => {
+    try {
+      setSubmitting(true);
+      setErrorMsg("");
+      setSuccessMsg("");
+      await reservationsApi.Reservations.decideReschedule(reservationId, { action: 'REJECT', reason: rejectReason });
+      setOpenReject(false);
+      setRejectReason("");
+      setSuccessMsg("Reschedule rejected.");
+      await mutate();
+    } catch (e) {
+      setErrorMsg(e.message || "Failed to reject reschedule.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <React.Fragment>
@@ -55,6 +173,30 @@ const Details = ({ reservationData = {} }) => {
               onClick={() => navigate(`/portal/reservations/form?isEditMode=true&reservationId=${reservationId}`)}
             >
               Edit
+            </Button>
+          </AnimateButton>
+          {hasPendingResched && (
+            <Stack direction='row' spacing={1}>
+              <AnimateButton>
+                <Button disabled={submitting} variant='contained' color='success' onClick={handleApprove}>
+                  Approve Reschedule
+                </Button>
+              </AnimateButton>
+              <AnimateButton>
+                <Button disabled={submitting} variant='outlined' color='error' onClick={() => setOpenReject(true)}>
+                  Reject
+                </Button>
+              </AnimateButton>
+            </Stack>
+          )}
+        </Stack>
+      )}
+
+      {isCustomer && (
+        <Stack direction='row' justifyContent='flex-end' spacing={2} marginBlock={2}>
+          <AnimateButton>
+            <Button disabled={!canRequestReschedule || submitting} variant='contained' color='primary' onClick={() => setOpenResched(true)}>
+              Request Reschedule
             </Button>
           </AnimateButton>
         </Stack>
@@ -172,6 +314,34 @@ const Details = ({ reservationData = {} }) => {
               </Grid>
             </MainCard>
 
+            {rescheduleRequest && (
+              <MainCard title="Reschedule Information" sx={{ marginBottom: 2 }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <LabeledValue
+                      title="Request Status"
+                      subTitle={<Chip size="small" label={titleCase(rescheduleRequest?.status || 'N/A')} color={{ PENDING: 'warning', APPROVED: 'success', REJECTED: 'error' }[rescheduleRequest?.status] || 'default'} />}
+                      icon={<IdcardOutlined />}
+                    />
+                  </Grid>
+                  {rescheduleRequest?.oldStartDate && (
+                    <Grid item xs={12} md={6}>
+                      <LabeledValue title="Original Dates" subTitle={<>
+                        <ConvertDate dateString={rescheduleRequest?.oldStartDate} time /> - <ConvertDate dateString={rescheduleRequest?.oldEndDate} time />
+                      </>} icon={<CalendarOutlined />} />
+                    </Grid>
+                  )}
+                  {rescheduleRequest?.newStartDate && (
+                    <Grid item xs={12} md={6}>
+                      <LabeledValue title="Requested New Dates" subTitle={<>
+                        <ConvertDate dateString={rescheduleRequest?.newStartDate} time /> - <ConvertDate dateString={rescheduleRequest?.newEndDate} time />
+                      </>} icon={<CalendarOutlined />} />
+                    </Grid>
+                  )}
+                </Grid>
+              </MainCard>
+            )}
+
             {!isCustomer && (
               <MainCard title="Customer Information">
                 <Grid container spacing={2}>
@@ -288,6 +458,82 @@ const Details = ({ reservationData = {} }) => {
           </MainCard>
         </Grid>
       </Grid>
+
+      {/* Feedback banners */}
+      <Grid container>
+        <Grid item xs={12}>
+          {errorMsg && <Alert sx={{ mt: 2 }} severity="error" onClose={() => setErrorMsg("")}>{errorMsg}</Alert>}
+          {successMsg && <Alert sx={{ mt: 2 }} severity="success" onClose={() => setSuccessMsg("")}>{successMsg}</Alert>}
+        </Grid>
+      </Grid>
+
+      {/* Reschedule Dialog */}
+      <Dialog open={openResched} onClose={() => setOpenResched(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Request Reschedule</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              {isGuestHouse ? (
+                <DateTimePicker
+                  value={reschedDateTime}
+                  onChange={(val) => setReschedDateTime(val)}
+                  disablePast
+                  ampm
+                  views={["year", "month", "day", "hours"]}
+                  slotProps={{ textField: { fullWidth: true, label: 'New Start Date & Time' } }}
+                />
+              ) : (
+                <>
+                  <ToggleButtonGroup
+                    value={reschedMode}
+                    exclusive
+                    onChange={(e, v) => v && setReschedMode(v)}
+                    color="primary"
+                    aria-label="time of day selection"
+                  >
+                    <ToggleButton value="day" aria-label="day mode">
+                      <SunOutlined style={{ marginRight: 6 }} /> Day Tour (7 AM - 5 PM)
+                    </ToggleButton>
+                    <ToggleButton value="night" aria-label="night mode">
+                      <MoonOutlined style={{ marginRight: 6 }} /> Night Tour (5 PM - 7 AM)
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                  <DatePicker
+                    value={reschedDate}
+                    onChange={(val) => setReschedDate(val)}
+                    disablePast
+                    slotProps={{ textField: { fullWidth: true, label: 'New Date' } }}
+                  />
+                </>
+              )}
+            </LocalizationProvider>
+            <Alert severity="info">Your request will be reviewed by staff. It's subject to confirmation.</Alert>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenResched(false)}>Cancel</Button>
+          <Button disabled={submitting} onClick={handleSubmitReschedule} variant="contained">Submit</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Reject Dialog */}
+      <Dialog open={openReject} onClose={() => setOpenReject(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Reject Reschedule</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            multiline
+            minRows={3}
+            label="Reason (optional)"
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenReject(false)}>Cancel</Button>
+          <Button color="error" variant="contained" disabled={submitting} onClick={handleReject}>Reject</Button>
+        </DialogActions>
+      </Dialog>
     </React.Fragment>
   );
 };

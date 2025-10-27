@@ -1,5 +1,6 @@
 import expressAsync from "express-async-handler";
 import reservationServices from "../services/reservationServices.js";
+import { getUserRole } from "../middleware/permissions.js";
 
 const createReservation = expressAsync(async (req, res) => {
   try {
@@ -94,3 +95,62 @@ export {
   updateReservationById,
   deleteReservationById
 }
+
+// ============ RESCHEDULE CONTROLLERS ============ //
+
+const requestReschedule = expressAsync(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { newStartDate, newEndDate } = req.body || {};
+    const requestedBy = req?.user?.userId;
+
+    const reservation = await reservationServices.requestRescheduleById(id, {
+      newStartDate,
+      newEndDate,
+      requestedBy,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Reschedule request submitted and is subject for confirmation.",
+      reservation,
+    });
+  } catch (error) {
+    console.error("Error in requestReschedule controller:", error);
+    throw new Error(error);
+  }
+});
+
+const decideReschedule = expressAsync(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { action, reason } = req.body || {};
+    const decidedBy = req?.user?.userId;
+
+    const role = getUserRole(req.user);
+    const allowed = ["RECEPTIONIST", "ADMIN", "MASTER_ADMIN"];
+    if (!allowed.includes(role)) {
+      return res.status(403).json({ message: "Only staff can approve or reject reschedule requests." });
+    }
+
+    const reservation = await reservationServices.decideRescheduleById(id, {
+      action,
+      reason,
+      decidedBy,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Reschedule ${String(action).toUpperCase() === 'APPROVE' ? 'approved' : 'rejected'} successfully`,
+      reservation,
+    });
+  } catch (error) {
+    console.error("Error in decideReschedule controller:", error);
+    throw new Error(error);
+  }
+});
+
+export {
+  requestReschedule,
+  decideReschedule,
+};
