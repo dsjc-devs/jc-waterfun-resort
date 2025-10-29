@@ -69,7 +69,7 @@ const ArticleDetails = () => {
             <Container sx={{ my: 4 }}>
                 <ArticleDetailsPage article={data} isLoading={isLoading} />
 
-                {/* Article Navigation Carousel */}
+                {/* Article Navigation Carousel - Responsive */}
                 {articles.length > 1 && currentIndex !== -1 && (
                     <Box sx={{ mt: 6, mb: 4 }}>
                         <Typography
@@ -85,14 +85,20 @@ const ArticleDetails = () => {
                             Continue Reading
                         </Typography>
 
-                        <Box sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 2,
-                            justifyContent: 'center'
-                        }}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: { xs: 'column', sm: 'row' },
+                                alignItems: { xs: 'stretch', sm: 'center' },
+                                gap: { xs: 3, sm: 2 },
+                                justifyContent: 'center',
+                                width: '100%',
+                                maxWidth: 900,
+                                mx: 'auto',
+                            }}
+                        >
                             {/* Previous Article */}
-                            <Box sx={{ flex: 1, maxWidth: 400 }}>
+                            <Box sx={{ flex: 1, maxWidth: 400, mb: { xs: 2, sm: 0 } }}>
                                 {currentIndex > 0 && (
                                     <Card
                                         sx={{
@@ -101,7 +107,8 @@ const ArticleDetails = () => {
                                             '&:hover': {
                                                 transform: 'translateY(-4px)',
                                                 boxShadow: 4
-                                            }
+                                            },
+                                            minHeight: 120,
                                         }}
                                         onClick={handlePrevious}
                                     >
@@ -155,7 +162,8 @@ const ArticleDetails = () => {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
-                                minWidth: 120
+                                minWidth: 120,
+                                mb: { xs: 2, sm: 0 },
                             }}>
                                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                                     {currentIndex + 1} of {articles.length}
@@ -178,7 +186,8 @@ const ArticleDetails = () => {
                                             '&:hover': {
                                                 transform: 'translateY(-4px)',
                                                 boxShadow: 4
-                                            }
+                                            },
+                                            minHeight: 120,
                                         }}
                                         onClick={handleNext}
                                     >
