@@ -11,6 +11,9 @@ import AboutUs from "sections/landing-pages/AboutUs";
 import DiscoverSection from "sections/landing-pages/DiscoverSection";
 import MapSection from "sections/landing-pages/MapSection";
 import FAQs from "sections/landing-pages/FAQs";
+import AmenityOverviewSection from "sections/landing-pages/AmenityOverviewSection";
+import GalleryOverviewSection from "sections/landing-pages/GalleryOverviewSection";
+import ArticleOverviewSection from "sections/landing-pages/ArticleOverviewSection";
 
 import bgImg from "assets/images/upload/our-mission.jpg";
 import Testimonials from "sections/landing-pages/Testimonials";
@@ -22,8 +25,8 @@ const Home = () => {
     <React.Fragment>
       <CarouselSection />
       <MiniCheckAvailability />
-      <AccommodationSection />
       <RateSection />
+      <AccommodationSection />
       <Hero
         backgroundImage={bgImg}
         buttonConfigs={{
@@ -33,9 +36,12 @@ const Home = () => {
           }
         }}
       />
+      <AmenityOverviewSection />
       <ContactUsHomePage />
+      <GalleryOverviewSection />
       <DiscoverSection />
       <AboutUs />
+      <ArticleOverviewSection />
       <Testimonials isHomepage={true} />
       <MapSection />
       <FAQs />
