@@ -4,9 +4,14 @@ import {
   Chip,
   Stack,
   Typography,
-  Button
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  alpha,
+  useTheme
 } from '@mui/material';
-import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EyeOutlined, EditOutlined, DeleteOutlined, CalendarOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 
 import ConvertDate from 'components/ConvertDate';
@@ -26,40 +31,82 @@ const statusColors = {
 
 const GridCard = ({ material, isOnPortal = false, onDelete, onEdit }) => {
   const navigate = useNavigate();
+  const theme = useTheme();
+
+  const truncateText = (text, maxLength = 150) => {
+    if (!text) return 'Discover the latest news and insights from our resort.';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
 
   return (
-    <Box
+    <Card
       sx={{
-        bgcolor: 'background.paper',
-        boxShadow: 2,
+        height: '100%',
         borderRadius: 3,
         overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        transition: 'box-shadow 0.2s, transform 0.2s',
+        background: 'rgba(255, 255, 255, 0.9)',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        cursor: 'pointer',
         '&:hover': {
-          boxShadow: 6,
-          transform: 'translateY(-4px)'
+          transform: 'translateY(-8px)',
+          boxShadow: `0 20px 40px ${alpha(theme.palette.primary.main, 0.15)}`,
+          '& .article-image': {
+            transform: 'scale(1.05)',
+          },
+          '& .view-button': {
+            opacity: 1,
+            transform: 'translateY(0)',
+          }
         }
       }}
     >
-      <Box sx={{ position: 'relative', width: '100%', height: 0, paddingTop: '60%' }}>
-        <Avatar
-          variant="rectangle"
-          src={material.thumbnail}
+      <Box sx={{ position: 'relative', overflow: 'hidden' }}>
+        <CardMedia
+          component="img"
+          height={200}
+          image={material.thumbnail || '/placeholder-article.jpg'}
           alt={material.title}
+          className="article-image"
           sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            borderTopLeftRadius: 12,
-            borderTopRightRadius: 12
+            transition: 'transform 0.3s ease',
+            objectFit: 'cover'
           }}
         />
+
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            bgcolor: 'rgba(255, 255, 255, 0.9)',
+            borderRadius: 2,
+            px: 1.5,
+            py: 0.5
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'primary.main',
+              fontWeight: 600,
+              fontSize: '0.75rem',
+              textTransform: 'capitalize'
+            }}
+          >
+            {material.type?.replace('-', ' ') || 'Article'}
+          </Typography>
+        </Box>
+
         <Box
           sx={{
             position: 'absolute',
@@ -77,57 +124,122 @@ const GridCard = ({ material, isOnPortal = false, onDelete, onEdit }) => {
         >
           <ConvertDate dateString={material.createdAt} />
         </Box>
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 12,
-            right: 12,
-            bgcolor: 'rgba(255,255,255,0.85)',
-            color: 'text.primary',
-            px: 1.2,
-            py: 0.4,
-            borderRadius: 2,
-            fontSize: '0.8rem',
-            fontWeight: 500,
-            boxShadow: 1,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5
-          }}
-        >
-          <EyeOutlined style={{ fontSize: 15, marginRight: 4 }} />
-          {material.views || 0}
-        </Box>
+
+        {!isOnPortal && (
+          <Button
+            className="view-button"
+            variant="contained"
+            size="small"
+            startIcon={<EyeOutlined />}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/articles/details/${material._id}`);
+            }}
+            sx={{
+              position: 'absolute',
+              bottom: 12,
+              left: 12,
+              opacity: 0,
+              transform: 'translateY(10px)',
+              transition: 'all 0.3s ease',
+              borderRadius: 2,
+              minWidth: 'auto',
+              px: 2
+            }}
+          >
+            Read
+          </Button>
+        )}
       </Box>
 
-      <Box sx={{ p: 2.5, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Typography variant="h6" fontWeight={700} gutterBottom sx={{ mb: 0.5 }}>
+      <CardContent
+        sx={{
+          p: { xs: 2, md: 3 },
+          '&:last-child': { pb: { xs: 2, md: 3 } },
+          display: 'flex',
+          flexDirection: 'column',
+          flexGrow: 1
+        }}
+        onClick={() => !isOnPortal && navigate(`/articles/details/${material._id}`)}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            fontFamily: 'Cinzel',
+            fontWeight: 600,
+            color: 'text.primary',
+            mb: 1,
+            fontSize: { xs: '1.1rem', md: '1.25rem' },
+            lineHeight: 1.3,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden'
+          }}
+        >
           {material.title}
         </Typography>
-        {material.excerpt && (
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, minHeight: 40 }}>
-            {material.excerpt}
-          </Typography>
-        )}
 
-        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 2 }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            fontSize: { xs: '0.875rem', md: '0.9rem' },
+            lineHeight: 1.5,
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            mb: 2,
+            flexGrow: 1
+          }}
+        >
+          {truncateText(material.content || material.excerpt)}
+        </Typography>
+
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 'auto' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <CalendarOutlined style={{ fontSize: '0.875rem', color: theme.palette.text.secondary }} />
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ fontSize: '0.75rem' }}
+              >
+                {formatDate(material.createdAt)}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 2 }}>
+              <EyeOutlined style={{ fontSize: '0.875rem', color: theme.palette.text.secondary }} />
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ fontSize: '0.75rem' }}
+              >
+                {material.views || 0}
+              </Typography>
+            </Box>
+          </Box>
+
           {isOnPortal && (
             <Chip size="small" label={statusLabels[material.status]} color={statusColors[material.status] || 'default'} />
           )}
-          {!isOnPortal && (
-            <Typography
-              variant="body2"
+          {material.featured && !isOnPortal && (
+            <Chip
+              label="Featured"
+              size="small"
               color="primary"
-              onClick={() => navigate(`/articles/details/${material._id}`)}
-              sx={{ cursor: 'pointer', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
-            >
-              Read More
-            </Typography>
+              sx={{
+                height: 20,
+                fontSize: '0.7rem',
+                fontWeight: 600
+              }}
+            />
           )}
-        </Stack>
+        </Box>
 
         {isOnPortal && (
-          <Stack direction="row" spacing={1.5} sx={{ mt: 'auto', '& .MuiButton-root': { borderRadius: 1.5, fontSize: 13, px: 2.2, py: 0.65, minWidth: 92, textTransform: 'none' } }}>
+          <Stack direction="row" spacing={1.5} sx={{ mt: 2, '& .MuiButton-root': { borderRadius: 1.5, fontSize: 13, px: 2.2, py: 0.65, minWidth: 92, textTransform: 'none' } }}>
             <Button
               size="small"
               variant="contained"
@@ -157,8 +269,8 @@ const GridCard = ({ material, isOnPortal = false, onDelete, onEdit }) => {
             </Button>
           </Stack>
         )}
-      </Box>
-    </Box>
+      </CardContent>
+    </Card>
   );
 }
 

@@ -82,6 +82,14 @@ const MarketingMaterials = {
     } catch (error) {
       throw new Error(error?.response?.data?.message);
     }
+  },
+  incrementView: async (materialId) => {
+    try {
+      const response = await axiosServices.patch(`/${endpoints.key}/${materialId}/increment-view`)
+      return response.data
+    } catch (error) {
+      throw new Error(error?.response?.data?.message);
+    }
   }
 }
 

@@ -5,6 +5,7 @@ import {
   getSingleMarketingMaterialById,
   updateMarketingMaterialById,
   deleteMarketingMaterialById,
+  incrementViewById,
 } from "../controllers/marketingMaterialsControllers.js";
 import createUploadMiddleware from '../middleware/multer/uploadMiddleware.js'
 
@@ -41,5 +42,6 @@ router.patch(
   updateMarketingMaterialById
 );
 router.delete("/:materialId", deleteMarketingMaterialById);
+router.patch("/:materialId/increment-view", incrementViewById);
 
 export default router;

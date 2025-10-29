@@ -47,7 +47,7 @@ const getSingleMarketingMaterialById = expressAsnc(async (req, res) => {
 
 const updateMarketingMaterialById = expressAsnc(async (req, res) => {
   let updateData = { ...req.body };
-  
+
   if (req.files?.['thumbnail']?.[0]?.path) {
     updateData.thumbnail = req.files['thumbnail'][0].path;
   } else if (req.body.thumbnailUrl) {
@@ -87,10 +87,23 @@ const deleteMarketingMaterialById = expressAsnc(async (req, res) => {
   }
 });
 
+const incrementViewById = expressAsnc(async (req, res) => {
+  try {
+    const response = await marketingMaterialsServices.incrementViewById(
+      req.params.materialId
+    );
+    res.json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 export {
   createMarketingMaterial,
   getMarketingMaterials,
   getSingleMarketingMaterialById,
   updateMarketingMaterialById,
   deleteMarketingMaterialById,
+  incrementViewById,
 };
