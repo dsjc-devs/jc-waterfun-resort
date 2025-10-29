@@ -109,10 +109,30 @@ const deleteMarketingMaterialById = async (materialId) => {
   }
 };
 
+const incrementViewById = async (materialId) => {
+  try {
+    const updatedMaterial = await MarketingMaterials.findOneAndUpdate(
+      { _id: materialId },
+      { $inc: { views: 1 } },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedMaterial) {
+      throw new Error("Marketing material not found");
+    }
+
+    return updatedMaterial;
+  } catch (error) {
+    console.error("Error incrementing view count:", error.message);
+    throw new Error(error);
+  }
+};
+
 export default {
   createMarketingMaterial,
   getMarketingMaterials,
   getSingleMarketingMaterialById,
   updateMarketingMaterialById,
   deleteMarketingMaterialById,
+  incrementViewById,
 };
