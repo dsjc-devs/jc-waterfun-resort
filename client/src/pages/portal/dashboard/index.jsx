@@ -263,7 +263,7 @@ const Dashboard = () => {
             />
           </Grid>
 
-          <Grid item xs={12} md={6} lg={3}>
+          <Grid item xs={12} md={6} lg={6}>
             <DashboardCard
               title="Staff Members"
               value={stats.staff.total}
@@ -279,7 +279,7 @@ const Dashboard = () => {
             />
           </Grid>
 
-          <Grid item xs={12} md={6} lg={3}>
+          <Grid item xs={12} md={6} lg={6}>
             <DashboardCard
               title="Total Customers"
               value={stats.customers.total}
@@ -292,28 +292,6 @@ const Dashboard = () => {
                 value: stats.customers.trend.value,
                 positive: stats.customers.trend.positive
               }}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6} lg={3}>
-            <DashboardCard
-              title="Quick Actions"
-              value="4"
-              subtitle="Available actions"
-              icon={<TrophyOutlined style={{ fontSize: 24 }} />}
-              color="info"
-              onClick={() => console.log('Quick actions clicked')}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6} lg={3}>
-            <DashboardCard
-              title="Performance"
-              value="Excellent"
-              subtitle="Overall rating"
-              icon={<TrophyOutlined style={{ fontSize: 24 }} />}
-              color="success"
-              gradient={true}
             />
           </Grid>
         </Grid>
