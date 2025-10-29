@@ -248,12 +248,13 @@ const PaymentPage = ({
           disableElevation
           loadingPosition="start"
           style={{ width: '150px' }}
-        // disabled={
-        //   loading || !totalPaid ||
-        //   Number(totalPaid) < minPayable ||
-        //   Number(totalPaid) > maxPayable ||
-        //   (!!recaptchaSiteKey && !recaptchaToken)
-        // }
+          disabled={
+            loading ||
+            !totalPaid ||
+            Number(totalPaid) < minPayable ||
+            Number(totalPaid) > maxPayable ||
+            (!!recaptchaSiteKey && !recaptchaToken)
+          }
         >
           Pay Now
         </LoadingButton>
