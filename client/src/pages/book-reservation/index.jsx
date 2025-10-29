@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router";
 import {
   Box,
@@ -13,6 +13,7 @@ import {
   TextField,
   DialogActions,
   useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { toast } from "react-toastify";
 import { useGetSingleAccommodation } from "api/accommodations";
@@ -70,6 +71,8 @@ const BookReservation = () => {
 
   const [loading, setLoading] = useState(false)
   const [redirectUrl, setRedirectUrl] = useState(null);
+  const [recaptchaToken, setRecaptchaToken] = useState("");
+  const recaptchaRef = useRef(null);
 
   const queryParams = new URLSearchParams(location.search);
   const accommodationId = queryParams.get("accommodationId");
@@ -82,6 +85,9 @@ const BookReservation = () => {
   const { data = {} } = useGetSingleAccommodation(accommodationId);
 
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
+  const muiTheme = useTheme();
+  const recaptchaTheme = muiTheme?.palette?.mode === 'dark' ? 'dark' : 'light';
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
 
   const calculatedTotal = (amount.accommodationTotal || 0) + (amount.entranceTotal || 0) + (amount.extraPersonFee || 0);
 
@@ -140,6 +146,12 @@ const BookReservation = () => {
   }, []);
 
   const handleCreateReservation = async (paymentMethod = 'gcash') => {
+    // Gate payment with ReCAPTCHA
+    const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
+    if (siteKey && !recaptchaToken) {
+      toast.error("Please complete the captcha before proceeding.");
+      return;
+    }
     setLoading(true)
     try {
       const bookingPayload = {
@@ -176,7 +188,9 @@ const BookReservation = () => {
         phone: user?.phoneNumber || "",
         returnUrl: `${window.location.origin}/payment-result`,
         paymentMethod,
-        bookingData: bookingPayload
+        bookingData: bookingPayload,
+        // Include recaptcha token for backend verification (if supported)
+        recaptchaToken: recaptchaToken || undefined,
       };
 
       const response = await agent.Payments.createPaymentWithBooking(paymentPayload);
@@ -195,6 +209,9 @@ const BookReservation = () => {
       toast.error(error?.message || `Error Occured. Please try again.`)
     } finally {
       setLoading(false)
+      // Reset captcha after an attempt
+      try { recaptchaRef.current?.reset(); } catch { }
+      setRecaptchaToken("");
     }
   }
 
@@ -308,6 +325,12 @@ const BookReservation = () => {
                     loading={loading}
                     bookingData={bookingData}
                     onCancel={() => setActiveStep(2)}
+                    // reCAPTCHA props for rendering within the page (moved down)
+                    recaptchaSiteKey={recaptchaSiteKey}
+                    recaptchaTheme={recaptchaTheme}
+                    recaptchaRef={recaptchaRef}
+                    recaptchaToken={recaptchaToken}
+                    setRecaptchaToken={setRecaptchaToken}
                   />
                 )}
               </Box>

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import ReCaptcha from 'components/ReCaptcha';
 import gcashLogo from 'assets/gcash.svg';
 import mayaLogo from 'assets/maya.svg';
 import {
@@ -36,7 +37,13 @@ const PaymentPage = ({
   handleCreateReservation,
   loading,
   bookingData,
-  onCancel
+  onCancel,
+  // reCAPTCHA props
+  recaptchaSiteKey,
+  recaptchaTheme = 'light',
+  recaptchaRef,
+  recaptchaToken,
+  setRecaptchaToken
 }) => {
   const { data } = useGetSinglePolicy({ id: '68bb03b6329342f89eaa0870' })
 
@@ -215,6 +222,18 @@ const PaymentPage = ({
 
       <Divider sx={{ mt: 4, mb: 2 }} />
 
+      {recaptchaSiteKey ? (
+        <Box sx={{ my: 2 }}>
+          <ReCaptcha
+            ref={recaptchaRef}
+            siteKey={recaptchaSiteKey}
+            theme={recaptchaTheme}
+            onChange={(token) => setRecaptchaToken?.(token || '')}
+            onExpired={() => setRecaptchaToken?.('')}
+          />
+        </Box>
+      ) : null}
+
       <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
         <Button onClick={onCancel} variant="outlined" sx={{ borderRadius: 2 }}>
           Cancel
@@ -227,12 +246,14 @@ const PaymentPage = ({
           sx={{ borderRadius: 2 }}
           loading={loading}
           disableElevation
-          // disabled={loading || !totalPaid ||
-          //   Number(totalPaid) < minPayable ||
-          //   Number(totalPaid) > maxPayable
-          // }
           loadingPosition="start"
           style={{ width: '150px' }}
+        // disabled={
+        //   loading || !totalPaid ||
+        //   Number(totalPaid) < minPayable ||
+        //   Number(totalPaid) > maxPayable ||
+        //   (!!recaptchaSiteKey && !recaptchaToken)
+        // }
         >
           Pay Now
         </LoadingButton>
