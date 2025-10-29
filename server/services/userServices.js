@@ -2,7 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { USER_ROLES } from '../constants/constants.js';
 import Users from '../models/usersModels.js';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
+import sendEmail from '../utils/sendNodeMail.js';
+import welcomeUser from '../templates/welcome-user.js';
 
 const authUser = async (data) => {
   const { emailAddress, password } = data || {};
@@ -91,6 +93,22 @@ const createUser = async (userData) => {
       password: hashedPassword,
       position: positionArr,
     });
+
+    // Send welcome email to new user
+    try {
+      const emailSubject = `🎉 Welcome to John Cezar Waterfun Resort, ${firstName}!`;
+      const emailBody = welcomeUser({
+        firstName,
+        lastName,
+        emailAddress,
+        position: positionArr
+      });
+
+      await sendEmail(emailAddress, emailSubject, emailBody);
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+      // Don't throw error for email failure - user creation should still succeed
+    }
 
     return user;
   } catch (error) {
