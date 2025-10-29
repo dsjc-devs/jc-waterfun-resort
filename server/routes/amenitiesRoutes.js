@@ -27,9 +27,9 @@ router.post(
   createAmenities
 );
 
-router.get("/", protect, getAmenitiesByQuery);
+router.get("/", getAmenitiesByQuery);
 
-router.get("/:id", protect, getAmenitiesById);
+router.get("/:id", getAmenitiesById);
 
 router.patch(
   "/:id",
