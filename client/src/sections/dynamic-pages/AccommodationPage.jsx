@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BookOutlined, CheckOutlined, ClockCircleOutlined, CloseOutlined, DeleteOutlined, EditOutlined, EyeOutlined, MenuOutlined, MoonOutlined, SunOutlined, UserOutlined } from '@ant-design/icons';
+import { BookOutlined, CheckOutlined, ClockCircleOutlined, CloseOutlined, DeleteOutlined, EditOutlined, EyeOutlined, LeftOutlined, MenuOutlined, MoonOutlined, RightOutlined, SunOutlined, UserOutlined } from '@ant-design/icons';
 import {
   Box,
   Button,
@@ -77,7 +77,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const [loading, setLoading] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
-  const [currentImage, setCurrentImage] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [openLogin, setOpenLogin] = useState(false)
   const [mode, setMode] = useState('day');
@@ -214,12 +214,25 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   };
 
   const openViewer = (img) => {
-    setCurrentImage(img);
+    const index = _pictures.findIndex(picture => picture === img);
+    setCurrentImageIndex(index >= 0 ? index : 0);
     setViewerOpen(true);
   };
 
   const openGallery = () => {
     setGalleryOpen(true);
+  };
+
+  const goToPrevious = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? _pictures.length - 1 : prevIndex - 1
+    );
+  };
+
+  const goToNext = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === _pictures.length - 1 ? 0 : prevIndex + 1
+    );
   };
 
   return (
@@ -605,22 +618,198 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
       <Dialog
         open={viewerOpen}
         onClose={() => setViewerOpen(false)}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: 'rgba(0, 0, 0, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: 3,
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.8)',
+          }
+        }}
       >
-        <Stack direction='row' justifyContent='flex-endDate'>
-          <IconButton onClick={() => setViewerOpen(false)}>
+        <DialogContent sx={{ p: 0, position: 'relative', minHeight: '80vh' }}>
+          {/* Close Button */}
+          <IconButton
+            onClick={() => setViewerOpen(false)}
+            sx={{
+              position: 'absolute',
+              top: 16,
+              right: 16,
+              zIndex: 10,
+              bgcolor: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              color: 'white',
+              '&:hover': {
+                bgcolor: 'rgba(255, 255, 255, 0.2)',
+                transform: 'scale(1.05)',
+              },
+              transition: 'all 0.3s ease',
+            }}
+          >
             <CloseOutlined />
           </IconButton>
-        </Stack>
-        <DialogContent
-          sx={{ display: 'flex', justifyContent: 'center', p: 2 }}
-        >
-          <img
-            src={currentImage}
-            alt="Accommodation"
-            style={{ maxWidth: '100%', maxHeight: '80vh', borderRadius: 8 }}
-          />
+
+          {/* Image Counter */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 16,
+              left: 16,
+              zIndex: 10,
+              bgcolor: 'rgba(0, 0, 0, 0.7)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: 2,
+              px: 2,
+              py: 1,
+            }}
+          >
+            <Typography variant="body2" sx={{ color: 'white', fontWeight: 600 }}>
+              {currentImageIndex + 1} / {_pictures.length}
+            </Typography>
+          </Box>
+
+          {/* Main Image */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: '80vh',
+              position: 'relative',
+            }}
+          >
+            {/* Previous Button */}
+            <IconButton
+              onClick={goToPrevious}
+              disabled={_pictures.length <= 1}
+              sx={{
+                position: 'absolute',
+                left: 16,
+                zIndex: 5,
+                bgcolor: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                width: 56,
+                height: 56,
+                '&:hover': {
+                  bgcolor: 'rgba(255, 255, 255, 0.2)',
+                  transform: 'scale(1.1)',
+                },
+                '&:disabled': {
+                  opacity: 0.3,
+                },
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <LeftOutlined style={{ fontSize: '24px' }} />
+            </IconButton>
+
+            {/* Current Image */}
+            <Box
+              component="img"
+              src={_pictures[currentImageIndex]}
+              alt={`Accommodation ${currentImageIndex + 1}`}
+              sx={{
+                maxWidth: '90%',
+                maxHeight: '75vh',
+                objectFit: 'contain',
+                borderRadius: 2,
+                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+                transition: 'all 0.5s ease',
+                animation: 'fadeIn 0.5s ease-in-out',
+                '@keyframes fadeIn': {
+                  '0%': { opacity: 0, transform: 'scale(0.95)' },
+                  '100%': { opacity: 1, transform: 'scale(1)' }
+                }
+              }}
+            />
+
+            {/* Next Button */}
+            <IconButton
+              onClick={goToNext}
+              disabled={_pictures.length <= 1}
+              sx={{
+                position: 'absolute',
+                right: 16,
+                zIndex: 5,
+                bgcolor: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                width: 56,
+                height: 56,
+                '&:hover': {
+                  bgcolor: 'rgba(255, 255, 255, 0.2)',
+                  transform: 'scale(1.1)',
+                },
+                '&:disabled': {
+                  opacity: 0.3,
+                },
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <RightOutlined style={{ fontSize: '24px' }} />
+            </IconButton>
+          </Box>
+
+          {/* Thumbnail Strip */}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 1,
+              p: 3,
+              overflowX: 'auto',
+              '&::-webkit-scrollbar': {
+                height: 6,
+              },
+              '&::-webkit-scrollbar-track': {
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: 3,
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: 'rgba(255, 255, 255, 0.3)',
+                borderRadius: 3,
+                '&:hover': {
+                  background: 'rgba(255, 255, 255, 0.5)',
+                },
+              },
+            }}
+          >
+            {_pictures.map((image, index) => (
+              <Box
+                key={index}
+                component="img"
+                src={image}
+                alt={`Thumbnail ${index + 1}`}
+                onClick={() => setCurrentImageIndex(index)}
+                sx={{
+                  width: 80,
+                  height: 60,
+                  objectFit: 'cover',
+                  borderRadius: 1,
+                  cursor: 'pointer',
+                  border: currentImageIndex === index
+                    ? '3px solid rgba(255, 255, 255, 0.8)'
+                    : '2px solid rgba(255, 255, 255, 0.2)',
+                  opacity: currentImageIndex === index ? 1 : 0.6,
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    opacity: 1,
+                    transform: 'scale(1.05)',
+                    border: '3px solid rgba(255, 255, 255, 0.6)',
+                  },
+                  flexShrink: 0,
+                }}
+              />
+            ))}
+          </Box>
         </DialogContent>
       </Dialog>
 

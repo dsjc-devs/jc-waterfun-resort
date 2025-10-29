@@ -84,7 +84,7 @@ const PaymentDialog = ({
           sx={{ borderRadius: 2 }}
           loading={loading}
           disableElevation
-          disabled={loading || !totalPaid || Number(totalPaid) < minPayable}
+          // disabled={loading || !totalPaid || Number(totalPaid) < minPayable}
           loadingPosition="start"
           fullWidth
           style={{ width: '150px' }}

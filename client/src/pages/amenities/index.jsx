@@ -34,6 +34,7 @@ const Amenities = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
+
     });
   }, [amenities]);
 
