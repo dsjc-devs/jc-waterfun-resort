@@ -12,15 +12,40 @@ const reservationDetails = (reservationData) => {
     faqs = []
   } = reservationData;
 
+  // Helper: Format date similar to client ConvertDate, but in Asia/Manila timezone
+  const formatDateInTimeZone = (inputDate, { timeZone = 'Asia/Manila', includeTime = true } = {}) => {
+    if (!inputDate) return 'Invalid date';
+
+    const date = new Date(inputDate);
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: includeTime ? 'numeric' : undefined,
+      minute: includeTime ? '2-digit' : undefined,
+      hour12: true
+    });
+
+    const parts = formatter.formatToParts(date);
+    const get = (type) => parts.find((p) => p.type === type)?.value || '';
+
+    let month = get('month');
+    if (month && !month.endsWith('.')) month = `${month}.`;
+    const day = get('day');
+    const year = get('year');
+
+    if (!includeTime) return `${month} ${day}, ${year}`;
+
+    const hour = get('hour');
+    const minute = get('minute');
+    const period = get('dayPeriod');
+    return `${month} ${day}, ${year} ${hour}:${minute} ${period}`;
+  };
+
   const guestName = `${userData?.firstName || ""} ${userData?.lastName || ""}`.trim();
-  const formattedStartDate = new Date(startDate).toLocaleString("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-  const formattedEndDate = new Date(endDate).toLocaleString("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
+  const formattedStartDate = formatDateInTimeZone(startDate, { includeTime: true });
+  const formattedEndDate = formatDateInTimeZone(endDate, { includeTime: true });
 
   // Environment-based URL handling
   const baseUrl = process.env.NODE_ENV === 'development'
@@ -161,7 +186,7 @@ const reservationDetails = (reservationData) => {
           <div style="margin-bottom: 20px;">
             <h4 style="margin: 0 0 10px; color: #333; font-size: 16px;">Check-in Instructions:</h4>
             <ul style="margin: 0; padding-left: 20px; color: #555; line-height: 1.6;">
-              <li>Check-in time:on or before ${formattedStartDate}</li>
+              <li>Check-in time: on or before ${formattedStartDate}</li>
               <li>Please bring a valid ID and this confirmation email</li>
               <li>Early check-in may be available upon request (subject to availability)</li>
             </ul>
