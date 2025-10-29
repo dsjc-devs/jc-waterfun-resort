@@ -67,8 +67,7 @@ const NavbarDesktop = ({ hasBanner = true }) => {
           width: '100%',
           minHeight: '80px',
           zIndex: 20,
-          backgroundColor: hasBanner ? 'rgba(0, 0, 0, 0.5)' : 'rgba(220, 225, 230, 0.95)',
-          boxShadow: hasBanner ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.1)',
+          backgroundColor: hasBanner ? 'rgba(0, 0, 0, 0.5)' : `rgba(0, 75, 128, .8)`,
         }}
       >
         <Container>
@@ -86,11 +85,11 @@ const NavbarDesktop = ({ hasBanner = true }) => {
                       fontFamily: "'Cinzel', sans-serif",
                       borderColor: isActive ? (theme) => theme.palette.secondary.contrastText : "transparent",
                       paddingTop: .5,
-                      color: hasBanner ? (theme) => theme.palette.secondary.contrastText : '#222',
+                      color: (theme) => theme.palette.secondary.contrastText,
                       fontWeight: 500,
                       '&:hover': {
                         cursor: 'pointer',
-                        color: hasBanner ? (theme) => theme.palette.primary.main : '#2a93c1',
+                        color: (theme) => theme.palette.primary.main,
                       },
                     }}
                   >
@@ -104,13 +103,6 @@ const NavbarDesktop = ({ hasBanner = true }) => {
                   variant='contained'
                   size='small'
                   onClick={() => navigate('/login')}
-                  sx={{
-                    backgroundColor: hasBanner ? undefined : '#2a93c1',
-                    color: hasBanner ? undefined : '#fff',
-                    '&:hover': {
-                      backgroundColor: hasBanner ? undefined : '#176a8c',
-                    },
-                  }}
                 >
                   {isLoggedIn ? "Portal" : "Login"}
                 </Button>
@@ -128,8 +120,7 @@ const NavbarDesktop = ({ hasBanner = true }) => {
           py: 2,
           minHeight: "57px !important",
           zIndex: 20,
-          backgroundColor: hasBanner ? 'rgba(0, 0, 0, 0.3)' : 'rgba(200, 210, 220, 0.9)',
-          boxShadow: hasBanner ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.1)',
+          backgroundColor: hasBanner ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 75, 128, 1)',
         }}
       >
         <Container>
@@ -160,7 +151,7 @@ const NavbarDesktop = ({ hasBanner = true }) => {
                       fontFamily: "Cinzel",
                       fontWeight: "normal",
                       fontSize: { xs: "0.9rem", md: "1rem" },
-                      color: hasBanner ? (theme) => theme.palette.secondary.contrastText : '#222',
+                      color: (theme) => theme.palette.secondary.contrastText,
                       transition: ".3s",
                       "&:hover": { opacity: 0.4 }
                     }}
@@ -172,7 +163,7 @@ const NavbarDesktop = ({ hasBanner = true }) => {
                       fontFamily: "Cinzel",
                       fontWeight: "700",
                       fontSize: { xs: "75%", md: "85%" },
-                      color: hasBanner ? (theme) => theme.palette.secondary.contrastText : '#2a93c1',
+                      color: (theme) => theme.palette.secondary.contrastText,
                       opacity: 0.8,
                     }}
                   >
