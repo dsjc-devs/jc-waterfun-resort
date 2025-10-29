@@ -38,7 +38,6 @@ const MiniCheckAvailability = () => {
   };
 
   const handleSearch = () => {
-    // Navigate to the full check availability page with the current criteria
     const searchParams = new URLSearchParams();
     searchParams.set('mode', bookingMode);
     searchParams.set('guests', criteria.guests.toString());
@@ -64,7 +63,7 @@ const MiniCheckAvailability = () => {
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box
         sx={{
-          py: 6,
+          py: { xs: 2, sm: 4, md: 6 },
           background: 'linear-gradient(135deg, #e3f2fd 0%, #f1f8e9 50%, #fff3e0 100%)',
           position: 'relative',
           overflow: 'hidden',
@@ -80,8 +79,8 @@ const MiniCheckAvailability = () => {
           }
         }}
       >
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-          <Box textAlign="center" mb={4}>
+        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1, px: { xs: 1, sm: 2, md: 0 } }}>
+          <Box textAlign="center" mb={{ xs: 2, sm: 3, md: 4 }}>
             <TitleTag title="🌊 Quick Availability Check" />
             <Typography
               variant="h6"
@@ -89,7 +88,8 @@ const MiniCheckAvailability = () => {
               sx={{
                 fontWeight: 400,
                 maxWidth: 600,
-                mx: 'auto'
+                mx: 'auto',
+                fontSize: { xs: '1rem', sm: '1.15rem', md: '1.25rem' }
               }}
             >
               Find your perfect getaway in seconds! Choose between day adventures or relaxing overnight stays.
@@ -99,18 +99,18 @@ const MiniCheckAvailability = () => {
           <Paper
             elevation={0}
             sx={{
-              p: 4,
-              borderRadius: 4,
+              p: { xs: 2, sm: 3, md: 4 },
+              borderRadius: { xs: 2, sm: 3, md: 4 },
               background: 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(10px)',
               border: '1px solid rgba(255, 255, 255, 0.2)',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-              maxWidth: 800,
+              maxWidth: { xs: '100%', sm: 500, md: 800 },
               mx: 'auto'
             }}
           >
-            <Box mb={3} textAlign="center">
-              <Stack direction="row" spacing={2} justifyContent="center" mb={2}>
+            <Box mb={{ xs: 2, sm: 3 }} textAlign="center">
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center" mb={2} alignItems="center">
                 <Chip
                   label="🌅 Day/Night Tours"
                   onClick={() => setBookingMode('tour')}
@@ -119,11 +119,13 @@ const MiniCheckAvailability = () => {
                   sx={{
                     px: 2,
                     py: 1,
-                    fontSize: '0.9rem',
+                    fontSize: { xs: '0.95rem', sm: '0.9rem' },
                     fontWeight: 600,
                     borderRadius: 3,
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
+                    width: { xs: '100%', sm: 'auto' },
+                    mb: { xs: 1, sm: 0 },
                     '&:hover': {
                       transform: 'translateY(-2px)',
                       boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)'
@@ -138,11 +140,13 @@ const MiniCheckAvailability = () => {
                   sx={{
                     px: 2,
                     py: 1,
-                    fontSize: '0.9rem',
+                    fontSize: { xs: '0.95rem', sm: '0.9rem' },
                     fontWeight: 600,
                     borderRadius: 3,
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
+                    width: { xs: '100%', sm: 'auto' },
+                    mb: { xs: 1, sm: 0 },
                     '&:hover': {
                       transform: 'translateY(-2px)',
                       boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)'
@@ -150,7 +154,7 @@ const MiniCheckAvailability = () => {
                   }}
                 />
               </Stack>
-              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: { xs: '0.95rem', sm: '1rem' } }}>
                 {bookingMode === 'tour'
                   ? '⏰ Perfect for day adventures (7AM-5PM) or magical night experiences (7PM-5AM)'
                   : '🗓️ Overnight stays are limited to 1 night only'
@@ -158,7 +162,7 @@ const MiniCheckAvailability = () => {
               </Typography>
             </Box>
 
-            <Grid container spacing={3} alignItems="center">
+            <Grid container spacing={{ xs: 2, sm: 3 }} alignItems="center">
               <Grid item xs={12} sm={bookingMode === 'tour' ? 4 : 3}>
                 {bookingMode === 'tour' ? (
                   <DatePicker
@@ -175,7 +179,8 @@ const MiniCheckAvailability = () => {
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
                             background: 'rgba(255, 255, 255, 0.9)'
-                          }
+                          },
+                          fontSize: { xs: '0.95rem', sm: '1rem' }
                         }}
                       />
                     )}
@@ -195,7 +200,8 @@ const MiniCheckAvailability = () => {
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
                             background: 'rgba(255, 255, 255, 0.9)'
-                          }
+                          },
+                          fontSize: { xs: '0.95rem', sm: '1rem' }
                         }}
                       />
                     )}
@@ -206,14 +212,15 @@ const MiniCheckAvailability = () => {
               <Grid item xs={12} sm={bookingMode === 'tour' ? 3 : 3}>
                 {bookingMode === 'tour' ? (
                   <FormControl fullWidth size="small">
-                    <InputLabel>🌅 Experience</InputLabel>
+                    <InputLabel sx={{ fontSize: { xs: '0.95rem', sm: '1rem' } }}>🌅 Experience</InputLabel>
                     <Select
                       value={criteria.tourType}
                       label="🌅 Experience"
                       onChange={(e) => handleInputChange('tourType', e.target.value)}
                       sx={{
                         borderRadius: 2,
-                        background: 'rgba(255, 255, 255, 0.9)'
+                        background: 'rgba(255, 255, 255, 0.9)',
+                        fontSize: { xs: '0.95rem', sm: '1rem' }
                       }}
                     >
                       <MenuItem value="day">Day Adventure</MenuItem>
@@ -236,7 +243,8 @@ const MiniCheckAvailability = () => {
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
                             background: 'rgba(255, 255, 255, 0.9)'
-                          }
+                          },
+                          fontSize: { xs: '0.95rem', sm: '1rem' }
                         }}
                       />
                     )}
@@ -267,7 +275,8 @@ const MiniCheckAvailability = () => {
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
                       background: 'rgba(255, 255, 255, 0.9)'
-                    }
+                    },
+                    fontSize: { xs: '0.95rem', sm: '1rem' }
                   }}
                 />
               </Grid>
@@ -280,11 +289,11 @@ const MiniCheckAvailability = () => {
                   startIcon={<SearchOutlined />}
                   fullWidth
                   sx={{
-                    py: 1.5,
+                    py: { xs: 1, sm: 1.5 },
                     borderRadius: 3,
                     background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
                     boxShadow: '0 4px 15px rgba(25, 118, 210, 0.3)',
-                    fontSize: '0.9rem',
+                    fontSize: { xs: '1rem', sm: '0.9rem' },
                     fontWeight: 600,
                     textTransform: 'capitalize',
                     '&:hover': {
@@ -299,8 +308,8 @@ const MiniCheckAvailability = () => {
               </Grid>
             </Grid>
 
-            <Box textAlign="center" mt={3}>
-              <Typography variant="body2" color="text.secondary">
+            <Box textAlign="center" mt={{ xs: 2, sm: 3 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.95rem', sm: '1rem' } }}>
                 Need more options? <Button variant="text" onClick={() => navigate('/book-now')} sx={{ textTransform: 'none', fontWeight: 600 }}>View Advanced Search</Button>
               </Typography>
             </Box>
