@@ -1,85 +1,92 @@
-.label-value {
-  h5 {
-    font-weight: 800;
-    font-size: 13px;
-    text-transform: capitalize;
-    margin-bottom: 0rem;
-  }
-
-  .subtitle {
-    font-size: 16px;
-    margin-top: 0;
-    line-height: 1;
-  }
-}
-
-.label-value-bold {
-  h5 {
-    font-weight: 800;
-  }
-}
-
-.label-value-light {
-  h5 {
-    font-weight: 400;
-  }
-}
-
-.label-value-icon {
-  display: flex;
-  align-items: center;
-
-  .icon {
-    margin-right: 1rem;
-
-    svg {
-      font-size: 1.2rem;
-    }
-  }
-
-  .caption {
+  .label-value {
     h5 {
-      font-weight: 300;
-      margin-bottom: 0;
+      font-weight: 800;
+      font-size: 13px;
       text-transform: capitalize;
-      cursor: auto;
+      margin-bottom: 0rem;
     }
 
     .subtitle {
-      cursor: auto;
+      font-size: 16px;
+      margin-top: 0;
+      line-height: 1;
     }
   }
-}
 
-.label-value-ellipsis {
-  position: relative;
-
-  .caption {
-    width: 80%;
+  .label-value-bold {
+    h5 {
+      font-weight: 800;
+    }
   }
 
-  .subtitle {
-    max-width: 100%;
-    /* width: 100%; */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: pointer;
+  .label-value-light {
+    h5 {
+      font-weight: 400;
+    }
   }
 
-  h5 {
-    cursor: pointer;
+  .label-value-icon {
+    display: flex;
+    align-items: center;
+
+    .icon {
+      margin-right: 1rem;
+
+      svg {
+        font-size: 1.2rem;
+      }
+    }
+
+    .caption {
+      h5 {
+        font-weight: 300;
+        margin-bottom: 0;
+        text-transform: capitalize;
+        cursor: auto;
+      }
+
+      .subtitle {
+        cursor: auto;
+      }
+    }
   }
-}
 
-.rdw-editor-toolbar {
-  background: #ddd !important;
-}
+  .label-value-ellipsis {
+    position: relative;
 
-.editorClassName {
-  min-height: 300px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
-}
+    .caption {
+      width: 80%;
+    }
+
+    .subtitle {
+      max-width: 100%;
+      /* width: 100%; */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+
+    h5 {
+      cursor: pointer;
+    }
+  }
+
+  .rdw-editor-toolbar {
+    background: #ddd !important;
+  }
+
+  .editorClassName {
+    min-height: 300px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+  }
+
+  /* Prevent accidental horizontal scroll without constraining widths */
+  html,
+  body,
+  #root {
+    overflow-x: clip;
+  }

@@ -8,10 +8,14 @@ import banner5 from 'assets/images/upload/accom2.jpg'
 import banner6 from 'assets/images/upload/accom3.jpg'
 import banner7 from 'assets/images/upload/accom4.jpg'
 import banner8 from 'assets/images/upload/banner4.jpg'
-import { Box } from '@mui/material'
+import { Box, useTheme, useMediaQuery } from '@mui/material'
 import { useGetCarousels } from 'api/carousel'
 
 const CarouselSection = () => {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'))
+
   const defaultSlides = [
     banner,
     banner2,
@@ -34,28 +38,104 @@ const CarouselSection = () => {
 
   const items = uploadedSlides.length > 0 ? uploadedSlides : defaultSlides
 
+  // Responsive height calculation
+  const getCarouselHeight = () => {
+    if (isMobile) return '50vh' // Reduced height for mobile
+    if (isTablet) return '75vh' // Medium height for tablet
+    return '100vh' // Full height for desktop
+  }
+
+  const carouselHeight = getCarouselHeight()
+
   return (
-    <Carousel
-      navButtonsAlwaysVisible
-      stopAutoPlayOnHover={false}
-      indicators={false}
-      height="100dvh"
-      duration={1000}
-      interval={5000}
+    <Box
+      sx={{
+        position: 'relative',
+        width: '100%',
+        height: carouselHeight,
+        overflow: 'hidden',
+        '& .MuiCarousel-root': {
+          height: '100%',
+        },
+        '& .MuiCarousel-indicators': {
+          display: 'none',
+        },
+        // Custom navigation button styles
+        '& .MuiCarousel-navButtons': {
+          opacity: isMobile ? 0.7 : 1,
+          '&:hover': {
+            opacity: 1,
+          },
+        },
+        '& .MuiCarousel-navButtonsWrapperLeft': {
+          left: isMobile ? '8px' : '16px',
+        },
+        '& .MuiCarousel-navButtonsWrapperRight': {
+          right: isMobile ? '8px' : '16px',
+        },
+        '& .MuiCarousel-navButton': {
+          backgroundColor: 'rgba(255, 255, 255, 0.3)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          width: isMobile ? '40px' : '50px',
+          height: isMobile ? '40px' : '50px',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.5)',
+          },
+          '& svg': {
+            fontSize: isMobile ? '20px' : '24px',
+            color: 'white',
+          },
+        },
+      }}
     >
-      {
-        items.map((item, idx) => (
-          <Box sx={{ position: "relative", height: "100dvh" }} key={idx}>
+      <Carousel
+        navButtonsAlwaysVisible
+        stopAutoPlayOnHover={!isMobile}
+        indicators={false}
+        height={carouselHeight}
+        duration={1000}
+        interval={isMobile ? 4000 : 5000}
+        animation="slide"
+        cycleNavigation={true}
+        swipe={true}
+        navButtonsProps={{
+          style: {
+            borderRadius: '50%',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
+          }
+        }}
+      >
+        {items.map((item, idx) => (
+          <Box
+            key={idx}
+            sx={{
+              position: "relative",
+              height: carouselHeight,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+            }}
+          >
             <Box
               component="img"
               src={item}
+              alt={`Carousel slide ${idx + 1}`}
+              loading={idx === 0 ? "eager" : "lazy"} // Optimize loading
               data-aos="fade-up"
               sx={{
                 width: "100%",
-                height: "100dvh",
+                height: "100%",
                 objectFit: "cover",
+                objectPosition: "center",
+                transition: 'transform 0.3s ease-in-out',
+                '&:hover': {
+                  transform: isMobile ? 'none' : 'scale(1.05)',
+                },
               }}
             />
+            {/* Enhanced overlay with gradient */}
             <Box
               data-aos="fade-up"
               sx={{
@@ -64,14 +144,16 @@ const CarouselSection = () => {
                 left: 0,
                 width: "100%",
                 height: "100%",
-                backgroundColor: "rgba(0, 0, 0, 0.2)",
+                background: isMobile
+                  ? 'linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.4) 100%)'
+                  : 'linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.3) 100%)',
+                pointerEvents: 'none',
               }}
             />
           </Box>
-
-        ))
-      }
-    </Carousel>
+        ))}
+      </Carousel>
+    </Box>
   )
 }
 
