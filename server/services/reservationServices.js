@@ -71,9 +71,9 @@ const createReservation = async (reservationData) => {
     const { accommodationId, startDate, endDate, amount } = reservationData || {};
     const { totalPaid, minimumPayable, total } = amount || {};
 
-    // if (totalPaid < minimumPayable) {
-    //   throw new Error("Total paid must be equal to or greater than the minimum payable amount.");
-    // }
+    if (totalPaid < minimumPayable) {
+      throw new Error("Total paid must be equal to or greater than the minimum payable amount.");
+    }
 
     const conflict = await hasDateConflict(accommodationId, startDate, endDate);
     if (conflict) {
