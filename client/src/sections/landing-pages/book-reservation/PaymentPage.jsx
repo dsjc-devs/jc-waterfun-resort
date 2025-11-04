@@ -249,7 +249,8 @@ const PaymentPage = ({
           loadingPosition="start"
           style={{ width: '150px' }}
           disabled={
-            loading || !totalPaid ||
+            loading ||
+            !totalPaid ||
             Number(totalPaid) < minPayable ||
             Number(totalPaid) > maxPayable ||
             (!!recaptchaSiteKey && !recaptchaToken)
