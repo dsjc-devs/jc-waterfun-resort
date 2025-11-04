@@ -62,7 +62,9 @@ const MultiFileUpload = ({
   hideButton,
   maxFileSize = 20, // 20MB
   multiple = true,
-  acceptedFileTypes = fileTypes
+  acceptedFileTypes = fileTypes,
+  selectedIndex = 0,
+  onSelect
 }) => {
   const maxSize = maxFileSize * 1024 * 1024;
   const { getRootProps, getInputProps, isDragActive, isDragReject, fileRejections } = useDropzone({
@@ -77,7 +79,12 @@ const MultiFileUpload = ({
         })
       );
 
-      setFieldValue('files', files ? [...files, ...mappedFiles] : mappedFiles);
+      const nextFiles = files ? [...files, ...mappedFiles] : mappedFiles;
+      setFieldValue('files', nextFiles);
+      // if no selection yet, default to first file
+      if (typeof selectedIndex !== 'number' || selectedIndex < 0) {
+        setFieldValue('thumbnailIndex', 0);
+      }
     },
 
   });
@@ -89,15 +96,24 @@ const MultiFileUpload = ({
   const onRemove = (fileToRemove) => {
     if (!files) return;
 
-    const filteredItems = files.filter((file) => {
+    const removeIndex = files.findIndex((f) => (fileToRemove.isExisting ? f.preview === fileToRemove.preview : f === fileToRemove));
+    const filteredItems = files.filter((file, idx) => {
       if (fileToRemove.isExisting) {
-        return file.preview !== fileToRemove.preview;
+        return idx !== removeIndex;
       } else {
-        return file !== fileToRemove;
+        return idx !== removeIndex;
       }
     });
 
     setFieldValue('files', filteredItems);
+    // adjust selected thumbnail index if necessary
+    if (filteredItems.length === 0) {
+      setFieldValue('thumbnailIndex', undefined);
+    } else if (removeIndex === selectedIndex) {
+      setFieldValue('thumbnailIndex', 0);
+    } else if (removeIndex < selectedIndex) {
+      setFieldValue('thumbnailIndex', selectedIndex - 1);
+    }
   };
 
   return (
@@ -138,7 +154,14 @@ const MultiFileUpload = ({
         </Stack>
         {fileRejections.length > 0 && <RejectionFiles fileRejections={fileRejections} maxSize={maxSize} />}
         {files && files.length > 0 && (
-          <FilesPreview files={files} showList={showList} onRemove={onRemove} type={type} />
+          <FilesPreview
+            files={files}
+            showList={showList}
+            onRemove={onRemove}
+            type={type}
+            selectedIndex={selectedIndex}
+            onSelect={(idx) => (onSelect ? onSelect(idx) : setFieldValue('thumbnailIndex', idx))}
+          />
         )}
       </Box>
 
@@ -165,6 +188,8 @@ MultiFileUpload.propTypes = {
   sx: PropTypes.object,
   type: PropTypes.string,
   maxFileSize: PropTypes.number,
+  selectedIndex: PropTypes.number,
+  onSelect: PropTypes.func,
 };
 
 export default MultiFileUpload;
