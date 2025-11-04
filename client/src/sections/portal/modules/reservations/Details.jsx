@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
+import exportReservationToPdf from "utils/exportReservationPdf";
 import MainCard from "components/MainCard";
 import {
   MailOutlined,
@@ -161,10 +162,19 @@ const Details = ({ reservationData = {} }) => {
     }
   };
 
+
   return (
     <React.Fragment>
-      {!isCustomer && (
-        <Stack direction='row' justifyContent='flex-end' spacing={2} marginBlock={2}>
+      <Stack direction='row' justifyContent='flex-end' spacing={2} marginBlock={2}>
+        <AnimateButton>
+          <Button
+            variant='contained'
+            onClick={() => exportReservationToPdf(reservationData, 'Show this to the receptionist upon entry to verify your reservation.')}
+          >
+            Export to PDF
+          </Button>
+        </AnimateButton>
+        {!isCustomer && (
           <AnimateButton>
             <Button
               variant='contained'
@@ -175,32 +185,29 @@ const Details = ({ reservationData = {} }) => {
               Edit
             </Button>
           </AnimateButton>
-          {hasPendingResched && (
-            <Stack direction='row' spacing={1}>
-              <AnimateButton>
-                <Button disabled={submitting} variant='contained' color='success' onClick={handleApprove}>
-                  Approve Reschedule
-                </Button>
-              </AnimateButton>
-              <AnimateButton>
-                <Button disabled={submitting} variant='outlined' color='error' onClick={() => setOpenReject(true)}>
-                  Reject
-                </Button>
-              </AnimateButton>
-            </Stack>
-          )}
-        </Stack>
-      )}
-
-      {isCustomer && (
-        <Stack direction='row' justifyContent='flex-end' spacing={2} marginBlock={2}>
+        )}
+        {hasPendingResched && !isCustomer && (
+          <Stack direction='row' spacing={1}>
+            <AnimateButton>
+              <Button disabled={submitting} variant='contained' color='success' onClick={handleApprove}>
+                Approve Reschedule
+              </Button>
+            </AnimateButton>
+            <AnimateButton>
+              <Button disabled={submitting} variant='outlined' color='error' onClick={() => setOpenReject(true)}>
+                Reject
+              </Button>
+            </AnimateButton>
+          </Stack>
+        )}
+        {isCustomer && (
           <AnimateButton>
             <Button disabled={!canRequestReschedule || submitting} variant='contained' color='primary' onClick={() => setOpenResched(true)}>
               Request Reschedule
             </Button>
           </AnimateButton>
-        </Stack>
-      )}
+        )}
+      </Stack>
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={8}>

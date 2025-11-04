@@ -34,6 +34,8 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { truncate } from 'lodash';
+import { toast } from 'react-toastify';
+import { DownloadOutlined } from '@ant-design/icons';
 
 import ReusableTable from 'components/ReusableTable'
 import Avatar from 'components/@extended/Avatar';
@@ -46,7 +48,9 @@ import useGetPosition from 'hooks/useGetPosition';
 import AnimateButton from 'components/@extended/AnimateButton';
 import textFormatter from 'utils/textFormatter';
 import ConfirmationDialog from 'components/ConfirmationDialog';
-import { toast } from 'react-toastify';
+import exportReservationToPdf from 'utils/exportReservationPdf';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const ReservationsTable = () => {
   const theme = useTheme()
@@ -410,7 +414,113 @@ const ReservationsTable = () => {
     } else {
       return [reservationColumn, customerColumn, reservationDatesColumn, dateCreatedColumn, guestsColumns, statusColumn, rescheduleColumn, financialsColumn, actionsColumn];
     }
-  }, [isCustomer]);
+  }, [isCustomer])
+
+  // Bulk export function (table-style; uses one table across pages)
+  const handleBulkExportToPdf = () => {
+    if (!filteredReservations.length) return;
+    const doc = new jsPDF('p', 'pt'); // use points for better sizing
+
+    const fmt = (v) => (v === undefined || v === null || v === '' ? '-' : String(v));
+    const peso = (value) => {
+      const num = Number(value || 0);
+      try {
+        const formatted = new Intl.NumberFormat('en-PH', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(num);
+        return `PHP ${formatted}`;
+      } catch (e) {
+        const fixed = (isFinite(num) ? num : 0).toFixed(2);
+        return `PHP ${fixed}`;
+      }
+    };
+    const formatDateTime = (value) => {
+      if (!value) return '-';
+      const d = new Date(value);
+      if (isNaN(d.getTime())) return fmt(value);
+      return d.toLocaleString(undefined, {
+        year: 'numeric', month: 'short', day: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+      });
+    };
+
+    // Header
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.text('Reservations Bulk Export', 40, 40);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Generated: ${formatDateTime(new Date())}`, 40, 58);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(40, 120, 40);
+    doc.text('Show this to the receptionist upon entry to verify your reservation.', 40, 76);
+    doc.setTextColor(0, 0, 0);
+
+    // Build table rows
+    const body = filteredReservations.map((r) => {
+      const paymentStatus = (r?.amount?.totalPaid || 0) >= (r?.amount?.total || 0)
+        ? 'Fully Paid' : ((r?.amount?.totalPaid || 0) > 0 ? 'Partially Paid' : 'Unpaid');
+      const balance = (r?.amount?.total || 0) - (r?.amount?.totalPaid || 0);
+      const customer = `${fmt(r?.userData?.firstName)} ${fmt(r?.userData?.lastName)}`.trim();
+      return [
+        fmt(r?.reservationId),
+        customer,
+        fmt(r?.userData?.emailAddress),
+        fmt(r?.accommodationData?.name),
+        formatDateTime(r?.startDate),
+        formatDateTime(r?.endDate),
+        fmt(r?.guests),
+        titleCase(fmt(r?.status)),
+        (r?.rescheduleRequest?.status ? titleCase(r?.rescheduleRequest?.status) : 'None'),
+        paymentStatus,
+        peso(r?.amount?.total),
+        peso(r?.amount?.totalPaid),
+        peso(balance),
+        formatDateTime(r?.createdAt)
+      ];
+    });
+
+    autoTable(doc, {
+      startY: 96,
+      styles: { fontSize: 8, cellPadding: 6 },
+      headStyles: { fillColor: [63, 81, 181], halign: 'center', valign: 'middle' },
+      bodyStyles: { valign: 'middle' },
+      columnStyles: {
+        0: { cellWidth: 70 },   // ID
+        1: { cellWidth: 110 },  // Customer
+        2: { cellWidth: 150 },  // Email
+        3: { cellWidth: 120 },  // Accommodation
+        4: { cellWidth: 110 },  // Start
+        5: { cellWidth: 110 },  // End
+        6: { cellWidth: 50, halign: 'right' },   // Guests
+        7: { cellWidth: 80 },   // Status
+        8: { cellWidth: 80 },   // Resched
+        9: { cellWidth: 90 },   // Payment
+        10: { cellWidth: 90, halign: 'right' },   // Total
+        11: { cellWidth: 90, halign: 'right' },   // Paid
+        12: { cellWidth: 90, halign: 'right' },   // Balance
+        13: { cellWidth: 120 }   // Created At
+      },
+      head: [[
+        'ID', 'Customer', 'Email', 'Accommodation', 'Start', 'End', 'Guests',
+        'Status', 'Resched', 'Payment', 'Total', 'Paid', 'Balance', 'Created At'
+      ]],
+      body
+    });
+
+    // Footer per page
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      const pageHeight = doc.internal.pageSize.getHeight();
+      doc.setFontSize(9);
+      doc.text('Generated by John Cezar Waterfun Resort • reservations list', 40, pageHeight - 16);
+      doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.getWidth() - 100, pageHeight - 16);
+    }
+
+    doc.save('reservations-bulk-export.pdf');
+  };
 
   return (
     <React.Fragment>
@@ -738,6 +848,17 @@ const ReservationsTable = () => {
         settings={{
           otherActionButton: (
             <React.Fragment>
+              <AnimateButton>
+                <Button
+                  variant='contained'
+                  color='secondary'
+                  startIcon={<DownloadOutlined />}
+                  onClick={handleBulkExportToPdf}
+                  sx={{ mr: 1 }}
+                >
+                  Bulk Export to PDF
+                </Button>
+              </AnimateButton>
               {(isAdmin || isMasterAdmin) && (
                 <AnimateButton>
                   <Button
@@ -768,6 +889,19 @@ const ReservationsTable = () => {
         >
           <EyeOutlined style={{ marginRight: 8 }} />
           View
+        </MenuItem>
+
+        <MenuItem
+          onClick={() => {
+            const row = reservations.find(r => r.reservationId === openMenu.reservationId)
+            if (row) {
+              exportReservationToPdf(row, 'Show this to the receptionist upon entry to verify your reservation.')
+            }
+            handleMenuClose()
+          }}
+        >
+          <DownloadOutlined style={{ marginRight: 8 }} />
+          Export to PDF
         </MenuItem>
 
         {(isAdmin || isMasterAdmin) && (
