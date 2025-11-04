@@ -23,7 +23,6 @@ import PageTitle from 'components/PageTitle';
 import FormWrapper from 'components/FormWrapper';
 import AnimateButton from 'components/@extended/AnimateButton';
 import LoadingButton from 'components/@extended/LoadingButton';
-import SingleFileUpload from 'components/dropzone/FileUpload';
 import MultiFileUpload from 'components/dropzone/MultiFile';
 import Editor from 'components/Editor';
 import MainCard from 'components/MainCard';
@@ -56,7 +55,10 @@ const validationSchema = Yup.object().shape({
     .positive("Price must be greater than 0"),
   files: Yup.array()
     .min(1, "At least one picture is required"),
-  thumbnail: Yup.mixed().required("Thumbnail is required"),
+  thumbnailIndex: Yup.number()
+    .typeError("Please select a thumbnail from the pictures")
+    .required("Please select a thumbnail from the pictures")
+    .min(0, "Invalid thumbnail selection"),
   notes: Yup.string().required("Notes are required"),
 });
 
@@ -85,7 +87,11 @@ const AmenityForm = () => {
         name: pic._id || pic.image.split('/').pop(),
         isExisting: true
       })) || [],
-      thumbnail: data?.thumbnail || [],
+      thumbnailIndex: (() => {
+        if (!data?.thumbnail || !Array.isArray(data?.pictures)) return 0;
+        const idx = data.pictures.findIndex((p) => p.image === data.thumbnail);
+        return idx >= 0 ? idx : 0;
+      })(),
     },
     validationSchema,
     enableReinitialize: true,
@@ -107,11 +113,8 @@ const AmenityForm = () => {
         formData.append('price', values.price);
         formData.append('notes', values.notes);
 
-        if (values.thumbnail instanceof File) {
-          formData.append('thumbnail', values.thumbnail);
-        } else if (typeof values.thumbnail === 'string') {
-          formData.append('thumbnail', values.thumbnail);
-        }
+        // send selected picture index as thumbnail
+        formData.append('thumbnailIndex', String(values.thumbnailIndex ?? 0));
 
         if (isEditMode) {
           formData.append("status", values.status);
@@ -129,9 +132,8 @@ const AmenityForm = () => {
     }
   });
 
-  const handleRemoveFile = (file) => {
-    const updatedFiles = formik.values.files.filter(f => f !== file);
-    formik.setFieldValue('files', updatedFiles);
+  const handleSelectThumbnail = (index) => {
+    formik.setFieldValue('thumbnailIndex', index);
   };
 
   return (
@@ -266,26 +268,22 @@ const AmenityForm = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={5}>
-                  <Typography variant='body1'>Thumbnail (Required)</Typography>
-                  <SingleFileUpload
-                    fieldName='thumbnail'
-                    file={formik.values.thumbnail || ''}
-                    setFieldValue={formik.setFieldValue}
-                    error={formik.errors.thumbnail}
-                  />
-                </Grid>
-
                 <Grid item xs={12}>
                   <Typography variant='body1'>Pictures (Required)</Typography>
                   <MultiFileUpload
                     setFieldValue={formik.setFieldValue}
                     files={formik.values.files || []}
-                    onRemove={handleRemoveFile}
                     error={formik.touched.files && !!formik.errors.files}
                     hideButton={true}
                     showList={true}
+                    selectedIndex={formik.values.thumbnailIndex}
+                    onSelect={handleSelectThumbnail}
                   />
+                  {formik.touched.thumbnailIndex && formik.errors.thumbnailIndex && (
+                    <FormHelperText error id="helper-text-thumbnailIndex">
+                      {formik.errors.thumbnailIndex}
+                    </FormHelperText>
+                  )}
                 </Grid>
 
                 <Grid item xs={12} md={12}>

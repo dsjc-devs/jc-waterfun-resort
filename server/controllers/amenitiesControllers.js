@@ -5,11 +5,16 @@ import textFormatter from "../utils/textFormatter.js";
 
 const createAmenities = expressAsync(async (req, res) => {
   try {
-    const thumbnail = req.files?.["thumbnail"]?.[0]?.path || "";
-
     const pictures = req.files?.["pictures"]
       ? req.files["pictures"].map((file) => ({ image: file.path }))
       : [];
+
+    // derive thumbnail from selected index (fallback to first picture)
+    const thumbnailIndex = Number.isInteger(parseInt(req.body?.thumbnailIndex))
+      ? parseInt(req.body.thumbnailIndex)
+      : 0;
+    const safeIndex = Math.min(Math.max(thumbnailIndex, 0), Math.max(pictures.length - 1, 0));
+    const thumbnail = pictures.length > 0 ? pictures[safeIndex]?.image : "";
 
     const payload = {
       ...req.body,
@@ -69,15 +74,23 @@ const updateAmenitiesById = expressAsync(async (req, res) => {
       return res.status(404).json({ message: "Amenities not found" });
     }
 
-    const thumbnail =
-      req.files?.["thumbnail"]?.[0]?.path || amenities.thumbnail;
-
     const newPictures =
       req.files?.["pictures"]?.map((file) => ({ image: file.path })) || [];
     const existingPictures = req.body.existingFiles
       ? JSON.parse(req.body.existingFiles)
       : amenities.pictures || [];
     const pictures = [...existingPictures, ...newPictures];
+
+    // compute thumbnail from provided index or preserve current if still present
+    let thumbnailIndex = Number.isInteger(parseInt(req.body?.thumbnailIndex))
+      ? parseInt(req.body.thumbnailIndex)
+      : undefined;
+    if (thumbnailIndex === undefined) {
+      const currentIdx = pictures.findIndex((p) => p.image === amenities.thumbnail);
+      thumbnailIndex = currentIdx >= 0 ? currentIdx : 0;
+    }
+    const safeIndex = Math.min(Math.max(thumbnailIndex, 0), Math.max(pictures.length - 1, 0));
+    const thumbnail = pictures[safeIndex]?.image || amenities.thumbnail;
 
     const payload = {
       ...req.body,
