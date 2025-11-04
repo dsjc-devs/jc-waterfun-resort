@@ -65,7 +65,7 @@ const ReservationsTable = () => {
   const [showFilters, setShowFilters] = useState(false)
 
   const [filters, setFilters] = useState({
-    status: '',
+    status: 'not-completed',
     paymentStatus: '',
     rescheduleStatus: '',
     startDate: '',
@@ -145,7 +145,11 @@ const ReservationsTable = () => {
 
   const filteredReservations = useMemo(() => {
     return reservations.filter(reservation => {
-      if (filters.status && reservation.status !== filters.status) return false
+      if (filters.status === 'not-completed') {
+        if (reservation.status === 'COMPLETED') return false;
+      } else if (filters.status && reservation.status !== filters.status) {
+        return false;
+      }
 
       if (filters.paymentStatus) {
         const paymentsStatus = reservation?.amount?.totalPaid >= reservation?.amount?.total
@@ -614,6 +618,9 @@ const ReservationsTable = () => {
                     onChange={(e) => handleFilterChange('status', e.target.value)}
                     sx={{ borderRadius: 2 }}
                   >
+                    <MenuItem value="not-completed">
+                      <Chip size="small" label="Not Completed" color="primary" />
+                    </MenuItem>
                     <MenuItem value="">All Statuses</MenuItem>
                     {filterOptions.statuses.map(status => (
                       <MenuItem key={status} value={status}>
