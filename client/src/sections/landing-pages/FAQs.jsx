@@ -1,13 +1,24 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Accordion, AccordionSummary, AccordionDetails, Typography, Container, Box, Paper, Button } from '@mui/material'
 import { ExpandMore, ArrowForward } from '@mui/icons-material'
 import { useGetFAQS } from 'api/faqs'
 import { useNavigate } from 'react-router-dom'
 
+import AOS from 'aos'
+
 const FAQs = ({ limit = 4 }) => {
+
   const { data } = useGetFAQS({ status: 'POSTED', limit })
   const { faqs = [] } = data || {}
   const navigate = useNavigate()
+
+  useEffect(() => {
+    AOS.init({ once: true });
+  }, []);
+
+  useEffect(() => {
+    AOS.refresh();
+  }, [faqs]);
 
   return (
     <Box

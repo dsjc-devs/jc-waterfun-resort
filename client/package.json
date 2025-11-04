@@ -53,6 +53,8 @@
     "framer-motion": "^11.0.8",
     "gsap": "^3.13.0",
     "inspreact": "^1.2.1",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "mdi-material-ui": "^7.9.4",
