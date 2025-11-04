@@ -86,9 +86,14 @@ const updateAccommodationById = async (id, updateData) => {
       const accommodation = await Accommodations.findById(id);
       if (!accommodation) throw new Error("Accommodation not found");
 
+      // Exclude fields that should not be bulk-updated across the group
+      const bulkFieldsToUpdate = { ...finalFieldsToUpdate };
+      delete bulkFieldsToUpdate.name;
+      delete bulkFieldsToUpdate.isFeatured;
+
       updatedAccommodation = await Accommodations.updateMany(
         { groupKey: accommodation.groupKey },
-        { $set: finalFieldsToUpdate },
+        { $set: bulkFieldsToUpdate },
         { runValidators: true }
       );
     } else {
