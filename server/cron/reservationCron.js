@@ -5,6 +5,7 @@ export const startReservationCron = () => {
   cron.schedule("* * * * *", async () => {
     try {
       await reservationServices.checkAndUpdateReservationStatus();
+      await reservationServices.sendUpcomingReservationReminders();
     } catch (error) {
       console.error("Error running reservation status check:", error);
     }
