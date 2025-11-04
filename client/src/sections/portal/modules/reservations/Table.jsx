@@ -65,7 +65,7 @@ const ReservationsTable = () => {
   const [showFilters, setShowFilters] = useState(false)
 
   const [filters, setFilters] = useState({
-    status: 'not-completed',
+    status: '',
     paymentStatus: '',
     rescheduleStatus: '',
     startDate: '',
@@ -74,7 +74,7 @@ const ReservationsTable = () => {
     accommodationType: '',
     minAmount: '',
     maxAmount: '',
-    dateRange: 'all'
+    dateRange: ''
   })
 
   const navigate = useNavigate()
@@ -152,9 +152,22 @@ const ReservationsTable = () => {
       }
 
       if (filters.paymentStatus) {
-        const paymentsStatus = reservation?.amount?.totalPaid >= reservation?.amount?.total
-        const paymentsStatusLabel = paymentsStatus ? 'FULLY_PAID' : (reservation?.amount?.totalPaid > 0 ? 'PARTIALLY_PAID' : 'UNPAID')
-        if (paymentsStatusLabel !== filters.paymentStatus) return false
+        const now = new Date();
+        const endDate = new Date(reservation?.endDate);
+        let paymentsStatusLabel;
+        if (reservation?.amount?.totalPaid >= reservation?.amount?.total) {
+          paymentsStatusLabel = 'FULLY_PAID';
+        } else if (reservation?.amount?.totalPaid > 0) {
+          // If end date has passed and still partially paid, mark as UNPAID
+          if (endDate < now) {
+            paymentsStatusLabel = 'UNPAID';
+          } else {
+            paymentsStatusLabel = 'PARTIALLY_PAID';
+          }
+        } else {
+          paymentsStatusLabel = 'UNPAID';
+        }
+        if (paymentsStatusLabel !== filters.paymentStatus) return false;
       }
 
       if (filters.customer) {
@@ -272,8 +285,20 @@ const ReservationsTable = () => {
       label: isCustomer ? 'Payment' : 'Financials',
       align: 'center',
       renderCell: (row) => {
-        const paymentsStatus = row?.amount?.totalPaid >= row?.amount?.total
-        const paymentsStatusLabel = paymentsStatus ? 'FULLY_PAID' : (row?.amount?.totalPaid > 0 ? 'PARTIALLY_PAID' : 'UNPAID')
+        const now = new Date();
+        const endDate = new Date(row?.endDate);
+        let paymentsStatusLabel;
+        if (row?.amount?.totalPaid >= row?.amount?.total) {
+          paymentsStatusLabel = 'FULLY_PAID';
+        } else if (row?.amount?.totalPaid > 0) {
+          if (endDate < now) {
+            paymentsStatusLabel = 'UNPAID';
+          } else {
+            paymentsStatusLabel = 'PARTIALLY_PAID';
+          }
+        } else {
+          paymentsStatusLabel = 'UNPAID';
+        }
 
         return (
           <Stack textAlign='left'>
