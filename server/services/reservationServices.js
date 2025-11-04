@@ -1,3 +1,5 @@
+import { sendSMS } from "../utils/sendSMS.js";
+
 import Reservation from "../models/reservationsModels.js";
 import generateRandomString from "../utils/generateRandomString.js";
 import reservationDetails from "../templates/reservation-details.js";
@@ -88,9 +90,22 @@ const createReservation = async (reservationData) => {
     });
 
     const hasEmailAddress = reservationData?.userData?.emailAddress;
+    const phoneNumber = reservationData?.userData?.phoneNumber;
 
     if (hasEmailAddress) {
       await sendReservationDetails({ ...reservationData, reservationId });
+    }
+
+    // Send SMS confirmation if phone is provided
+    if (phoneNumber) {
+      try {
+        const acc = await Accommodations.findById(accommodationId);
+        const formatDate = (d) => new Date(d).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+        const msg = `Reservation CONFIRMED: ${reservationId}\n${acc?.name || 'Accommodation'}\n${formatDate(startDate)} to ${formatDate(endDate)}.\nThank you for booking!`;
+        await sendSMS({ number: phoneNumber, message: msg });
+      } catch (e) {
+        console.error("Error sending reservation SMS:", e?.message);
+      }
     }
 
     return reservation;
@@ -306,6 +321,17 @@ const requestRescheduleById = async (reservationId, { newStartDate, newEndDate, 
       await sendEmail(emailAddress, subject, emailContent);
     }
 
+    // SMS notify
+    if (userData?.phoneNumber) {
+      try {
+        const formatDate = (d) => new Date(d).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+        const msg = `Reschedule request received: ${reservationId}\nNew: ${formatDate(newStart)} to ${formatDate(newEnd)}.\nWe will update you soon.`;
+        await sendSMS({ number: userData.phoneNumber, message: msg });
+      } catch (e) {
+        console.error("Error sending reschedule request SMS:", e?.message);
+      }
+    }
+
     return reservation;
   } catch (error) {
     console.error("Error requesting reschedule:", error);
@@ -373,6 +399,18 @@ const decideRescheduleById = async (reservationId, { action, reason, decidedBy }
       const emailContent = await emailTemplate(body);
       const subject = `Reschedule ${reservation.rescheduleRequest.status} - ${reservationId}`;
       await sendEmail(emailAddress, subject, emailContent);
+    }
+
+    // SMS notify decision
+    if (userData?.phoneNumber) {
+      try {
+        const formatDate = (d) => new Date(d).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+        const decision = reservation.rescheduleRequest.status;
+        const msg = `Reschedule ${decision}: ${reservationId}\n${formatDate(reservation.rescheduleRequest.newStartDate)} to ${formatDate(reservation.rescheduleRequest.newEndDate)}${reason ? `\nReason: ${reason}` : ''}`;
+        await sendSMS({ number: `09619957794`, message: msg });
+      } catch (e) {
+        console.error("Error sending reschedule decision SMS:", e?.message);
+      }
     }
 
     return reservation;
