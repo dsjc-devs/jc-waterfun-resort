@@ -942,58 +942,290 @@ const Dashboard = () => {
 
   const renderCustomerDashboard = () => (
     <React.Fragment>
-      <PageTitle title='Customer Dashboard' />
-      <Container maxWidth="md" sx={{ mt: 3 }}>
+      <PageTitle title='My Dashboard' />
+      <Container maxWidth="lg" sx={{ mt: 3 }}>
         <Box mb={4}>
-          <Typography variant="h5" fontWeight={700} color="text.primary" mb={1}>
-            Welcome, {user?.firstName}!
+          <Typography variant="h4" fontWeight={700} color="text.primary" mb={1}>
+            Welcome back, {user?.firstName}! 🏖️
+          </Typography>
+          <Typography variant="body1" color="text.secondary" mb={1}>
+            {dateString}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Your reservations and activity.
+            Ready for your next amazing experience at John Cezar Waterfun Resort?
           </Typography>
         </Box>
-        <Stack direction="row" spacing={2} sx={{ mb: 4 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            component={RouterLink}
-            to="/portal/reservations"
-          >
-            Reservations
-          </Button>
-          <Button
-            variant="contained"
-            color="success"
-            component={RouterLink}
-            to="/portal/testimonial"
-          >
-            Add Testimonial
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            component={RouterLink}
-            to="/book-now"
-          >
-            Book Now
-          </Button>
-        </Stack>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
+
+        {/* Quick Actions for Customers */}
+        <Box mb={4}>
+          <Typography variant="h6" fontWeight={600} color="text.primary" mb={2}>
+            Quick Actions
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={4}>
+              <Button
+                variant="contained"
+                color="primary"
+                component={RouterLink}
+                to="/book-now"
+                startIcon={<CalendarOutlined />}
+                fullWidth
+                sx={{
+                  py: 3,
+                  borderRadius: 3,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+                  background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
+                  '&:hover': {
+                    boxShadow: '0 6px 16px rgba(25, 118, 210, 0.4)',
+                    transform: 'translateY(-2px)'
+                  },
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <Box textAlign="center">
+                  <Typography variant="h6" fontWeight={600} mb={0.5}>
+                    Book Now
+                  </Typography>
+                  <Typography variant="caption" color="rgba(255,255,255,0.9)">
+                    Reserve your perfect getaway
+                  </Typography>
+                </Box>
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Button
+                variant="contained"
+                color="secondary"
+                component={RouterLink}
+                to="/portal/reservations"
+                startIcon={<CalendarTodayOutlined />}
+                fullWidth
+                sx={{
+                  py: 3,
+                  borderRadius: 3,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  boxShadow: '0 4px 12px rgba(156, 39, 176, 0.3)',
+                  background: 'linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%)',
+                  '&:hover': {
+                    boxShadow: '0 6px 16px rgba(156, 39, 176, 0.4)',
+                    transform: 'translateY(-2px)'
+                  },
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <Box textAlign="center">
+                  <Typography variant="h6" fontWeight={600} mb={0.5}>
+                    My Reservations
+                  </Typography>
+                  <Typography variant="caption" color="rgba(255,255,255,0.9)">
+                    Manage your bookings
+                  </Typography>
+                </Box>
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Button
+                variant="contained"
+                color="success"
+                component={RouterLink}
+                to="/portal/testimonial"
+                startIcon={<TrophyOutlined />}
+                fullWidth
+                sx={{
+                  py: 3,
+                  borderRadius: 3,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  boxShadow: '0 4px 12px rgba(46, 125, 50, 0.3)',
+                  background: 'linear-gradient(135deg, #2e7d32 0%, #66bb6a 100%)',
+                  '&:hover': {
+                    boxShadow: '0 6px 16px rgba(46, 125, 50, 0.4)',
+                    transform: 'translateY(-2px)'
+                  },
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <Box textAlign="center">
+                  <Typography variant="h6" fontWeight={600} mb={0.5}>
+                    Share Experience
+                  </Typography>
+                  <Typography variant="caption" color="rgba(255,255,255,0.9)">
+                    Write a testimonial
+                  </Typography>
+                </Box>
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+
+        {/* Customer Stats Cards */}
+        <Grid container spacing={3} mb={4}>
+          <Grid item xs={12} md={6}>
             <DashboardCard
-              title="Your Reservations"
-              value={stats.reservations.today}
-              icon={<CalendarOutlined />}
+              title="My Reservations"
+              value={stats.reservations.total}
+              subtitle="Total Bookings"
+              icon={<CalendarOutlined style={{ fontSize: 28 }} />}
               color="primary"
               isLoading={isLoading}
               details={[
-                { icon: <CalendarTodayOutlined />, label: 'Upcoming', value: stats.reservations.today },
-                { icon: <CalendarMonth />, label: 'This Month', value: stats.reservations.month }
+                { icon: <CalendarTodayOutlined fontSize="small" />, label: 'Upcoming', value: stats.reservations.today },
+                { icon: <CalendarMonth fontSize="small" />, label: 'This Month', value: stats.reservations.month },
+                { icon: <Event fontSize="small" />, label: 'All Time', value: stats.reservations.total }
               ]}
               gradient={true}
+              trend={{
+                icon: <TrendingUp fontSize="small" />,
+                value: `+${stats.reservations.month || 0}`,
+                positive: true
+              }}
             />
           </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper
+              elevation={2}
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                height: '100%',
+                background: 'linear-gradient(135deg, #ff7043 0%, #ffab91 100%)',
+                color: 'white',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
+              }}
+            >
+              <Box display="flex" alignItems="center" mb={2}>
+                <TrophyOutlined style={{ fontSize: 32, marginRight: 12 }} />
+                <Typography variant="h6" fontWeight={600}>
+                  Resort Experience
+                </Typography>
+              </Box>
+              <Typography variant="h4" fontWeight={700} mb={1}>
+                Welcome Member!
+              </Typography>
+              <Typography variant="body2" color="rgba(255,255,255,0.9)" mb={2}>
+                Thank you for choosing John Cezar Waterfun Resort for your memorable experiences.
+              </Typography>
+              <Typography variant="caption" color="rgba(255,255,255,0.8)">
+                Member since: {new Date(user?.createdAt || Date.now()).getFullYear()}
+              </Typography>
+            </Paper>
+          </Grid>
         </Grid>
+
+        {/* Featured Services */}
+        <Box mb={4}>
+          <Typography variant="h6" fontWeight={600} color="text.primary" mb={2}>
+            Explore Our Services
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={6}>
+              <Paper
+                elevation={1}
+                onClick={() => window.open(`/accommodations`)}
+                sx={{
+                  p: 2,
+                  borderRadius: 2,
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
+                  }
+                }}
+              >
+                <HomeOutlined style={{ fontSize: 32, color: '#1976d2', marginBottom: 8 }} />
+                <Typography variant="subtitle2" fontWeight={600} mb={1}>
+                  Accommodations
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Rooms, cottages & event halls
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} sm={6} md={6}>
+              <Paper
+                onClick={() => window.open(`/amenities`)}
+                elevation={1}
+                sx={{
+                  p: 2,
+                  borderRadius: 2,
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
+                  }
+                }}
+              >
+                <TrophyOutlined style={{ fontSize: 32, color: '#f57c00', marginBottom: 8 }} />
+                <Typography variant="subtitle2" fontWeight={600} mb={1}>
+                  Amenities
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Pools, activities & facilities
+                </Typography>
+              </Paper>
+            </Grid>
+          </Grid>
+        </Box>
+
+        {/* Recent Activity */}
+        <Box mt={4}>
+          <Typography variant="h6" fontWeight={600} color="text.primary" mb={2}>
+            Your Recent Activity
+          </Typography>
+          <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
+            {stats.recentActivity.length > 0 ? (
+              stats.recentActivity.map((activity, idx) => (
+                <Box key={idx} sx={{ display: 'flex', alignItems: 'center', py: 1.5, borderBottom: idx < stats.recentActivity.length - 1 ? '1px solid #f0f0f0' : 'none' }}>
+                  <Avatar sx={{ bgcolor: 'primary.main', mr: 2, width: 40, height: 40 }}>
+                    <CalendarOutlined />
+                  </Avatar>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="body2" fontWeight={600} color="text.primary">
+                      {activity.detail}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {activity.time}
+                    </Typography>
+                  </Box>
+                  <Chip
+                    label={activity.type}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                  />
+                </Box>
+              ))
+            ) : (
+              <Box textAlign="center" py={4}>
+                <CalendarOutlined style={{ fontSize: 48, color: '#ccc', marginBottom: 16 }} />
+                <Typography variant="h6" color="text.secondary" mb={1}>
+                  No recent activity
+                </Typography>
+                <Typography variant="body2" color="text.secondary" mb={3}>
+                  Start by making your first reservation!
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  component={RouterLink}
+                  to="/book-now"
+                  startIcon={<CalendarOutlined />}
+                >
+                  Book Now
+                </Button>
+              </Box>
+            )}
+          </Paper>
+        </Box>
       </Container>
     </React.Fragment>
   );

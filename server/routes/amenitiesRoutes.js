@@ -16,11 +16,9 @@ router.post(
   protect,
   createUploadMiddleware({
     fields: [
-      { name: "thumbnail", maxCount: 1 },
       { name: "pictures", maxCount: 10 },
     ],
     fieldFolders: {
-      thumbnail: "amenities/thumbnails",
       pictures: "amenities/pictures",
     },
   }),
@@ -36,11 +34,9 @@ router.patch(
   protect,
   createUploadMiddleware({
     fields: [
-      { name: "thumbnail", maxCount: 1 },
       { name: "pictures", maxCount: 10 },
     ],
     fieldFolders: {
-      thumbnail: "amenities/thumbnails",
       pictures: "amenities/pictures",
     },
   }),

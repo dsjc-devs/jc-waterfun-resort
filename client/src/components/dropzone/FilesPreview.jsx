@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { List, ListItemText, ListItem, Link } from '@mui/material';
+import { List, ListItemText, ListItem, Link, Chip, Box } from '@mui/material';
 
 // project import
 import IconButton from 'components/@extended/IconButton';
@@ -15,7 +15,7 @@ import { CloseCircleFilled, FileFilled } from '@ant-design/icons';
 
 // ==============================|| MULTI UPLOAD - PREVIEW ||============================== //
 
-export default function FilesPreview({ showList = false, files, onRemove, type, sx }) {
+export default function FilesPreview({ showList = false, files, onRemove, type, sx, selectedIndex = 0, onSelect }) {
   const theme = useTheme();
   const hasFile = files.length > 0;
   const layoutType = type;
@@ -57,14 +57,24 @@ export default function FilesPreview({ showList = false, files, onRemove, type, 
                 position: 'relative',
                 display: 'inline-flex',
                 verticalAlign: 'text-top',
-                border: `solid 1px ${theme.palette.divider}`,
+                border: `solid 2px ${index === selectedIndex ? theme.palette.primary.main : theme.palette.divider}`,
                 overflow: 'hidden'
               }}
+              onClick={() => onSelect && onSelect(index)}
             >
               <img alt="preview" src={preview} style={{ width: '100%' }} />
               {!type?.includes('image') && (
                 <FileFilled
                   style={{ width: '100%', fontSize: '1.5rem', justifyContent: 'center' }}
+                />
+              )}
+
+              {index === selectedIndex && (
+                <Chip
+                  label="Cover"
+                  size="small"
+                  color="primary"
+                  sx={{ position: 'absolute', top: 6, left: 6, bgcolor: 'primary.main', color: 'primary.contrastText' }}
                 />
               )}
 
@@ -140,5 +150,7 @@ FilesPreview.propTypes = {
   files: PropTypes.array,
   onRemove: PropTypes.func,
   type: PropTypes.string,
-  sx: PropTypes.object
+  sx: PropTypes.object,
+  selectedIndex: PropTypes.number,
+  onSelect: PropTypes.func
 };
