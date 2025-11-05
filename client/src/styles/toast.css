@@ -1,0 +1,117 @@
+/* Custom Toast styles - applies to react-toastify via ToastContainer className hooks */
+:root {
+  --toast-radius: 12px;
+  --toast-shadow: 0 10px 30px rgba(2, 6, 23, 0.15);
+  --toast-bg: #ffffff;
+  --toast-fg: #0f172a;
+  /* slate-900 */
+  --toast-muted: #475569;
+  /* slate-600 */
+  --toast-border: rgba(15, 23, 42, 0.08);
+  --toast-success: #10b981;
+  /* emerald-500 */
+  --toast-error: #ef4444;
+  /* red-500 */
+  --toast-warning: #f59e0b;
+  /* amber-500 */
+  --toast-info: #0ea5e9;
+  /* sky-500 */
+}
+
+/* Frame applied to each toast container */
+.c-toast__frame {
+  border-radius: var(--toast-radius) !important;
+  box-shadow: var(--toast-shadow) !important;
+  background: var(--toast-bg) !important;
+  color: var(--toast-fg) !important;
+  border: 1px solid var(--toast-border) !important;
+}
+
+.c-toast__body {
+  padding: 12px 14px !important;
+}
+
+.c-toast__progress {
+  background: linear-gradient(90deg, var(--toast-info), var(--toast-success)) !important;
+  height: 2px !important;
+}
+
+/* Our inner content component */
+.c-toast {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.c-toast__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.c-toast__content {
+  min-width: 0;
+}
+
+.c-toast__title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.c-toast__message {
+  color: var(--toast-muted);
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+
+.c-toast__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--toast-border);
+  background: #f8fafc;
+  color: #0f172a;
+  font-weight: 600;
+  font-size: 0.8rem;
+  transition: background .2s ease, transform .06s ease;
+}
+
+.c-toast__action:hover {
+  background: #eef2f7;
+}
+
+.c-toast__action:active {
+  transform: translateY(1px);
+}
+
+/* Variant accents for the left icon color */
+.c-toast--success .c-toast__icon {
+  color: var(--toast-success);
+}
+
+.c-toast--error .c-toast__icon {
+  color: var(--toast-error);
+}
+
+.c-toast--warning .c-toast__icon {
+  color: var(--toast-warning);
+}
+
+.c-toast--info .c-toast__icon {
+  color: var(--toast-info);
+}
+
+/* Make default close button subtler */
+.Toastify__close-button {
+  color: #64748b;
+  opacity: 0.7;
+}
+
+.Toastify__close-button:hover {
+  opacity: 1;
+}

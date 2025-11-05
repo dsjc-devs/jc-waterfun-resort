@@ -154,6 +154,7 @@ const BookReservation = () => {
     }
     setLoading(true)
     try {
+      const computedMode = bookingData?.mode || mode;
       const bookingPayload = {
         userId: user?.userId,
         userData: {
@@ -162,6 +163,9 @@ const BookReservation = () => {
         accommodationId: bookingData.accommodationData?._id,
         startDate: bookingData.startDate,
         endDate: bookingData.endDate,
+        // send both for server-side handling of fixed night times
+        mode: computedMode,
+        isDayMode: computedMode === 'day',
         guests: bookingData?.accommodationData?.hasPoolAccess ? Object.values(bookingData?.entrances || {}).reduce((sum, val) => sum + val, 0) : bookingData?.guests,
         entrances: {
           adult: bookingData.entrances.adult,

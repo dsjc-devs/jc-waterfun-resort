@@ -17,6 +17,7 @@ import "aos/dist/aos.css";
 import gsap from "gsap";
 
 import 'styles/main.css'
+import 'styles/toast.css'
 
 // ==============================|| APP - THEME, ROUTER, LOCAL ||============================== //
 
@@ -52,6 +53,10 @@ export default function App() {
         draggable
         pauseOnHover
         theme="light"
+        limit={3}
+        toastClassName="c-toast__frame"
+        bodyClassName="c-toast__body"
+        progressClassName="c-toast__progress"
         transition={Bounce}
       />
 

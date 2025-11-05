@@ -53,6 +53,7 @@ const PaymentPage = ({
   const [ackNoRefund, setAckNoRefund] = useState(false);
   const [canAcknowledge, setCanAcknowledge] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('gcash');
+  const [showRecaptchaAlert, setShowRecaptchaAlert] = useState(false);
   const termsRef = useRef(null);
   const minPayable = bookingData?.amount?.minimumPayable || 1;
   const maxPayable = bookingData?.amount?.total || 1;
@@ -85,6 +86,12 @@ const PaymentPage = ({
   };
 
   const handlePayNowClick = () => {
+    // If captcha is enabled but not solved, show alert and stop
+    if (recaptchaSiteKey && !recaptchaToken) {
+      setShowRecaptchaAlert(true);
+      return;
+    }
+
     setTermsOpen(true);
   };
 
@@ -134,16 +141,6 @@ const PaymentPage = ({
         2. Click "Pay Now" to complete your reservation.<br />
         3. You will receive a confirmation once your payment is successful.
       </Typography>
-      {showMinAlert && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          The amount entered is less than the minimum payable. Please enter at least {formatPeso(minPayable)}.
-        </Alert>
-      )}
-      {showMaxAlert && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          The amount entered is more than the total price. Maximum payable: {formatPeso(maxPayable)}.
-        </Alert>
-      )}
       <Box mt={2}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
@@ -228,11 +225,35 @@ const PaymentPage = ({
             ref={recaptchaRef}
             siteKey={recaptchaSiteKey}
             theme={recaptchaTheme}
-            onChange={(token) => setRecaptchaToken?.(token || '')}
-            onExpired={() => setRecaptchaToken?.('')}
+            onChange={(token) => {
+              setRecaptchaToken?.(token || '');
+              if (token) setShowRecaptchaAlert(false);
+            }}
+            onExpired={() => {
+              setRecaptchaToken?.('');
+              setShowRecaptchaAlert(true);
+            }}
           />
+          {showRecaptchaAlert && !recaptchaToken ? (
+            <Alert severity="warning" sx={{ mt: 1 }}>
+              Please complete the reCAPTCHA verification before continuing.
+            </Alert>
+          ) : null}
         </Box>
       ) : null}
+
+      <React.Fragment>
+        {showMinAlert && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            The amount entered is less than the minimum payable. Please enter at least {formatPeso(minPayable)}.
+          </Alert>
+        )}
+        {showMaxAlert && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            The amount entered is more than the total price. Maximum payable: {formatPeso(maxPayable)}.
+          </Alert>
+        )}
+      </React.Fragment>
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
         <Button onClick={onCancel} variant="outlined" sx={{ borderRadius: 2 }}>

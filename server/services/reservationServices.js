@@ -1,4 +1,6 @@
 import { sendSMS } from "../utils/sendSMS.js";
+import { formatDateInTimeZone } from "../utils/formatDate.js";
+import { isNightBooking, getNightDisplayStrings } from "../utils/bookingMode.js";
 
 import Reservation from "../models/reservationsModels.js";
 import generateRandomString from "../utils/generateRandomString.js";
@@ -100,8 +102,16 @@ const createReservation = async (reservationData) => {
     if (phoneNumber) {
       try {
         const acc = await Accommodations.findById(accommodationId);
-        const formatDate = (d) => new Date(d).toLocaleString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-        const msg = `Reservation CONFIRMED: ${reservationId}\n${acc?.name || 'Accommodation'}\n${formatDate(startDate)} to ${formatDate(endDate)}.\nThank you for booking!`;
+        const night = isNightBooking({
+          mode: reservationData?.mode,
+          isDayMode: reservationData?.isDayMode,
+          startDate,
+          endDate,
+        });
+        const { start: s, end: e } = night
+          ? getNightDisplayStrings(startDate, endDate)
+          : { start: formatDateInTimeZone(startDate, { includeTime: true }), end: formatDateInTimeZone(endDate, { includeTime: true }) };
+        const msg = `Reservation CONFIRMED: ${reservationId}\n${acc?.name || 'Accommodation'}\n${s} to ${e}.\nThank you for booking!`;
         await sendSMS({ number: phoneNumber, message: msg });
       } catch (e) {
         console.error("Error sending reservation SMS:", e?.message);
@@ -275,6 +285,8 @@ const sendUpcomingReservationReminders = async () => {
           userData,
           startDate,
           endDate,
+          mode: reservation.mode,
+          isDayMode: reservation.isDayMode,
           guests: reservation.guests,
           status: "REMINDER",
           amount,
@@ -293,8 +305,16 @@ const sendUpcomingReservationReminders = async () => {
       // SMS
       try {
         if (userData?.phoneNumber) {
-          const formatDate = (d) => new Date(d).toLocaleString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-          const msg = `Reminder: Your reservation ${reservationId} starts tomorrow at ${formatDate(startDate)}. See you at John Cezar Waterfun Resort!`;
+          const night = isNightBooking({
+            mode: reservation.mode,
+            isDayMode: reservation.isDayMode,
+            startDate,
+            endDate,
+          });
+          const s = night
+            ? getNightDisplayStrings(startDate, endDate).start
+            : formatDateInTimeZone(startDate, { includeTime: true });
+          const msg = `Reminder: Your reservation ${reservationId} starts tomorrow at ${s}. See you at John Cezar Waterfun Resort!`;
           await sendSMS({ number: userData.phoneNumber, message: msg });
         }
       } catch (e) {
@@ -386,8 +406,16 @@ const requestRescheduleById = async (reservationId, { newStartDate, newEndDate, 
     // SMS notify
     if (userData?.phoneNumber) {
       try {
-        const formatDate = (d) => new Date(d).toLocaleString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-        const msg = `Reschedule request received: ${reservationId}\nNew: ${formatDate(newStart)} to ${formatDate(newEnd)}.\nWe will update you soon.`;
+        const night = isNightBooking({
+          mode: reservation.mode,
+          isDayMode: reservation.isDayMode,
+          startDate: newStart,
+          endDate: newEnd,
+        });
+        const { start: s, end: e } = night
+          ? getNightDisplayStrings(newStart, newEnd)
+          : { start: formatDateInTimeZone(newStart, { includeTime: true }), end: formatDateInTimeZone(newEnd, { includeTime: true }) };
+        const msg = `Reschedule request received: ${reservationId}\nNew: ${s} to ${e}.\nWe will update you soon.`;
         await sendSMS({ number: userData.phoneNumber, message: msg });
       } catch (e) {
         console.error("Error sending reschedule request SMS:", e?.message);
@@ -466,9 +494,20 @@ const decideRescheduleById = async (reservationId, { action, reason, decidedBy }
     // SMS notify decision
     if (userData?.phoneNumber) {
       try {
-        const formatDate = (d) => new Date(d).toLocaleString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         const decision = reservation.rescheduleRequest.status;
-        const msg = `Reschedule ${decision}: ${reservationId}\n${formatDate(reservation.rescheduleRequest.newStartDate)} to ${formatDate(reservation.rescheduleRequest.newEndDate)}${reason ? `\nReason: ${reason}` : ''}`;
+        const night = isNightBooking({
+          mode: reservation.mode,
+          isDayMode: reservation.isDayMode,
+          startDate: reservation.rescheduleRequest.newStartDate,
+          endDate: reservation.rescheduleRequest.newEndDate,
+        });
+        const { start: s, end: e } = night
+          ? getNightDisplayStrings(reservation.rescheduleRequest.newStartDate, reservation.rescheduleRequest.newEndDate)
+          : {
+            start: formatDateInTimeZone(reservation.rescheduleRequest.newStartDate, { includeTime: true }),
+            end: formatDateInTimeZone(reservation.rescheduleRequest.newEndDate, { includeTime: true }),
+          };
+        const msg = `Reschedule ${decision}: ${reservationId}\n${s} to ${e}${reason ? `\nReason: ${reason}` : ''}`;
         await sendSMS({ number: userData.phoneNumber, message: msg });
       } catch (e) {
         console.error("Error sending reschedule decision SMS:", e?.message);

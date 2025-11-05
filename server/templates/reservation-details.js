@@ -1,4 +1,6 @@
 import { PROD_URL } from "../constants/constants.js";
+import { formatDateInTimeZone } from "../utils/formatDate.js";
+import { isNightBooking, getNightDisplayStrings } from "../utils/bookingMode.js";
 
 const reservationDetails = (reservationData) => {
   const {
@@ -14,40 +16,19 @@ const reservationDetails = (reservationData) => {
     faqs = []
   } = reservationData;
 
-  // Helper: Format date similar to client ConvertDate, but in Asia/Manila timezone
-  const formatDateInTimeZone = (inputDate, { timeZone = 'Asia/Manila', includeTime = true } = {}) => {
-    if (!inputDate) return 'Invalid date';
-
-    const date = new Date(inputDate);
-    const formatter = new Intl.DateTimeFormat('en-US', {
-      timeZone,
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: includeTime ? 'numeric' : undefined,
-      minute: includeTime ? '2-digit' : undefined,
-      hour12: true
-    });
-
-    const parts = formatter.formatToParts(date);
-    const get = (type) => parts.find((p) => p.type === type)?.value || '';
-
-    let month = get('month');
-    if (month && !month.endsWith('.')) month = `${month}.`;
-    const day = get('day');
-    const year = get('year');
-
-    if (!includeTime) return `${month} ${day}, ${year}`;
-
-    const hour = get('hour');
-    const minute = get('minute');
-    const period = get('dayPeriod');
-    return `${month} ${day}, ${year} ${hour}:${minute} ${period}`;
-  };
+  // Using shared formatter for consistency across emails/SMS
 
   const guestName = `${userData?.firstName || ""} ${userData?.lastName || ""}`.trim();
-  const formattedStartDate = formatDateInTimeZone(startDate, { includeTime: true });
-  const formattedEndDate = formatDateInTimeZone(endDate, { includeTime: true });
+  const isNight = isNightBooking({
+    mode: reservationData?.mode,
+    isDayMode: reservationData?.isDayMode,
+    startDate,
+    endDate,
+  });
+
+  const { start: nightStart, end: nightEnd } = getNightDisplayStrings(startDate, endDate);
+  const formattedStartDate = isNight ? nightStart : formatDateInTimeZone(startDate, { includeTime: true });
+  const formattedEndDate = isNight ? nightEnd : formatDateInTimeZone(endDate, { includeTime: true });
 
   // Environment-based URL handling
   const baseUrl = process.env.NODE_ENV === 'development'
