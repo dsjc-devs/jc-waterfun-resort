@@ -80,21 +80,10 @@ const MiniCheckAvailability = () => {
         }}
       >
         <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1, px: { xs: 1, sm: 2, md: 0 } }}>
-          <Box textAlign="center" mb={{ xs: 2, sm: 3, md: 4 }}>
-            <TitleTag title="🌊 Quick Availability Check" />
-            <Typography
-              variant="h6"
-              color="text.secondary"
-              sx={{
-                fontWeight: 400,
-                maxWidth: 600,
-                mx: 'auto',
-                fontSize: { xs: '1rem', sm: '1.15rem', md: '1.25rem' }
-              }}
-            >
-              Find your perfect getaway in seconds! Choose between day adventures or relaxing overnight stays.
-            </Typography>
-          </Box>
+          <TitleTag
+            title="🌊 Quick Availability Check"
+            subtitle="Find your perfect getaway in seconds! Choose between day adventures or relaxing overnight stays."
+          />
 
           <Paper
             elevation={0}
@@ -154,10 +143,10 @@ const MiniCheckAvailability = () => {
                   }}
                 />
               </Stack>
-              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: { xs: '0.95rem', sm: '1rem' } }}>
+              <Typography variant="body1" color="text.secondary">
                 {bookingMode === 'tour'
-                  ? '⏰ Perfect for day adventures (7AM-5PM) or magical night experiences (7PM-5AM)'
-                  : '🗓️ Overnight stays are limited to 1 night only'
+                  ? ' Perfect for day adventures (7AM-5PM) or magical night experiences (7PM-5AM)'
+                  : ' Overnight stays are limited to 1 night only'
                 }
               </Typography>
             </Box>
@@ -212,10 +201,10 @@ const MiniCheckAvailability = () => {
               <Grid item xs={12} sm={bookingMode === 'tour' ? 3 : 3}>
                 {bookingMode === 'tour' ? (
                   <FormControl fullWidth size="small">
-                    <InputLabel sx={{ fontSize: { xs: '0.95rem', sm: '1rem' } }}>🌅 Experience</InputLabel>
+                    <InputLabel sx={{ fontSize: { xs: '0.95rem', sm: '1rem' } }}>Experience</InputLabel>
                     <Select
                       value={criteria.tourType}
-                      label="🌅 Experience"
+                      label="Experience"
                       onChange={(e) => handleInputChange('tourType', e.target.value)}
                       sx={{
                         borderRadius: 2,
@@ -254,7 +243,7 @@ const MiniCheckAvailability = () => {
 
               <Grid item xs={12} sm={3}>
                 <TextField
-                  label="👥 Guests"
+                  label="Guests"
                   type="number"
                   value={criteria.guests}
                   onChange={(e) => {
