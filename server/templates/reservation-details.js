@@ -1,3 +1,5 @@
+import { PROD_URL } from "../constants/constants.js";
+
 const reservationDetails = (reservationData) => {
   const {
     reservationId,
@@ -50,7 +52,7 @@ const reservationDetails = (reservationData) => {
   // Environment-based URL handling
   const baseUrl = process.env.NODE_ENV === 'development'
     ? 'http://localhost:3000'
-    : (process.env.CLIENT_URL || 'https://johncezarwaterfunresort.com');
+    : PROD_URL
 
   return `
     <div style="max-width: 600px; margin: 0 auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; line-height: 1.6;">

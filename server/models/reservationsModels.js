@@ -89,6 +89,10 @@ const reservationSchema = new mongoose.Schema(
     guests: {
       type: Number,
       required: true,
+    },
+    reminderSent: {
+      type: Boolean,
+      default: false
     }
   },
   {

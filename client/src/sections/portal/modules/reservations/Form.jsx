@@ -115,7 +115,6 @@ const ReservationForm = () => {
       setSubmitting(true);
       try {
         const payload = {
-          isWalkIn: true,
           userId: values.userData?.userId,
           userData: values.userData,
           accommodationId: values.accommodationId,
@@ -136,10 +135,11 @@ const ReservationForm = () => {
           }
         };
         if (isEditMode && reservationId) {
+          payload.isWalkIn = true;
           await agent.Reservations.editReservation(reservationId, payload);
           toast.success('Reservation updated successfully!');
         } else {
-          await agent.Reservations.createReservation(payload);
+          await agent.Reservations.createReservation({ ...payload, isWalkIn: true });
           toast.success('Reservation created successfully!');
           formik.resetForm();
           setSelectedAccommodation({});

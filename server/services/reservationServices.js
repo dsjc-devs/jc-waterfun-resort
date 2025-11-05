@@ -100,7 +100,7 @@ const createReservation = async (reservationData) => {
     if (phoneNumber) {
       try {
         const acc = await Accommodations.findById(accommodationId);
-        const formatDate = (d) => new Date(d).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+        const formatDate = (d) => new Date(d).toLocaleString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         const msg = `Reservation CONFIRMED: ${reservationId}\n${acc?.name || 'Accommodation'}\n${formatDate(startDate)} to ${formatDate(endDate)}.\nThank you for booking!`;
         await sendSMS({ number: phoneNumber, message: msg });
       } catch (e) {
@@ -248,6 +248,68 @@ const checkAndUpdateReservationStatus = async () => {
   }
 }
 
+// Send reminders 1 day before start date (once)
+const sendUpcomingReservationReminders = async () => {
+  try {
+    const now = new Date();
+    const windowStart = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    windowStart.setSeconds(0, 0);
+    const windowEnd = new Date(windowStart.getTime() + 60 * 1000); // 1-minute window
+
+    const toRemind = await Reservation.find({
+      status: "CONFIRMED",
+      reminderSent: { $ne: true },
+      startDate: { $gte: windowStart, $lt: windowEnd }
+    }).populate("accommodationId");
+
+    if (!toRemind.length) return { sent: 0 };
+
+    for (const reservation of toRemind) {
+      const { reservationId, userData, startDate, endDate, amount, accommodationId: accommodationData } = reservation.toObject();
+
+      // Build email
+      try {
+        const subject = `Reminder: Your reservation starts tomorrow - ${reservationId}`;
+        const body = reservationDetails({
+          reservationId,
+          userData,
+          startDate,
+          endDate,
+          guests: reservation.guests,
+          status: "REMINDER",
+          amount,
+          accommodationData,
+          policies: await Policies.find({ status: 'POSTED' }).limit(5),
+          faqs: await FAQs.find({ status: 'POSTED' }).limit(5)
+        });
+        const html = await emailTemplate(body);
+        if (userData?.emailAddress) {
+          await sendEmail(userData.emailAddress, subject, html);
+        }
+      } catch (e) {
+        console.error("Reminder email error:", e?.message || e);
+      }
+
+      // SMS
+      try {
+        if (userData?.phoneNumber) {
+          const formatDate = (d) => new Date(d).toLocaleString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+          const msg = `Reminder: Your reservation ${reservationId} starts tomorrow at ${formatDate(startDate)}. See you at John Cezar Waterfun Resort!`;
+          await sendSMS({ number: userData.phoneNumber, message: msg });
+        }
+      } catch (e) {
+        console.error("Reminder SMS error:", e?.message);
+      }
+
+      // Mark as sent to avoid duplicates
+      await Reservation.updateOne({ _id: reservation._id }, { $set: { reminderSent: true } });
+    }
+
+    return { sent: toRemind.length };
+  } catch (error) {
+    console.error("Error sending upcoming reservation reminders:", error);
+  }
+}
 // default export is defined at the end after all functions are declared
 
 // ============ RESCHEDULE FEATURES ============ //
@@ -324,7 +386,7 @@ const requestRescheduleById = async (reservationId, { newStartDate, newEndDate, 
     // SMS notify
     if (userData?.phoneNumber) {
       try {
-        const formatDate = (d) => new Date(d).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+        const formatDate = (d) => new Date(d).toLocaleString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         const msg = `Reschedule request received: ${reservationId}\nNew: ${formatDate(newStart)} to ${formatDate(newEnd)}.\nWe will update you soon.`;
         await sendSMS({ number: userData.phoneNumber, message: msg });
       } catch (e) {
@@ -404,10 +466,10 @@ const decideRescheduleById = async (reservationId, { action, reason, decidedBy }
     // SMS notify decision
     if (userData?.phoneNumber) {
       try {
-        const formatDate = (d) => new Date(d).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+        const formatDate = (d) => new Date(d).toLocaleString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         const decision = reservation.rescheduleRequest.status;
         const msg = `Reschedule ${decision}: ${reservationId}\n${formatDate(reservation.rescheduleRequest.newStartDate)} to ${formatDate(reservation.rescheduleRequest.newEndDate)}${reason ? `\nReason: ${reason}` : ''}`;
-        await sendSMS({ number: `09619957794`, message: msg });
+        await sendSMS({ number: userData.phoneNumber, message: msg });
       } catch (e) {
         console.error("Error sending reschedule decision SMS:", e?.message);
       }
@@ -428,6 +490,7 @@ export default {
   updateReservationById,
   deleteReservationById,
   checkAndUpdateReservationStatus,
+  sendUpcomingReservationReminders,
   requestRescheduleById,
   decideRescheduleById,
 }

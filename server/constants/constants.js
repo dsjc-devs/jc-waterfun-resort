@@ -88,11 +88,14 @@ const RESORT_DETAILS = {
 
 const NO_CATEGORY = "No Category"
 
+const PROD_URL = `https://www.john-cezar-waterfun-resort.com`
+
 export {
   colours,
   USER_TYPES,
   USER_STATUSSES,
   USER_ROLES,
   RESORT_DETAILS,
-  NO_CATEGORY
+  NO_CATEGORY,
+  PROD_URL
 }
