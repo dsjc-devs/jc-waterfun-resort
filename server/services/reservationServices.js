@@ -100,7 +100,7 @@ const createReservation = async (reservationData) => {
     if (phoneNumber) {
       try {
         const acc = await Accommodations.findById(accommodationId);
-        const formatDate = (d) => new Date(d).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+        const formatDate = (d) => new Date(d).toLocaleString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         const msg = `Reservation CONFIRMED: ${reservationId}\n${acc?.name || 'Accommodation'}\n${formatDate(startDate)} to ${formatDate(endDate)}.\nThank you for booking!`;
         await sendSMS({ number: phoneNumber, message: msg });
       } catch (e) {
@@ -386,7 +386,7 @@ const requestRescheduleById = async (reservationId, { newStartDate, newEndDate, 
     // SMS notify
     if (userData?.phoneNumber) {
       try {
-        const formatDate = (d) => new Date(d).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+        const formatDate = (d) => new Date(d).toLocaleString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         const msg = `Reschedule request received: ${reservationId}\nNew: ${formatDate(newStart)} to ${formatDate(newEnd)}.\nWe will update you soon.`;
         await sendSMS({ number: userData.phoneNumber, message: msg });
       } catch (e) {
@@ -466,10 +466,10 @@ const decideRescheduleById = async (reservationId, { action, reason, decidedBy }
     // SMS notify decision
     if (userData?.phoneNumber) {
       try {
-        const formatDate = (d) => new Date(d).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+        const formatDate = (d) => new Date(d).toLocaleString('en-PH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         const decision = reservation.rescheduleRequest.status;
         const msg = `Reschedule ${decision}: ${reservationId}\n${formatDate(reservation.rescheduleRequest.newStartDate)} to ${formatDate(reservation.rescheduleRequest.newEndDate)}${reason ? `\nReason: ${reason}` : ''}`;
-        await sendSMS({ number: `09619957794`, message: msg });
+        await sendSMS({ number: userData.phoneNumber, message: msg });
       } catch (e) {
         console.error("Error sending reschedule decision SMS:", e?.message);
       }
