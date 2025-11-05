@@ -116,7 +116,7 @@ const Summary = ({ bookingInfo }) => {
             <Box sx={{ mt: 2 }}>
               <LabeledValue
                 title="Total Guests"
-                subTitle={entrances.adult + entrances.child + entrances.pwdSenior}
+                subTitle={guests ? guests : (entrances.adult + entrances.child + entrances.pwdSenior)}
               />
             </Box>
           </MainCard>
