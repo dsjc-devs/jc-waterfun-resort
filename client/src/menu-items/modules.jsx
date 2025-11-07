@@ -170,6 +170,15 @@ const getModules = ({ accommodations = [], amenities = [] }) => {
           icon: icons.CalendarIcon,
           breadcrumbs: false,
           access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value, USER_ROLES.RECEPTIONIST.value],
+        },
+        {
+          id: 'blocked-dates',
+          title: 'Blocked Dates',
+          type: 'item',
+          url: '/portal/blocked-dates',
+          icon: icons.LockOutlined,
+          breadcrumbs: false,
+          access: [USER_ROLES.MASTER_ADMIN.value, USER_ROLES.ADMIN.value],
         }
       ]
     },

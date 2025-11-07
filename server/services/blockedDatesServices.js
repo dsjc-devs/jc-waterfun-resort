@@ -16,7 +16,7 @@ const getAllBlockedDates = async () => {
     const manualBlocked = await BlockedDates.aggregate([
       {
         $project: {
-          _id: 0,
+          _id: 1,
           startDate: 1,
           endDate: 1,
           reason: 1,

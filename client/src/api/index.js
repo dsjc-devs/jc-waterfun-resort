@@ -12,6 +12,7 @@ import Policies from "./policies"
 import ResortRates from "./resort-rates"
 import ContactUs from "./contact"
 import Dashboard from "./dashboard"
+import BlockedDates from './blocked-dates'
 
 
 const agent = {
@@ -28,7 +29,8 @@ const agent = {
   ...Policies,
   ...ResortRates,
   ...ContactUs,
-  ...Dashboard
+  ...Dashboard,
+  ...BlockedDates
 }
 
 export default agent

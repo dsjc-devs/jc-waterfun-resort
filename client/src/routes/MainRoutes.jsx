@@ -35,6 +35,10 @@ const Reservations = Loadable(lazy(() => import('pages/portal/reservations')));
 const ReservationDetails = Loadable(lazy(() => import('pages/portal/reservations/details')));
 const ReservationForm = Loadable(lazy(() => import('pages/portal/reservations/form')));
 
+// blocked dates
+const BlockedDates = Loadable(lazy(() => import('pages/portal/blocked-dates')));
+const BlockedDateForm = Loadable(lazy(() => import('pages/portal/blocked-dates/form')));
+
 // testimonial
 const AddTestimonial = Loadable(lazy(() => import('pages/portal/testimonial')));
 
@@ -143,6 +147,19 @@ const MainRoutes = {
               path: 'form',
               element: <ReservationForm />
             },
+          ]
+        },
+        {
+          path: 'blocked-dates',
+          children: [
+            {
+              index: true,
+              element: <BlockedDates />
+            },
+            {
+              path: 'form',
+              element: <BlockedDateForm />
+            }
           ]
         },
         {
