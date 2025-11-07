@@ -145,9 +145,6 @@ const ResortRates = () => {
                   • Kiddie water slides
                 </Typography>
                 <Typography variant="body2" color="#634131" mb={1}>
-                  • Swimming lessons for kids
-                </Typography>
-                <Typography variant="body2" color="#634131" mb={1}>
                   • Poolside lounging & cabanas
                 </Typography>
               </Card>
