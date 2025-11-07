@@ -16,10 +16,13 @@ const createAmenities = expressAsync(async (req, res) => {
     const safeIndex = Math.min(Math.max(thumbnailIndex, 0), Math.max(pictures.length - 1, 0));
     const thumbnail = pictures.length > 0 ? pictures[safeIndex]?.image : "";
 
+    const createHasPrice = req.body.hasPrice === 'true' || req.body.hasPrice === true;
     const payload = {
       ...req.body,
       thumbnail,
       pictures,
+      hasPrice: createHasPrice,
+      price: createHasPrice ? Number(req.body.price) : undefined,
     };
 
     const type = await amenitiesTypeServices.getSingleAmenitiesType(
@@ -92,11 +95,17 @@ const updateAmenitiesById = expressAsync(async (req, res) => {
     const safeIndex = Math.min(Math.max(thumbnailIndex, 0), Math.max(pictures.length - 1, 0));
     const thumbnail = pictures[safeIndex]?.image || amenities.thumbnail;
 
+    const updateHasPrice = req.body.hasPrice === 'true' || req.body.hasPrice === true;
+    const nextPrice = updateHasPrice
+      ? (req.body.price !== undefined ? Number(req.body.price) : amenities.price)
+      : undefined;
+
     const payload = {
       ...req.body,
       thumbnail,
       pictures,
-      price: req.body.price ? Number(req.body.price) : amenities.price,
+      hasPrice: updateHasPrice,
+      price: nextPrice,
     };
 
     const updatedAmenities = await amenitiesServices.updateAmenitiesById(

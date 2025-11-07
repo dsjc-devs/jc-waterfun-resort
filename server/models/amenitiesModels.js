@@ -56,6 +56,10 @@ const amenitiesSchema = new mongoose.Schema(
       enum: ["POSTED", "ARCHIVED", "UNPOSTED"],
       default: "POSTED",
     },
+    hasPrice: {
+      type: Boolean,
+      default: false,
+    },
     price: {
       type: Number,
     },

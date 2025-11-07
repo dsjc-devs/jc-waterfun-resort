@@ -96,7 +96,7 @@ const AmenityCard = ({ amenityData, onView, onEdit, onDelete, isOnPortal = false
           {amenityData?.description}
         </Typography>
 
-        {amenityData?.price && (
+        {amenityData?.hasPrice && amenityData?.price ? (
           <Typography
             variant="h6"
             sx={{
@@ -106,6 +106,17 @@ const AmenityCard = ({ amenityData, onView, onEdit, onDelete, isOnPortal = false
             }}
           >
             ₱{amenityData.price}
+          </Typography>
+        ) : (
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 600,
+              mb: 2,
+              color: 'success.main'
+            }}
+          >
+            {amenityData?.hasPrice ? 'Price unavailable' : 'Included'}
           </Typography>
         )}
 
