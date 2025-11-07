@@ -55,7 +55,7 @@ import autoTable from 'jspdf-autotable';
 const ReservationsTable = () => {
   const theme = useTheme()
   const { user } = useAuth()
-  const { isCustomer, isAdmin, isMasterAdmin } = useGetPosition()
+  const { isCustomer, isAdmin, isMasterAdmin, isReceptionist } = useGetPosition()
 
   const { data = {}, isLoading, mutate } = useGetReservations(isCustomer ? { userId: user?.userId } : {})
   const { reservations = [] } = data || {}
@@ -886,7 +886,7 @@ const ReservationsTable = () => {
                   Bulk Export to PDF
                 </Button>
               </AnimateButton>
-              {(isAdmin || isMasterAdmin) && (
+              {!isCustomer && (
                 <AnimateButton>
                   <Button
                     variant='contained'
@@ -931,7 +931,7 @@ const ReservationsTable = () => {
           Export to PDF
         </MenuItem>
 
-        {(isAdmin || isMasterAdmin) && (
+        {!isCustomer && (
           <MenuItem
             onClick={() => {
               navigate(`/portal/reservations/form?isEditMode=true&reservationId=${openMenu.reservationId}`)
@@ -942,7 +942,7 @@ const ReservationsTable = () => {
           </MenuItem>
         )}
 
-        {(isAdmin || isMasterAdmin) && (() => {
+        {!isCustomer && (() => {
           const row = reservations.find(r => r.reservationId === openMenu.reservationId)
           const canMark = row && (row?.amount?.totalPaid || 0) < (row?.amount?.total || 0)
           return canMark ? (
