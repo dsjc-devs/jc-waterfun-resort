@@ -13,6 +13,8 @@ import {
 } from 'constants/constants';
 import ConvertDate from 'components/ConvertDate';
 import { Box, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { useGetBlockedDates } from 'api/blocked-dates';
 
 const getResponsiveStyles = () => {
   const isMobile = window.innerWidth <= 768;
@@ -58,6 +60,8 @@ const getResponsiveDescStyles = () => {
 const Calendar = ({ events = [], title = '', subtitle = '' }) => {
   const [tooltip, setTooltip] = useState({ show: false, content: '', x: 0, y: 0 });
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const theme = useTheme();
+  const { data: blockedDates = [] } = useGetBlockedDates();
 
   React.useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -67,6 +71,8 @@ const Calendar = ({ events = [], title = '', subtitle = '' }) => {
 
   const handleEventClick = (info) => {
     const event = info.event;
+    // Ignore navigation for blocked events
+    if (event.extendedProps?.type === 'blocked') return;
     const startDate = event.start?.toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
@@ -80,7 +86,9 @@ const Calendar = ({ events = [], title = '', subtitle = '' }) => {
       day: 'numeric'
     });
 
-    window.open(`/portal/reservations/details/${event.extendedProps?.reservationId}`, '_blank');
+    if (event.extendedProps?.reservationId) {
+      window.open(`/portal/reservations/details/${event.extendedProps?.reservationId}`, '_blank');
+    }
   };
 
   const handleDateClick = (info) => {
@@ -100,6 +108,11 @@ const Calendar = ({ events = [], title = '', subtitle = '' }) => {
         <div className="tooltip-date">
           <ConvertDate dateString={event.extendedProps?.startDate} time={true} /> - <ConvertDate dateString={event.extendedProps?.endDate} time={true} />
         </div>
+        {event.extendedProps?.reason && (
+          <div style={{ marginTop: '4px', fontSize: '0.75rem', color: '#fde68a' }}>
+            Reason: {event.extendedProps.reason}
+          </div>
+        )}
         {event.extendedProps?.userData && (
           <div style={{ marginTop: '4px', fontSize: '0.75rem', color: '#cbd5e1' }}>
             Guest: {event.extendedProps.userData.firstName} {event.extendedProps.userData.lastName}
@@ -124,34 +137,56 @@ const Calendar = ({ events = [], title = '', subtitle = '' }) => {
     setTooltip({ show: false, content: '', x: 0, y: 0 });
   };
 
-  const processedEvents = events.length > 0
-    && events.map((event, index) => {
-      if (event.userData) {
-        return {
-          id: `reservation-${index}`,
-          title: `${event.userData.firstName} ${event.userData.lastName} - ${event?.accommodationData?.name}`,
-          start: event.startDate,
-          end: event.endDate,
-          backgroundColor: '#4f8a8b',
-          borderColor: '#4f8a8b',
-          textColor: '#ffffff',
-          extendedProps: {
-            type: 'reservation',
-            userData: event.userData,
-            startDate: event.startDate,
-            endDate: event.endDate,
-            reservationId: event.reservationId
-          }
-        };
-      }
+  // Build reservation events
+  const reservationEvents = (events.length > 0 ? events.map((event, index) => {
+    if (event.userData) {
       return {
-        id: `event-${index}`,
-        backgroundColor: event.color || '#4f8a8b',
-        borderColor: event.color || '#4f8a8b',
+        id: `reservation-${index}`,
+        title: `${event.userData.firstName} ${event.userData.lastName} - ${event?.accommodationData?.name}`,
+        start: event.startDate,
+        end: event.endDate,
+        backgroundColor: '#4f8a8b',
+        borderColor: '#4f8a8b',
         textColor: '#ffffff',
-        ...event
+        extendedProps: {
+          type: 'reservation',
+          userData: event.userData,
+          startDate: event.startDate,
+          endDate: event.endDate,
+          reservationId: event.reservationId
+        }
       };
-    })
+    }
+    return {
+      id: `event-${index}`,
+      backgroundColor: event.color || '#4f8a8b',
+      borderColor: event.color || '#4f8a8b',
+      textColor: '#ffffff',
+      ...event
+    };
+  }) : []);
+
+  // Build non-reservation blocked dates as warning-colored events
+  const blockedEvents = (blockedDates || [])
+    .filter((bd) => bd && bd.isFromReservation === false)
+    .map((bd, i) => ({
+      id: `blocked-${i}`,
+      title: 'Blocked',
+      start: bd.startDate,
+      end: bd.endDate,
+      backgroundColor: theme.palette.warning.main,
+      borderColor: theme.palette.warning.main,
+      textColor: '#ffffff',
+      extendedProps: {
+        type: 'blocked',
+        startDate: bd.startDate,
+        endDate: bd.endDate,
+        reason: bd.reason,
+        accommodationId: bd.accommodationId,
+      }
+    }));
+
+  const processedEvents = [...reservationEvents, ...blockedEvents];
 
 
   const getHeaderToolbar = () => {
@@ -193,6 +228,16 @@ const Calendar = ({ events = [], title = '', subtitle = '' }) => {
   return (
     <Box sx={getResponsiveStyles()}>
       <style>{CUSTOM_CALENDAR_CSS}</style>
+      {/* Ensure blocked events use warning color strongly */}
+      <style>{`
+        .fc .blocked-event,
+        .fc .blocked-event .fc-event-main,
+        .fc .blocked-event .fc-event-main-frame {
+          background-color: ${theme.palette.warning.main} !important;
+          border-color: ${theme.palette.warning.main} !important;
+          color: #111827 !important;
+        }
+      `}</style>
       <Box sx={getResponsiveHeaderStyles()}>
         <Typography
           variant="h2"
@@ -259,9 +304,15 @@ const Calendar = ({ events = [], title = '', subtitle = '' }) => {
         nowIndicator={true}
         eventDidMount={(info) => {
           info.el.setAttribute('data-event-type', info.event.extendedProps?.type || 'default');
-          info.el.style.backgroundColor = info.event.backgroundColor || '#4f8a8b';
-          info.el.style.borderColor = info.event.borderColor || '#4f8a8b';
-          info.el.style.color = info.event.textColor || '#ffffff';
+          const isBlocked = info.event.extendedProps?.type === 'blocked';
+          const bg = isBlocked ? theme.palette.warning.main : (info.event.backgroundColor || '#4f8a8b');
+          const border = isBlocked ? theme.palette.warning.main : (info.event.borderColor || '#4f8a8b');
+          const text = isBlocked ? '#111827' : (info.event.textColor || '#ffffff');
+          // Force override styles in case calendar CSS is more specific
+          info.el.style.setProperty('background-color', bg, 'important');
+          info.el.style.setProperty('border-color', border, 'important');
+          info.el.style.setProperty('color', text, 'important');
+          if (isBlocked) info.el.classList.add('blocked-event');
         }}
         loading={(isLoading) => {
           console.log('Calendar loading:', isLoading);
