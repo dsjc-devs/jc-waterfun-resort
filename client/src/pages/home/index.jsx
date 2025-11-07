@@ -32,6 +32,7 @@ const Home = () => {
       <CarouselSection />
       <MiniCheckAvailability />
       <RateSection />
+      <ImportantInfoSection />
       <AccommodationSection />
       <Hero
         backgroundImage={bgImg}
@@ -54,7 +55,6 @@ const Home = () => {
       <ContactLocationSection />
       <ArticleOverviewSection />
       <Testimonials isHomepage={true} />
-      <ImportantInfoSection />
       <MapSection />
       <FAQs />
     </React.Fragment >
