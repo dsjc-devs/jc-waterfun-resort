@@ -275,7 +275,7 @@ const ReservationForm = () => {
     if (mode === 'day') {
       d.setHours(7, 0, 0, 0);
     } else {
-      d.setHours(17, 0, 0, 0);
+      d.setHours(19, 0, 0, 0);
     }
     return d;
   };
@@ -295,7 +295,8 @@ const ReservationForm = () => {
   const isNightStay = (date) => {
     if (!date) return false;
     const endHour = date.getHours();
-    return endHour > 17 || endHour < 6;
+    // Night stay now starts at 7 PM (19:00) and ends at 7 AM (07:00)
+    return endHour > 19 || endHour <= 5;
   };
 
   const isDateBlockedGuestHouse = (startDate, endDate) => {
@@ -318,7 +319,7 @@ const ReservationForm = () => {
 
       if (mode === 'night') {
         const nightStart = new Date(date);
-        nightStart.setHours(17, 0, 0, 0);
+        nightStart.setHours(19, 0, 0, 0);
         const nightEnd = new Date(date);
         nightEnd.setDate(nightEnd.getDate() + 1);
         nightEnd.setHours(7, 0, 0, 0);
@@ -467,7 +468,7 @@ const ReservationForm = () => {
                           </ToggleButton>
 
                           <ToggleButton value="night" aria-label="night mode" disabled={startDate && isDateBlocked(startDate, 'night')}>
-                            <MoonOutlined style={{ marginRight: 6 }} /> Night Tour (7 PM - 5 AM)
+                            <MoonOutlined style={{ marginRight: 6 }} /> Night Tour (7 PM - 7 AM)
                           </ToggleButton>
                         </ToggleButtonGroup>
 

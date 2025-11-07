@@ -87,7 +87,7 @@ const Details = ({ reservationData = {} }) => {
     if (!dateLike) return null;
     const d = new Date(dateLike);
     if (mode === 'day') d.setHours(7, 0, 0, 0);
-    else d.setHours(17, 0, 0, 0);
+    else d.setHours(19, 0, 0, 0);
     return d;
   };
   const computeModeEnd = (start, mode) => {
@@ -487,7 +487,7 @@ const Details = ({ reservationData = {} }) => {
                       <SunOutlined style={{ marginRight: 6 }} /> Day Tour (7 AM - 5 PM)
                     </ToggleButton>
                     <ToggleButton value="night" aria-label="night mode">
-                      <MoonOutlined style={{ marginRight: 6 }} /> Night Tour (5 PM - 7 AM)
+                      <MoonOutlined style={{ marginRight: 6 }} /> Night Tour (7 PM - 7 AM)
                     </ToggleButton>
                   </ToggleButtonGroup>
                   <DatePicker
