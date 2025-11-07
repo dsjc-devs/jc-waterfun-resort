@@ -35,6 +35,8 @@ const ReusableTable = ({
     order: defaultOrder = "asc",
     orderBy: defaultOrderBy = "createdAt",
     otherActionButton,
+    disablePagination = false,
+    hideSearch = false,
   } = settings || {};
 
   const theme = useTheme();
@@ -101,6 +103,7 @@ const ReusableTable = ({
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
+  const displayRows = disablePagination ? sortedRows : paginatedRows;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -153,39 +156,41 @@ const ReusableTable = ({
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: hideSearch ? "flex-end" : "space-between",
           gap: "1em",
           alignItems: "center",
           mt: 1,
           mb: 3,
         }}
       >
-        <TextField
-          placeholder={`Search for ${rows?.length} records...`}
-          value={searchQuery}
-          onChange={handleSearchChange}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchOutlined style={{ color: "#6b7280" }} />
-              </InputAdornment>
-            ),
-          }}
-          sx={{
-            width: "300px",
-            backgroundColor: "#fff",
-            borderRadius: "12px",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": { borderColor: "#e5e7eb" },
-              "&:hover fieldset": { borderColor: "#6366f1" },
-              "&.Mui-focused fieldset": {
-                borderColor: "#4f46e5",
-                boxShadow: "0 0 0 3px rgba(79,70,229,0.15)",
+        {!hideSearch && (
+          <TextField
+            placeholder={`Search for ${rows?.length} records...`}
+            value={searchQuery}
+            onChange={handleSearchChange}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchOutlined style={{ color: "#6b7280" }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              width: "300px",
+              backgroundColor: "#fff",
+              borderRadius: "12px",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#e5e7eb" },
+                "&:hover fieldset": { borderColor: "#6366f1" },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#4f46e5",
+                  boxShadow: "0 0 0 3px rgba(79,70,229,0.15)",
+                },
               },
-            },
-          }}
-        />
+            }}
+          />
+        )}
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           {otherActionButton}
@@ -308,7 +313,7 @@ const ReusableTable = ({
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedRows.map((row, index) => (
+              displayRows.map((row, index) => (
                 <TableRow
                   hover
                   sx={{
@@ -350,34 +355,36 @@ const ReusableTable = ({
       </TableContainer>
 
       {/* Pagination */}
-      <Box sx={{ my: 1 }} >
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 15]}
-          count={filteredRows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Rows:"
-          sx={{
-            paddingRight: "2rem !important",
-            backgroundColor: theme.palette.background.default,
-            borderTop: `1px solid ${theme.palette.divider}`,
-            "& .MuiTablePagination-actions button": {
-              borderRadius: "12px",
-              transition: "all 0.25s ease",
-              marginRight: "0.5rem",
-              backgroundColor: theme.palette.action.hover,
-              color: theme.palette.primary.dark,
-              "&:hover": {
-                backgroundColor: theme.palette.primary.light,
-                transform: "scale(1.15)",
-                boxShadow: `0px 3px 6px ${theme.palette.primary.main}50`,
+      {!disablePagination && (
+        <Box sx={{ my: 1 }} >
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 15]}
+            count={filteredRows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Rows:"
+            sx={{
+              paddingRight: "2rem !important",
+              backgroundColor: theme.palette.background.default,
+              borderTop: `1px solid ${theme.palette.divider}`,
+              "& .MuiTablePagination-actions button": {
+                borderRadius: "12px",
+                transition: "all 0.25s ease",
+                marginRight: "0.5rem",
+                backgroundColor: theme.palette.action.hover,
+                color: theme.palette.primary.dark,
+                "&:hover": {
+                  backgroundColor: theme.palette.primary.light,
+                  transform: "scale(1.15)",
+                  boxShadow: `0px 3px 6px ${theme.palette.primary.main}50`,
+                },
               },
-            },
-          }}
-        />
-      </Box>
+            }}
+          />
+        </Box>
+      )}
     </MainCard>
   );
 };

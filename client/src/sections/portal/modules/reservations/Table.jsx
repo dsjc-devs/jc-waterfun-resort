@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import reservationsApi, { useGetReservations } from 'api/reservations';
 import {
   Box,
@@ -6,6 +6,7 @@ import {
   Chip,
   Divider,
   Fade,
+  Pagination,
   Menu,
   MenuItem,
   Stack,
@@ -38,6 +39,7 @@ import { toast } from 'react-toastify';
 import { DownloadOutlined } from '@ant-design/icons';
 
 import ReusableTable from 'components/ReusableTable'
+import axiosServices from 'utils/axios'
 import Avatar from 'components/@extended/Avatar';
 import formatPeso from 'utils/formatPrice';
 import titleCase from 'utils/titleCaseFormatter';
@@ -57,8 +59,13 @@ const ReservationsTable = () => {
   const { user } = useAuth()
   const { isCustomer, isAdmin, isMasterAdmin, isReceptionist } = useGetPosition()
 
-  const { data = {}, isLoading, mutate } = useGetReservations(isCustomer ? { userId: user?.userId } : {})
-  const { reservations = [] } = data || {}
+  // Server pagination state
+  const [page, setPage] = useState(1)
+  const [limit] = useState(10)
+
+  const baseQuery = isCustomer ? { userId: user?.userId } : {}
+  const { data = {}, isLoading, mutate } = useGetReservations({ ...baseQuery, page, limit })
+  const { reservations = [], totalPages = 1, currentPage = 1 } = data || {}
 
   const [openMenu, setOpenMenu] = useState({ anchorEl: null, reservationId: '' })
   const [selectedReservationId, setSelectedReservationId] = useState('')
@@ -76,6 +83,38 @@ const ReservationsTable = () => {
     maxAmount: '',
     dateRange: ''
   })
+  // Global search state (server-side like experience)
+  const [globalSearch, setGlobalSearch] = useState('')
+  const [allReservations, setAllReservations] = useState([])
+  const [loadingAll, setLoadingAll] = useState(false)
+
+  // Fetch all reservations once (for global search) when user starts searching
+  useEffect(() => {
+    const fetchAll = async () => {
+      if (!globalSearch) return; // only load when searching
+      // Avoid refetch if already loaded and not empty
+      if (allReservations.length) return;
+      try {
+        setLoadingAll(true)
+        // First request without page/limit to use defaults and get totalReservations
+        const firstRes = await axiosServices.get(`/${import.meta.env.VITE_API_KEY_}/${import.meta.env.VITE_API_VER}/reservations`)
+        const total = firstRes?.data?.totalReservations || 0
+        let accumulated = firstRes?.data?.reservations || []
+        const pages = firstRes?.data?.totalPages || 1
+        // If more than 1 page, fetch remaining pages sequentially
+        for (let p = 2; p <= pages; p++) {
+          const resp = await axiosServices.get(`/${import.meta.env.VITE_API_KEY_}/${import.meta.env.VITE_API_VER}/reservations?page=${p}&limit=${firstRes?.data?.reservations?.length || 10}`)
+          accumulated = accumulated.concat(resp?.data?.reservations || [])
+        }
+        setAllReservations(accumulated)
+      } catch (e) {
+        console.error('Failed to fetch all reservations for search', e)
+      } finally {
+        setLoadingAll(false)
+      }
+    }
+    fetchAll()
+  }, [globalSearch, allReservations.length])
 
   const navigate = useNavigate()
 
@@ -144,7 +183,8 @@ const ReservationsTable = () => {
   }, [reservations])
 
   const filteredReservations = useMemo(() => {
-    return reservations.filter(reservation => {
+    const source = globalSearch && allReservations.length ? allReservations : reservations
+    return source.filter(reservation => {
       if (filters.status === 'not-completed') {
         if (reservation.status === 'COMPLETED') return false;
       } else if (filters.status && reservation.status !== filters.status) {
@@ -222,9 +262,23 @@ const ReservationsTable = () => {
         }
       }
 
+      // Global text search across key fields when globalSearch active
+      if (globalSearch) {
+        const haystack = [
+          reservation.reservationId,
+          reservation.userData?.firstName,
+          reservation.userData?.lastName,
+          reservation.userData?.emailAddress,
+          reservation.accommodationData?.name,
+          reservation.status,
+          reservation.rescheduleRequest?.status
+        ].map(v => String(v || '').toLowerCase()).join(' ')
+        if (!haystack.includes(globalSearch.toLowerCase())) return false
+      }
+
       return true
     })
-  }, [reservations, filters])
+  }, [reservations, filters, globalSearch, allReservations])
 
   const activeFiltersCount = Object.values(filters).filter(value => value && value !== 'all').length
 
@@ -857,6 +911,22 @@ const ReservationsTable = () => {
         </Collapse>
       </Paper>
 
+      {/* Action bar with global search & summary */}
+      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2, justifyContent: 'space-between' }}>
+        <TextField
+          size='small'
+          placeholder='Global search reservations...'
+          value={globalSearch}
+          onChange={(e) => { setGlobalSearch(e.target.value); setPage(1); }}
+          sx={{ width: { xs: '100%', sm: 320 } }}
+          InputProps={{
+            startAdornment: <UserOutlined style={{ marginRight: 8, color: theme.palette.text.secondary }} />
+          }}
+        />
+        <Typography variant='caption' sx={{ fontWeight: 500, color: 'text.secondary' }}>
+          {globalSearch && loadingAll ? 'Searching…' : `Showing ${Math.min(page * limit, (data?.totalReservations || 0)) || filteredReservations.length} of ${data?.totalReservations || filteredReservations.length} reservations`}
+        </Typography>
+      </Box>
       <ReusableTable
         searchableColumns={[
           "reservationId",
@@ -867,10 +937,9 @@ const ReservationsTable = () => {
           "status",
           "rescheduleRequest.status",
         ]}
-        itemsPerPage={5}
         columns={columns}
         rows={filteredReservations}
-        isLoading={isLoading}
+        isLoading={isLoading || (globalSearch && loadingAll)}
         noMessage="No reservations found."
         settings={{
           otherActionButton: (
@@ -900,8 +969,24 @@ const ReservationsTable = () => {
             </React.Fragment>
           ),
           order: 'desc',
+          // Disable local pagination; we are using server pagination with API
+          disablePagination: true,
+          hideSearch: true,
         }}
       />
+
+      {totalPages > 1 && (
+        <Box display="flex" justifyContent="center" mt={2}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={(e, value) => setPage(value)}
+            color="primary"
+            shape="rounded"
+            size="small"
+          />
+        </Box>
+      )}
 
       <Menu
         anchorEl={openMenu.anchorEl}
@@ -942,7 +1027,7 @@ const ReservationsTable = () => {
           </MenuItem>
         )}
 
-        {!isCustomer && (() => {
+        {(isAdmin || isReceptionist || isMasterAdmin) && (() => {
           const row = reservations.find(r => r.reservationId === openMenu.reservationId)
           const canMark = row && (row?.amount?.totalPaid || 0) < (row?.amount?.total || 0)
           return canMark ? (
