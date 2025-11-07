@@ -14,6 +14,12 @@ import FAQs from "sections/landing-pages/FAQs";
 import AmenityOverviewSection from "sections/landing-pages/AmenityOverviewSection";
 import GalleryOverviewSection from "sections/landing-pages/GalleryOverviewSection";
 import ArticleOverviewSection from "sections/landing-pages/ArticleOverviewSection";
+import WhatsIncludedSection from "sections/landing-pages/WhatsIncludedSection";
+import ResortFacilitiesSection from "sections/landing-pages/ResortFacilitiesSection";
+import BookingPaymentSection from "sections/landing-pages/BookingPaymentSection";
+import GroupPackagesSection from "sections/landing-pages/GroupPackagesSection";
+import ContactLocationSection from "sections/landing-pages/ContactLocationSection";
+import ImportantInfoSection from "sections/landing-pages/ImportantInfoSection";
 
 import bgImg from "assets/images/upload/our-mission.jpg";
 import Testimonials from "sections/landing-pages/Testimonials";
@@ -37,12 +43,18 @@ const Home = () => {
         }}
       />
       <AmenityOverviewSection />
+      <WhatsIncludedSection />
+      <ResortFacilitiesSection />
       <ContactUsHomePage />
+      <BookingPaymentSection />
+      <GroupPackagesSection />
       <GalleryOverviewSection />
       <DiscoverSection />
       <AboutUs />
+      <ContactLocationSection />
       <ArticleOverviewSection />
       <Testimonials isHomepage={true} />
+      <ImportantInfoSection />
       <MapSection />
       <FAQs />
     </React.Fragment >
