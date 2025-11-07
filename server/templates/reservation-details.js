@@ -32,7 +32,7 @@ const reservationDetails = (reservationData) => {
 
   // Environment-based URL handling
   const baseUrl = process.env.NODE_ENV === 'development'
-    ? 'http://localhost:3000'
+    ? 'https://john-cezar-waterfun-resort-dev-25ca58b8e31e.herokuapp.com'
     : PROD_URL
 
   return `
