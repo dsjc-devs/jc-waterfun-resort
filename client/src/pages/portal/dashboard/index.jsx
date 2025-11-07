@@ -499,7 +499,7 @@ const Dashboard = () => {
                 variant="contained"
                 color="primary"
                 component={RouterLink}
-                to="/portal/content-management/accommodations"
+                to="/portal/accommodations?type=room"
                 startIcon={<HomeOutlined />}
                 fullWidth
                 sx={{
@@ -561,7 +561,7 @@ const Dashboard = () => {
                 variant="contained"
                 color="warning"
                 component={RouterLink}
-                to="/portal/content-management/amenities"
+                to="/portal/amenities?type=swimming_pool"
                 startIcon={<TrophyOutlined />}
                 fullWidth
                 sx={{
