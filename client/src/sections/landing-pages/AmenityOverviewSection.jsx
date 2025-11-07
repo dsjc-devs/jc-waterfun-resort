@@ -71,7 +71,7 @@ const AmenityOverviewSection = () => {
           {isLoading && (
             <Grid container spacing={3}>
               {Array.from({ length: 6 }).map((_, idx) => (
-                <Grid item xs={12} sm={6} md={4} key={idx}>
+                <Grid item xs={12} sm={6} md={6} key={idx}>
                   <EmptyUserCard />
                 </Grid>
               ))}
@@ -81,7 +81,7 @@ const AmenityOverviewSection = () => {
           {!isLoading && amenities.length > 0 && (
             <Grid container spacing={3}>
               {amenities.map((amenity, index) => (
-                <Grid item xs={12} sm={6} md={4} key={amenity._id || index}>
+                <Grid item xs={12} sm={6} md={6} key={amenity._id || index}>
                   <Card
                     sx={{
                       height: '100%',
