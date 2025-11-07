@@ -8,7 +8,7 @@ import EmptyUserCard from 'components/cards/skeleton/EmptyUserCard'
 import Loader from 'components/Loader'
 import PageTitle from 'components/PageTitle'
 import ScrollTop from 'components/ScrollTop'
-import AmenityPage from 'sections/portal/AmenityPage'
+import AmenityPage from 'sections/dynamic-pages/AmenityPage'
 import textFormatter from 'utils/textFormatter'
 
 const AmenityDetails = () => {

@@ -3,10 +3,8 @@ import { useGetSingleAmenity } from 'api/amenities'
 import { useParams } from 'react-router'
 
 import React from 'react'
-import Banner from 'components/Banner'
 import PageTitle from 'components/PageTitle'
-import AmenityPage from 'sections/portal/AmenityPage'
-import textFormatter from 'utils/textFormatter'
+import AmenityPage from 'sections/dynamic-pages/AmenityPage'
 
 const AmenityDetails = () => {
   const { id } = useParams()
