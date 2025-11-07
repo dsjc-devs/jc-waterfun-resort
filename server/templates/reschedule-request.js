@@ -1,6 +1,6 @@
-const rescheduleRequest = ({ reservationId, guestName = 'Guest', accommodationData = {}, oldStartDate, oldEndDate, newStartDate, newEndDate }) => {
-  const formatDate = (d) => new Date(d).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+import formatDateInTimeZone from '../utils/formatDate.js';
 
+const rescheduleRequest = ({ reservationId, guestName = 'Guest', accommodationData = {}, oldStartDate, oldEndDate, newStartDate, newEndDate }) => {
   return `
     <div style="font-family: Arial, sans-serif; color: #333;">
       <h2 style="margin:0 0 12px;">Reschedule Request Received</h2>
@@ -11,11 +11,11 @@ const rescheduleRequest = ({ reservationId, guestName = 'Guest', accommodationDa
         <tbody>
           <tr>
             <td style="padding: 6px 8px; border: 1px solid #eee;">Current Dates</td>
-            <td style="padding: 6px 8px; border: 1px solid #eee;"><strong>${formatDate(oldStartDate)} - ${formatDate(oldEndDate)}</strong></td>
+            <td style="padding: 6px 8px; border: 1px solid #eee;"><strong>${formatDateInTimeZone(oldStartDate)} - ${formatDateInTimeZone(oldEndDate)}</strong></td>
           </tr>
           <tr>
             <td style="padding: 6px 8px; border: 1px solid #eee;">Requested New Dates</td>
-            <td style="padding: 6px 8px; border: 1px solid #eee;"><strong>${formatDate(newStartDate)} - ${formatDate(newEndDate)}</strong></td>
+            <td style="padding: 6px 8px; border: 1px solid #eee;"><strong>${formatDateInTimeZone(newStartDate)} - ${formatDateInTimeZone(newEndDate)}</strong></td>
           </tr>
         </tbody>
       </table>

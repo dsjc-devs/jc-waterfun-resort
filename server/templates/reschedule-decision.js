@@ -1,3 +1,5 @@
+import formatDateInTimeZone from '../utils/formatDate.js';
+
 const rescheduleDecision = ({
   reservationId,
   guestName = 'Guest',
@@ -9,8 +11,6 @@ const rescheduleDecision = ({
   decision = 'APPROVED',
   reason
 }) => {
-  const formatDate = (d) => new Date(d).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
-
   const approved = decision === 'APPROVED';
 
   return `
@@ -25,12 +25,12 @@ const rescheduleDecision = ({
         <tbody>
           <tr>
             <td style="padding: 6px 8px; border: 1px solid #eee;">Original Dates</td>
-            <td style="padding: 6px 8px; border: 1px solid #eee;"><strong>${formatDate(oldStartDate)} - ${formatDate(oldEndDate)}</strong></td>
+            <td style="padding: 6px 8px; border: 1px solid #eee;"><strong>${formatDateInTimeZone(oldStartDate)} - ${formatDateInTimeZone(oldEndDate)}</strong></td>
           </tr>
           ${approved ? `
           <tr>
             <td style="padding: 6px 8px; border: 1px solid #eee;">New Confirmed Dates</td>
-            <td style="padding: 6px 8px; border: 1px solid #eee;"><strong>${formatDate(newStartDate)} - ${formatDate(newEndDate)}</strong></td>
+            <td style="padding: 6px 8px; border: 1px solid #eee;"><strong>${formatDateInTimeZone(newStartDate)} - ${formatDateInTimeZone(newEndDate)}</strong></td>
           </tr>` : ''}
         </tbody>
       </table>
