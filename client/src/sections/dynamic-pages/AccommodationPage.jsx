@@ -46,15 +46,29 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const location = useLocation();
   const { isLoggedIn } = useAuth()
 
-  const { data: blockedDates = [] } = useGetBlockedDates()
+  const { data: blockedDatesRaw = [] } = useGetBlockedDates()
   const { data: reservationData } = useGetReservations(isOnPortal ? { accommodationId: data?._id } : {})
   const { reservations = [] } = reservationData || {}
 
-  const bookedRanges = blockedDates?.filter((f) => f.accommodationId === data?._id)?.map((d) => ({
-    startDate: new Date(d.startDate),
-    endDate: new Date(d.endDate),
-    accommodationId: d.accommodationId
-  })) || [];
+
+  // Blocked dates: resort-wide or for this accommodation, and not from reservation
+  const blockedDates = (Array.isArray(blockedDatesRaw) ? blockedDatesRaw : (blockedDatesRaw?.blockedDates || []))
+    .filter(bd => !bd.isFromReservation && (!bd.accommodationId || bd.accommodationId === data?._id))
+    .map(bd => ({
+      startDate: new Date(bd.startDate),
+      endDate: new Date(bd.endDate),
+      reason: bd.reason,
+      accommodationId: bd.accommodationId
+    }));
+
+  // Booked ranges (from reservations)
+  const bookedRanges = (Array.isArray(blockedDatesRaw) ? blockedDatesRaw : (blockedDatesRaw?.blockedDates || []))
+    .filter((f) => f.accommodationId === data?._id && f.isFromReservation)
+    .map((d) => ({
+      startDate: new Date(d.startDate),
+      endDate: new Date(d.endDate),
+      accommodationId: d.accommodationId
+    })) || [];
 
   const {
     name,
@@ -116,29 +130,53 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
     return endHour > 17 || endHour < 6;
   };
 
-  const isDateBlocked = (date, mode) => {
-    return bookedRanges.some((range) => {
+  // Returns true if date is blocked by a blocked date (resort-wide or for this accommodation)
+  const isDateBlockedByAdmin = (date, mode) => {
+    return blockedDates.some((range) => {
       if (mode === "day") {
         const dayStart = new Date(date);
         dayStart.setHours(7, 0, 0, 0);
         const dayEnd = new Date(date);
         dayEnd.setHours(17, 0, 0, 0);
-
         return range.startDate < dayEnd && range.endDate > dayStart;
       }
-
       if (mode === "night") {
         const nightStart = new Date(date);
         nightStart.setHours(17, 0, 0, 0);
         const nightEnd = new Date(date);
         nightEnd.setDate(nightEnd.getDate() + 1);
         nightEnd.setHours(7, 0, 0, 0);
-
         return range.startDate < nightEnd && range.endDate > nightStart;
       }
-
       return false;
     });
+  };
+
+  // Returns true if date is blocked by a reservation
+  const isDateBlockedByReservation = (date, mode) => {
+    return bookedRanges.some((range) => {
+      if (mode === "day") {
+        const dayStart = new Date(date);
+        dayStart.setHours(7, 0, 0, 0);
+        const dayEnd = new Date(date);
+        dayEnd.setHours(17, 0, 0, 0);
+        return range.startDate < dayEnd && range.endDate > dayStart;
+      }
+      if (mode === "night") {
+        const nightStart = new Date(date);
+        nightStart.setHours(17, 0, 0, 0);
+        const nightEnd = new Date(date);
+        nightEnd.setDate(nightEnd.getDate() + 1);
+        nightEnd.setHours(7, 0, 0, 0);
+        return range.startDate < nightEnd && range.endDate > nightStart;
+      }
+      return false;
+    });
+  };
+
+  // Unified check for UI
+  const isDateBlocked = (date, mode) => {
+    return isDateBlockedByAdmin(date, mode) || isDateBlockedByReservation(date, mode);
   };
 
   const isDateBlockedGuestHouse = (startDate, endDate) => {
@@ -524,12 +562,12 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                           color="warning.main"
                           sx={{ mt: 1, fontStyle: "italic" }}
                         >
-                          {isDateBlocked(startDate, "day") && !isDateBlocked(startDate, "night") &&
-                            "Only Night Tour is available for this date."}
-                          {!isDateBlocked(startDate, "day") && isDateBlocked(startDate, "night") &&
-                            "Only Day Tour is available for this date."}
-                          {isDateBlocked(startDate, "day") && isDateBlocked(startDate, "night") &&
-                            "No tours are available for this date."}
+                          {isDateBlockedByAdmin(startDate, "day") && !isDateBlockedByAdmin(startDate, "night") &&
+                            "Only Night Tour is available for this date (blocked by admin)."}
+                          {!isDateBlockedByAdmin(startDate, "day") && isDateBlockedByAdmin(startDate, "night") &&
+                            "Only Day Tour is available for this date (blocked by admin)."}
+                          {isDateBlockedByAdmin(startDate, "day") && isDateBlockedByAdmin(startDate, "night") &&
+                            "No tours are available for this date (blocked by admin)."}
                         </Typography>
                       )}
                     </Box>
