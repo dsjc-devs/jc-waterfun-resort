@@ -75,6 +75,7 @@ const ReservationsTable = () => {
     status: '',
     paymentStatus: '',
     rescheduleStatus: '',
+    reservationType: '',
     startDate: '',
     endDate: '',
     customer: '',
@@ -163,6 +164,7 @@ const ReservationsTable = () => {
       status: '',
       paymentStatus: '',
       rescheduleStatus: '',
+      reservationType: '',
       startDate: '',
       endDate: '',
       customer: '',
@@ -220,6 +222,12 @@ const ReservationsTable = () => {
       if (filters.rescheduleStatus) {
         const current = reservation?.rescheduleRequest?.status || 'NONE'
         if (current !== filters.rescheduleStatus) return false
+      }
+
+      if (filters.reservationType) {
+        const isReservation = reservation?.isWalkIn === false;
+        if (filters.reservationType === 'Via Online' && !isReservation) return false;
+        if (filters.reservationType === 'Walk-In' && isReservation) return false;
       }
 
       if (filters.minAmount && reservation.amount?.total < parseFloat(filters.minAmount)) return false
@@ -443,6 +451,23 @@ const ReservationsTable = () => {
       }
     };
 
+    const isReservationColumn = {
+      id: 'reservationType',
+      label: 'Reservation Type',
+      align: 'center',
+      renderCell: (row) => {
+        const isReservation = row?.isWalkIn === false; // true if not walk-in
+        return (
+          <Chip
+            size='small'
+            label={isReservation ? 'Via Online' : 'Walk-In'}
+            color={isReservation ? 'success' : 'default'}
+            variant={isReservation ? 'filled' : 'outlined'}
+          />
+        );
+      }
+    };
+
     const rescheduleColumn = {
       id: 'reschedule',
       label: 'Reschedule',
@@ -493,9 +518,9 @@ const ReservationsTable = () => {
     }
 
     if (isCustomer) {
-      return [reservationColumn, reservationDatesColumn, dateCreatedColumn, guestsColumns, statusColumn, rescheduleColumn, financialsColumn, actionsColumn];
+      return [reservationColumn, reservationDatesColumn, dateCreatedColumn, guestsColumns, statusColumn, isReservationColumn, rescheduleColumn, financialsColumn, actionsColumn];
     } else {
-      return [reservationColumn, customerColumn, reservationDatesColumn, dateCreatedColumn, guestsColumns, statusColumn, rescheduleColumn, financialsColumn, actionsColumn];
+      return [reservationColumn, customerColumn, reservationDatesColumn, dateCreatedColumn, guestsColumns, statusColumn, isReservationColumn, rescheduleColumn, financialsColumn, actionsColumn];
     }
   }, [isCustomer])
 
@@ -547,6 +572,8 @@ const ReservationsTable = () => {
         ? 'Fully Paid' : ((r?.amount?.totalPaid || 0) > 0 ? 'Partially Paid' : 'Unpaid');
       const balance = (r?.amount?.total || 0) - (r?.amount?.totalPaid || 0);
       const customer = `${fmt(r?.userData?.firstName)} ${fmt(r?.userData?.lastName)}`.trim();
+      const isReservation = r?.isWalkIn === false; // true if not walk-in
+      const reservationTypeLabel = isReservation ? 'Via Online' : 'Walk-In';
       return [
         fmt(r?.reservationId),
         customer,
@@ -556,6 +583,7 @@ const ReservationsTable = () => {
         formatDateTime(r?.endDate),
         fmt(r?.guests),
         titleCase(fmt(r?.status)),
+        reservationTypeLabel,
         (r?.rescheduleRequest?.status ? titleCase(r?.rescheduleRequest?.status) : 'None'),
         paymentStatus,
         peso(r?.amount?.total),
@@ -576,13 +604,13 @@ const ReservationsTable = () => {
       // Align numeric columns to the right but avoid fixed widths that can push columns off-page
       columnStyles: {
         6: { halign: 'right' },   // Guests
-        10: { halign: 'right' },  // Total
-        11: { halign: 'right' },  // Paid
-        12: { halign: 'right' }   // Balance
+        11: { halign: 'right' },  // Total
+        12: { halign: 'right' },  // Paid
+        13: { halign: 'right' }   // Balance
       },
       head: [[
         'ID', 'Customer', 'Email', 'Accommodation', 'Start', 'End', 'Guests',
-        'Status', 'Resched', 'Payment', 'Total', 'Paid', 'Balance', 'Created At'
+        'Status', 'Reservation Type', 'Resched', 'Payment', 'Total', 'Paid', 'Balance', 'Created At'
       ]],
       body
     });
@@ -796,6 +824,26 @@ const ReservationsTable = () => {
                     {filterOptions.accommodationTypes.map(type => (
                       <MenuItem key={type} value={type}>{type}</MenuItem>
                     ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Reservation Type</InputLabel>
+                  <Select
+                    value={filters.reservationType}
+                    label="Reservation Type"
+                    onChange={(e) => handleFilterChange('reservationType', e.target.value)}
+                    sx={{ borderRadius: 2 }}
+                  >
+                    <MenuItem value="">All Types</MenuItem>
+                    <MenuItem value="Via Online">
+                      <Chip size="small" label="Via Online" color="success" />
+                    </MenuItem>
+                    <MenuItem value="Walk-In">
+                      <Chip size="small" label="Walk-In" variant="outlined" />
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Grid>

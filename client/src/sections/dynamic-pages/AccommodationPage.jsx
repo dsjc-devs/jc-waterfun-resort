@@ -107,7 +107,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
     if (mode === "day") {
       d.setHours(7, 0, 0, 0);
     } else {
-      d.setHours(17, 0, 0, 0);
+      d.setHours(19, 0, 0, 0);
     }
     return d;
   };
@@ -127,7 +127,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const isNightStay = (date) => {
     if (!date) return false;
     const endHour = date.getHours();
-    return endHour > 17 || endHour < 6;
+    return endHour > 19 || endHour <= 5;
   };
 
   // Returns true if date is blocked by a blocked date (resort-wide or for this accommodation)
@@ -142,7 +142,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
       }
       if (mode === "night") {
         const nightStart = new Date(date);
-        nightStart.setHours(17, 0, 0, 0);
+        nightStart.setHours(19, 0, 0, 0);
         const nightEnd = new Date(date);
         nightEnd.setDate(nightEnd.getDate() + 1);
         nightEnd.setHours(7, 0, 0, 0);
@@ -164,7 +164,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
       }
       if (mode === "night") {
         const nightStart = new Date(date);
-        nightStart.setHours(17, 0, 0, 0);
+        nightStart.setHours(19, 0, 0, 0);
         const nightEnd = new Date(date);
         nightEnd.setDate(nightEnd.getDate() + 1);
         nightEnd.setHours(7, 0, 0, 0);
