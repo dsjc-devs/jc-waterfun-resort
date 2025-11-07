@@ -1,10 +1,21 @@
-import { Grid, Typography, Box } from '@mui/material'
+import { Grid, Typography, Box, Button } from '@mui/material'
+import { EyeOutlined } from '@ant-design/icons'
 
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import ConvertDate from 'components/ConvertDate'
 import formatPeso from 'utils/formatPrice'
+import AnimateButton from 'components/@extended/AnimateButton'
 
 const LongAccommodationCard = ({ data }) => {
+  const navigate = useNavigate()
+
+  const handleViewDetails = () => {
+    if (data?._id) {
+      navigate(`/portal/accommodations/details/${data._id}`)
+    }
+  }
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12} md={3}>
@@ -75,6 +86,20 @@ const LongAccommodationCard = ({ data }) => {
             </Typography>
           </Box>
         )}
+
+        <Box mt={2}>
+          <AnimateButton>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<EyeOutlined />}
+              onClick={handleViewDetails}
+              disabled={!data?._id}
+            >
+              View Details
+            </Button>
+          </AnimateButton>
+        </Box>
       </Grid>
     </Grid>
   )
