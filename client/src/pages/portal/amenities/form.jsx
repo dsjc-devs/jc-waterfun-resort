@@ -11,7 +11,9 @@ import {
   MenuItem,
   Select,
   Box,
-  FormHelperText
+  FormHelperText,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
 
 import { FormikProvider, useFormik } from 'formik';
@@ -49,10 +51,14 @@ const validationSchema = Yup.object().shape({
   description: Yup.string()
     .required("Description is required")
     .min(10, "Description must be at least 10 characters"),
+  hasPrice: Yup.boolean().default(false),
   price: Yup.number()
     .typeError("Price must be a number")
-    .required("Price is required")
-    .positive("Price must be greater than 0"),
+    .when('hasPrice', {
+      is: true,
+      then: (schema) => schema.required("Price is required").positive("Price must be greater than 0"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
   files: Yup.array()
     .min(1, "At least one picture is required"),
   thumbnailIndex: Yup.number()
@@ -81,7 +87,8 @@ const AmenityForm = () => {
       notes: data?.notes || '',
       type: (_type && _type) || data?.type || '',
       description: data?.description || '',
-      price: data?.price || '',
+      hasPrice: !!data?.hasPrice || false,
+      price: data?.price ?? '',
       files: data?.pictures?.map((pic) => ({
         preview: pic.image,
         name: pic._id || pic.image.split('/').pop(),
@@ -110,7 +117,10 @@ const AmenityForm = () => {
         formData.append('name', values.name);
         formData.append('type', values.type);
         formData.append('description', values.description);
-        formData.append('price', values.price);
+        formData.append('hasPrice', String(values.hasPrice));
+        if (values.hasPrice) {
+          formData.append('price', String(values.price));
+        }
         formData.append('notes', values.notes);
 
         // send selected picture index as thumbnail
@@ -240,19 +250,38 @@ const AmenityForm = () => {
                 )}
 
                 <Grid item xs={12} md={6}>
-                  <Typography variant='body1'>Price (Required)</Typography>
-                  <FormikTextInput
-                    variant="outlined"
-                    name='price'
-                    value={formik.values.price}
-                    onChange={formik.handleChange}
-                    fullWidth
-                    type='number'
-                    placeholder='e.g. 500'
-                    InputProps={{
-                      startAdornment: <InputAdornment position='start'>₱</InputAdornment>
-                    }}
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={formik.values.hasPrice}
+                        onChange={(e) => {
+                          formik.setFieldValue('hasPrice', e.target.checked);
+                          if (!e.target.checked) {
+                            formik.setFieldValue('price', '');
+                          }
+                        }}
+                        color="primary"
+                      />
+                    }
+                    label="Has Price?"
                   />
+                  {formik.values.hasPrice && (
+                    <>
+                      <Typography variant='body1'>Price ({formik.values.hasPrice ? 'Required' : 'Optional'})</Typography>
+                      <FormikTextInput
+                        variant="outlined"
+                        name='price'
+                        value={formik.values.price}
+                        onChange={formik.handleChange}
+                        fullWidth
+                        type='number'
+                        placeholder='e.g. 500'
+                        InputProps={{
+                          startAdornment: <InputAdornment position='start'>₱</InputAdornment>
+                        }}
+                      />
+                    </>
+                  )}
                 </Grid>
 
                 <Grid item xs={12}>

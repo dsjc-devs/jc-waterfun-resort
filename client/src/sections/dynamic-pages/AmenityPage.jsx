@@ -35,6 +35,8 @@ import IconButton from 'components/@extended/IconButton';
 import LabeledValue from 'components/LabeledValue';
 import useGetPosition from 'hooks/useGetPosition';
 import textFormatter from 'utils/textFormatter';
+import formatPeso from 'utils/formatPrice';
+import { PESO_SIGN } from 'constants/constants';
 
 const AmenityPage = ({ data, isLoading, isOnPortal = true }) => {
   const { isCustomer } = useGetPosition();
@@ -50,11 +52,14 @@ const AmenityPage = ({ data, isLoading, isOnPortal = true }) => {
     notes,
     status,
     capacity,
-    features = []
+    features = [],
+    hasPrice,
+    price
   } = data || {};
 
   const transformedPictures = pictures?.map((pic) => pic?.image) || [];
-  const _pictures = [thumbnail, ...transformedPictures];
+  // Ensure no undefined entries render causing react warnings
+  const _pictures = [thumbnail, ...transformedPictures].filter(Boolean);
 
   const [loading, setLoading] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -235,6 +240,28 @@ const AmenityPage = ({ data, isLoading, isOnPortal = true }) => {
                 />
               </Grid>
 
+              <Grid item xs={12} sm={6} md={4}>
+                <LabeledValue
+                  title="Pricing"
+                  subTitle={hasPrice && price ? (
+                    <Chip
+                      label={`${formatPeso(price)}`}
+                      color="primary"
+                      size="small"
+                      sx={{ fontWeight: 600 }}
+                    />
+                  ) : (
+                    <Chip
+                      label="Included"
+                      color="success"
+                      size="small"
+                      sx={{ fontWeight: 600 }}
+                    />
+                  )}
+                  icon={<Typography fontSize={24}>{PESO_SIGN}</Typography>}
+                />
+              </Grid>
+
               {capacity && (
                 <Grid item xs={12} sm={6} md={4}>
                   <LabeledValue
@@ -247,6 +274,39 @@ const AmenityPage = ({ data, isLoading, isOnPortal = true }) => {
             </Grid>
 
             <Divider sx={{ mb: 2 }} />
+
+            {/* Feature Chips */}
+            {features?.length > 0 && (
+              <Stack direction="row" flexWrap="wrap" gap={1} mb={4}>
+                {features.map((f, idx) => (
+                  <Chip key={idx} label={f} size="small" variant="outlined" />
+                ))}
+              </Stack>
+            )}
+
+            {/* Pricing Highlight */}
+            <Box
+              sx={{
+                mb: 4,
+                p: 3,
+                borderRadius: 2,
+                bgcolor: hasPrice ? 'primary.dark' : 'success.dark',
+                color: 'common.white',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1,
+                boxShadow: 3,
+              }}
+            >
+              <Typography variant="h5" fontWeight={700}>
+                {hasPrice && price ? 'Amenity Rate' : 'Complimentary Amenity'}
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                {hasPrice && price
+                  ? `Current price for this amenity is ${formatPeso(price)}. Rates may change without prior notice.`
+                  : 'This amenity is included with your stay. Availability may vary based on maintenance or scheduling.'}
+              </Typography>
+            </Box>
 
             {notes && (
               <Box marginBlock={5}>
