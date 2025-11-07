@@ -9,7 +9,8 @@ import {
   PhoneOutlined,
   EditOutlined,
 } from "@ant-design/icons";
-import { Grid, Chip, Stack, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert, ToggleButtonGroup, ToggleButton } from "@mui/material";
+import { Grid, Chip, Stack, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, ToggleButtonGroup, ToggleButton, Alert } from "@mui/material";
+import { toast } from 'react-toastify';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -67,8 +68,6 @@ const Details = ({ reservationData = {} }) => {
   const [reschedDateTime, setReschedDateTime] = useState(startDate ? new Date(startDate) : null); // for guest house
   const [rejectReason, setRejectReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
 
   // Only return null after all hooks are called
   if (!reservationData || !userData) return null;
@@ -106,8 +105,6 @@ const Details = ({ reservationData = {} }) => {
   const handleSubmitReschedule = async () => {
     try {
       setSubmitting(true);
-      setErrorMsg("");
-      setSuccessMsg("");
       let s, e;
       if (isGuestHouse) {
         if (!reschedDateTime) throw new Error('Please select a new start date and time.');
@@ -119,12 +116,12 @@ const Details = ({ reservationData = {} }) => {
         e = computeModeEnd(s, reschedMode);
       }
       await reservationsApi.Reservations.requestReschedule(reservationId, { newStartDate: s.toISOString(), newEndDate: e.toISOString() });
-      setSuccessMsg("Reschedule request sent. Please wait for staff confirmation.");
+      toast.success("Reschedule request sent. Please wait for staff confirmation.");
       setOpenResched(false);
       setRejectReason("");
       await mutate();
     } catch (e) {
-      setErrorMsg(e.message || "Failed to submit reschedule request.");
+      toast.error(e.message || "Failed to submit reschedule request.");
     } finally {
       setSubmitting(false);
     }
@@ -133,13 +130,11 @@ const Details = ({ reservationData = {} }) => {
   const handleApprove = async () => {
     try {
       setSubmitting(true);
-      setErrorMsg("");
-      setSuccessMsg("");
       await reservationsApi.Reservations.decideReschedule(reservationId, { action: 'APPROVE' });
-      setSuccessMsg("Reschedule approved.");
+      toast.success("Reschedule approved.");
       await mutate();
     } catch (e) {
-      setErrorMsg(e.message || "Failed to approve reschedule.");
+      toast.error(e.message || "Failed to approve reschedule.");
     } finally {
       setSubmitting(false);
     }
@@ -148,15 +143,13 @@ const Details = ({ reservationData = {} }) => {
   const handleReject = async () => {
     try {
       setSubmitting(true);
-      setErrorMsg("");
-      setSuccessMsg("");
       await reservationsApi.Reservations.decideReschedule(reservationId, { action: 'REJECT', reason: rejectReason });
       setOpenReject(false);
       setRejectReason("");
-      setSuccessMsg("Reschedule rejected.");
+      toast.success("Reschedule rejected.");
       await mutate();
     } catch (e) {
-      setErrorMsg(e.message || "Failed to reject reschedule.");
+      toast.error(e.message || "Failed to reject reschedule.");
     } finally {
       setSubmitting(false);
     }
@@ -463,14 +456,6 @@ const Details = ({ reservationData = {} }) => {
               </Grid>
             </Grid>
           </MainCard>
-        </Grid>
-      </Grid>
-
-      {/* Feedback banners */}
-      <Grid container>
-        <Grid item xs={12}>
-          {errorMsg && <Alert sx={{ mt: 2 }} severity="error" onClose={() => setErrorMsg("")}>{errorMsg}</Alert>}
-          {successMsg && <Alert sx={{ mt: 2 }} severity="success" onClose={() => setSuccessMsg("")}>{successMsg}</Alert>}
         </Grid>
       </Grid>
 
