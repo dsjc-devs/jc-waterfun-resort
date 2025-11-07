@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import { PESO_SIGN } from 'constants/constants';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -42,6 +43,7 @@ import Calendar from 'sections/portal/modules/reservations/Calendar';
 const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const { isCustomer } = useGetPosition()
   const navigate = useNavigate();
+  const location = useLocation();
   const { isLoggedIn } = useAuth()
 
   const { data: blockedDates = [] } = useGetBlockedDates()
@@ -175,6 +177,60 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   useEffect(() => {
     setManualMode(false);
   }, [startDate]);
+
+  // Initialize date/mode from URL params (coming from Check Availability)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const modeParam = params.get('mode'); // 'tour' | 'checkin'
+    const tourType = params.get('tourType'); // 'day' | 'night'
+    const tourDate = params.get('tourDate');
+    const checkInDate = params.get('checkInDate');
+    const checkOutDate = params.get('checkOutDate');
+    const startParam = params.get('startDate');
+    const endParam = params.get('endDate');
+
+    try {
+      // Tour mode date
+      if ((modeParam === 'tour') || (tourType && tourDate)) {
+        const m = tourType === 'night' ? 'night' : 'day';
+        setMode(m);
+        if (tourDate) {
+          const raw = new Date(tourDate);
+          if (!isNaN(raw.getTime())) {
+            const s = applyModeStartTime(raw, m);
+            const e = computeModeEnd(s, m);
+            setStartDate(s);
+            setEndDate(e);
+            setManualMode(true);
+          }
+        }
+        return;
+      }
+
+      // Check-in/out dates
+      if ((modeParam === 'checkin') || (checkInDate && checkOutDate)) {
+        const s = checkInDate ? new Date(checkInDate) : (startParam ? new Date(startParam) : null);
+        const e = checkOutDate ? new Date(checkOutDate) : (endParam ? new Date(endParam) : null);
+        if (s && !isNaN(s.getTime())) setStartDate(s);
+        if (e && !isNaN(e.getTime())) setEndDate(e);
+        if (e) setMode(isNightStay(e) ? 'night' : 'day');
+        setManualMode(true);
+        return;
+      }
+
+      // Fallback explicit start/end
+      if (startParam || endParam) {
+        const s = startParam ? new Date(startParam) : null;
+        const e = endParam ? new Date(endParam) : null;
+        if (s && !isNaN(s.getTime())) setStartDate(s);
+        if (e && !isNaN(e.getTime())) setEndDate(e);
+        if (e) setMode(isNightStay(e) ? 'night' : 'day');
+        setManualMode(true);
+      }
+    } catch (_) {
+      // ignore malformed params
+    }
+  }, [location.search]);
 
   const handleModeChange = (event, newMode) => {
     if (!newMode) return;
