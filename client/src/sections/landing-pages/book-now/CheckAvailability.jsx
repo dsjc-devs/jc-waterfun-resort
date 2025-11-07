@@ -395,7 +395,27 @@ const CheckAvailability = () => {
             fullWidth
             sx={{ mt: 'auto' }}
             onClick={() => {
-              window.open(`/accommodations/details/${_id}`);
+              let url = `/accommodations/details/${_id}`;
+              const params = new URLSearchParams();
+
+              if (bookingMode === 'tour' && criteria.tourDate) {
+                params.set('mode', 'tour');
+                params.set('tourType', criteria.tourType);
+                params.set('tourDate', new Date(criteria.tourDate).toISOString());
+              } else if (
+                bookingMode === 'checkin' &&
+                criteria.checkInDate &&
+                criteria.checkOutDate
+              ) {
+                params.set('mode', 'checkin');
+                params.set('checkInDate', new Date(criteria.checkInDate).toISOString());
+                params.set('checkOutDate', new Date(criteria.checkOutDate).toISOString());
+              }
+
+              const qs = params.toString();
+              if (qs) url += `?${qs}`;
+              url += '#book_reservation_section';
+              window.open(url);
             }}
           >
             Select This Accommodation
