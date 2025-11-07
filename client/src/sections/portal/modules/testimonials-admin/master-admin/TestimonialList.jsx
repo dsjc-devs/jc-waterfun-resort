@@ -132,7 +132,7 @@ const TestimonialRow = ({ t, onApprove, onUnpublish, onDelete, onView }) => {
 
 const TestimonialsAdmin = () => {
     const { user } = useAuth();
-    const [tab, setTab] = useState(0);
+    const [tab, setTab] = useState(0); // Default to 'All' tab (leftmost)
     const [confirm, setConfirm] = useState({ open: false, item: null });
     const [selectedTestimonial, setSelectedTestimonial] = useState(null);
     const [page, setPage] = useState(1);
@@ -151,8 +151,8 @@ const TestimonialsAdmin = () => {
 
     const serverQuery = useMemo(() => {
         const q = { page, limit };
-        if (tab === 0) q.isPosted = false;
-        else if (tab === 1) q.isPosted = true;
+        if (tab === 1) q.isPosted = false;
+        else if (tab === 2) q.isPosted = true;
         return q;
     }, [page, limit, tab]);
 
@@ -298,9 +298,9 @@ const TestimonialsAdmin = () => {
                 aria-label="testimonial tabs"
                 sx={{ mb: 2 }}
             >
+                <Tab label={`All (${allCount})`} />
                 <Tab label={`Pending (${pendingCount})`} />
                 <Tab label={`Published (${publishedCount})`} />
-                <Tab label={`All (${allCount})`} />
             </Tabs>
 
             <Paper elevation={0} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2, mb: 2 }}>
@@ -522,8 +522,9 @@ const TestimonialsAdmin = () => {
                     </>
                 )}
             </Dialog>
+
         </Container>
     );
-};
+}
 
 export default TestimonialsAdmin;
