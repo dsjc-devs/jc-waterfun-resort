@@ -448,7 +448,8 @@ const ReservationsTable = () => {
   // Bulk export function (table-style; uses one table across pages)
   const handleBulkExportToPdf = () => {
     if (!filteredReservations.length) return;
-    const doc = new jsPDF('p', 'pt'); // use points for better sizing
+    // Use landscape to fit more columns across the page
+    const doc = new jsPDF('l', 'pt'); // use points for better sizing
 
     const fmt = (v) => (v === undefined || v === null || v === '' ? '-' : String(v));
     const peso = (value) => {
@@ -512,24 +513,18 @@ const ReservationsTable = () => {
 
     autoTable(doc, {
       startY: 96,
-      styles: { fontSize: 8, cellPadding: 6 },
+      // Let the table auto-fit within page width and wrap as needed
+      margin: { left: 24, right: 24 },
+      tableWidth: 'wrap',
+      styles: { fontSize: 7, cellPadding: 4, overflow: 'linebreak' },
       headStyles: { fillColor: [63, 81, 181], halign: 'center', valign: 'middle' },
       bodyStyles: { valign: 'middle' },
+      // Align numeric columns to the right but avoid fixed widths that can push columns off-page
       columnStyles: {
-        0: { cellWidth: 70 },   // ID
-        1: { cellWidth: 110 },  // Customer
-        2: { cellWidth: 150 },  // Email
-        3: { cellWidth: 120 },  // Accommodation
-        4: { cellWidth: 110 },  // Start
-        5: { cellWidth: 110 },  // End
-        6: { cellWidth: 50, halign: 'right' },   // Guests
-        7: { cellWidth: 80 },   // Status
-        8: { cellWidth: 80 },   // Resched
-        9: { cellWidth: 90 },   // Payment
-        10: { cellWidth: 90, halign: 'right' },   // Total
-        11: { cellWidth: 90, halign: 'right' },   // Paid
-        12: { cellWidth: 90, halign: 'right' },   // Balance
-        13: { cellWidth: 120 }   // Created At
+        6: { halign: 'right' },   // Guests
+        10: { halign: 'right' },  // Total
+        11: { halign: 'right' },  // Paid
+        12: { halign: 'right' }   // Balance
       },
       head: [[
         'ID', 'Customer', 'Email', 'Accommodation', 'Start', 'End', 'Guests',
