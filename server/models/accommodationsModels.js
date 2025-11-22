@@ -71,6 +71,11 @@ const accommodationsSchema = new mongoose.Schema(
       enum: ["POSTED", "ARCHIVED", "UNPOSTED"],
       default: "POSTED"
     },
+    tourType: {
+      type: String,
+      required: true,
+      enum: ["OVERNIGHT", "DAYUSE"],
+    },
     type: {
       type: String,
       required: true,
