@@ -159,6 +159,21 @@ const Details = ({ reservationData = {} }) => {
 
   return (
     <React.Fragment>
+      {/* Reschedule Guidelines Alert */}
+      {isCustomer && status === 'CONFIRMED' && (
+        <Alert
+          severity={canRequestReschedule ? "info" : "warning"}
+          sx={{ marginBottom: 2 }}
+        >
+          <strong>Reschedule Policy:</strong> Reschedule requests are only allowed at least 2 days before your reservation date.
+          {!isAtLeast2DaysBefore(startDate) && (
+            <span> Your reservation is too close to the start date for rescheduling.</span>
+          )}
+          {hasPendingResched && (
+            <span> You currently have a pending reschedule request.</span>
+          )}
+        </Alert>
+      )}
       <Stack direction='row' justifyContent='flex-end' spacing={2} marginBlock={2}>
         <AnimateButton>
           <Button
