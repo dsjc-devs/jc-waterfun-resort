@@ -13,6 +13,9 @@ import FAQs from "../models/faqsModels.js";
 import rescheduleRequestTemplate from "../templates/reschedule-request.js";
 import rescheduleDecisionTemplate from "../templates/reschedule-decision.js";
 
+// Standard footer for all outbound SMS messages
+const SMS_FOOTER = "\n(Automated message. Do not reply.)";
+
 const hasDateConflict = async (accommodationId, newStartDate, newEndDate) => {
   const conflict = await Reservation.findOne({
     accommodationId,
@@ -111,7 +114,7 @@ const createReservation = async (reservationData) => {
         const { start: s, end: e } = night
           ? getNightDisplayStrings(startDate, endDate)
           : { start: formatDateInTimeZone(startDate, { includeTime: true }), end: formatDateInTimeZone(endDate, { includeTime: true }) };
-        const msg = `Reservation CONFIRMED: ${reservationId}\n${acc?.name || 'Accommodation'}\n${s} to ${e}.\nThank you for booking!`;
+        const msg = `Reservation CONFIRMED: ${reservationId}\n${acc?.name || 'Accommodation'}\n${s} to ${e}.\nThank you for booking!${SMS_FOOTER}`;
         await sendSMS({ number: phoneNumber, message: msg });
       } catch (e) {
         console.error("Error sending reservation SMS:", e?.message);
@@ -314,7 +317,7 @@ const sendUpcomingReservationReminders = async () => {
           const s = night
             ? getNightDisplayStrings(startDate, endDate).start
             : formatDateInTimeZone(startDate, { includeTime: true });
-          const msg = `Reminder: Your reservation ${reservationId} starts tomorrow at ${s}. See you at John Cezar Waterfun Resort!`;
+          const msg = `Reminder: Your reservation ${reservationId} starts tomorrow at ${s}. See you at John Cezar Waterfun Resort!${SMS_FOOTER}`;
           await sendSMS({ number: userData.phoneNumber, message: msg });
         }
       } catch (e) {
@@ -415,7 +418,7 @@ const requestRescheduleById = async (reservationId, { newStartDate, newEndDate, 
         const { start: s, end: e } = night
           ? getNightDisplayStrings(newStart, newEnd)
           : { start: formatDateInTimeZone(newStart, { includeTime: true }), end: formatDateInTimeZone(newEnd, { includeTime: true }) };
-        const msg = `Reschedule request received: ${reservationId}\nNew: ${s} to ${e}.\nWe will update you soon.`;
+        const msg = `Reschedule request received: ${reservationId}\nNew: ${s} to ${e}.\nWe will update you soon.${SMS_FOOTER}`;
         await sendSMS({ number: userData.phoneNumber, message: msg });
       } catch (e) {
         console.error("Error sending reschedule request SMS:", e?.message);
@@ -507,7 +510,7 @@ const decideRescheduleById = async (reservationId, { action, reason, decidedBy }
             start: formatDateInTimeZone(reservation.rescheduleRequest.newStartDate, { includeTime: true }),
             end: formatDateInTimeZone(reservation.rescheduleRequest.newEndDate, { includeTime: true }),
           };
-        const msg = `Reschedule ${decision}: ${reservationId}\n${s} to ${e}${reason ? `\nReason: ${reason}` : ''}`;
+        const msg = `Reschedule ${decision}: ${reservationId}\n${s} to ${e}${reason ? `\nReason: ${reason}` : ''}${SMS_FOOTER}`;
         await sendSMS({ number: userData.phoneNumber, message: msg });
       } catch (e) {
         console.error("Error sending reschedule decision SMS:", e?.message);
