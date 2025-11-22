@@ -27,8 +27,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 import PageTitle from 'components/PageTitle';
 import DashboardCard from 'components/DashboardCard';
 import useDashboardStats from 'hooks/useDashboardStats';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { exportToPDF } from 'utils/exportToPDF';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -143,330 +142,204 @@ const Dashboard = () => {
     { name: 'Online', count: onlineCount }
   ];
 
-  const exportTransactionsReportToPdf = () => {
+  const exportTransactionsReportToPdf = async () => {
     try {
-      const doc = new jsPDF('p', 'pt');
-
-      const fmt = (v) => (v === undefined || v === null || v === '' ? '-' : String(v));
-      const formatDateTime = (value) => {
-        if (!value) return '-';
-        const d = new Date(value);
-        if (isNaN(d.getTime())) return fmt(value);
-        return d.toLocaleString(undefined, {
-          year: 'numeric', month: 'short', day: '2-digit',
-          hour: '2-digit', minute: '2-digit'
-        });
-      };
-
-      // Header
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(16);
-      doc.text('Transactions by Type Report', 40, 40);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
       const periodLabel = (isMasterAdmin || isAdmin)
         ? `${monthLabel} ${selectedYear}`
         : 'Current Period';
-      doc.text(`Generated: ${formatDateTime(new Date())}`, 40, 58);
-      doc.text(`Period: ${periodLabel}`, 40, 72);
-
-      // Table body
       const total = walkInCount + onlineCount;
-      const body = [
-        ['Walk-in', walkInCount],
-        ['Online', onlineCount],
-        [{ content: 'Total', styles: { fontStyle: 'bold' } }, { content: total, styles: { fontStyle: 'bold' } }]
-      ];
-
-      autoTable(doc, {
-        startY: 96,
-        styles: { fontSize: 10, cellPadding: 6 },
-        headStyles: { fillColor: [25, 118, 210], halign: 'center', valign: 'middle' },
-        bodyStyles: { valign: 'middle' },
-        head: [['Type', 'Count']],
-        body
+      await exportToPDF({
+        fileName: 'transactions-report.pdf',
+        title: 'Transactions by Type Report',
+        subtitle: `Period: ${periodLabel}`,
+        sections: [
+          {
+            heading: 'Transactions Breakdown',
+            table: {
+              head: ['Type', 'Count'],
+              rows: [
+                ['Walk-in', walkInCount],
+                ['Online', onlineCount],
+                ['Total', total]
+              ]
+            }
+          }
+        ],
+        footerNote: 'Internal analytics document.',
+        preparedBy: user
       });
-
-      // Footer per page
-      const pageCount = doc.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        const pageHeight = doc.internal.pageSize.getHeight();
-        doc.setFontSize(9);
-        doc.text('John Cezar Waterfun Resort • transactions report', 40, pageHeight - 16);
-        doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.getWidth() - 100, pageHeight - 16);
-      }
-
-      doc.save('transactions-report.pdf');
     } catch (e) {
       console.error('Failed to export transactions report:', e);
     }
   };
 
   // Export: Full Dashboard Report (summary of reservations, occupancy, staff, customers, types)
-  const exportFullDashboardReportToPdf = () => {
+  const exportFullDashboardReportToPdf = async () => {
     try {
-      const doc = new jsPDF('p', 'pt');
-
-      const fmt = (v) => (v === undefined || v === null || v === '' ? '-' : String(v));
-      const formatDateTime = (value) => {
-        if (!value) return '-';
-        const d = new Date(value);
-        if (isNaN(d.getTime())) return fmt(value);
-        return d.toLocaleString(undefined, {
-          year: 'numeric', month: 'short', day: '2-digit',
-          hour: '2-digit', minute: '2-digit'
-        });
-      };
-
       const periodLabel = (isMasterAdmin || isAdmin)
         ? `${monthLabel} ${selectedYear}`
         : 'Current Period';
-
-      // Header
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(16);
-      doc.text('Resort Dashboard Report', 40, 40);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      doc.text(`Generated: ${formatDateTime(new Date())}`, 40, 58);
-      doc.text(`Period: ${periodLabel}`, 40, 72);
-
-      // Section: Reservations Summary
       const byStatus = dashboard?.reservationsByStatus || {};
       const byType = dashboard?.reservationsByType || {};
       const byPeriod = dashboard?.reservationsByPeriod || {};
       const totalReservations = dashboard?.totalReservations || 0;
-
-      autoTable(doc, {
-        startY: 96,
-        styles: { fontSize: 10, cellPadding: 6 },
-        headStyles: { fillColor: [33, 150, 243] },
-        head: [[`Reservations Summary (Total: ${totalReservations})`, 'Count']],
-        body: [
-          ['Confirmed', byStatus.CONFIRMED || 0],
-          ['Completed', byStatus.COMPLETED || 0],
-          ['Walk-in', byType.walkIn || 0],
-          ['Online', byType.online || 0],
-          ['Today', byPeriod.today || 0],
-          ['This Week', byPeriod.thisWeek || 0],
-          ['This Month', byPeriod.thisMonth || 0],
-          ['This Year', byPeriod.thisYear || 0]
-        ]
-      });
-
-      // Section: Occupancy
       const occ = dashboard?.occupancyRate || {};
-      autoTable(doc, {
-        margin: { top: 20 },
-        styles: { fontSize: 10, cellPadding: 6 },
-        headStyles: { fillColor: [76, 175, 80] },
-        head: [['Occupancy Overview', 'Value']],
-        body: [
-          ['Current Occupancy', occ.currentOccupancy ?? 0],
-          ['Total Capacity', occ.totalCapacity ?? 0],
-          ['Occupancy %', `${occ.occupancyPercentage ?? 0}%`],
-          ['Occupied Rooms', occ.occupiedRooms ?? 0],
-          ['Available Rooms', occ.availableRooms ?? 0]
-        ]
-      });
-
-      const occTypes = Array.isArray(dashboard?.occupancyByAccommodationType)
-        ? dashboard.occupancyByAccommodationType
-        : [];
-      if (occTypes.length) {
-        autoTable(doc, {
-          margin: { top: 10 },
-          styles: { fontSize: 9, cellPadding: 5 },
-          headStyles: { fillColor: [76, 175, 80] },
-          head: [['Accommodation Type', 'Total', 'Occupied', 'Available', 'Occupancy %']],
-          body: occTypes.map((t) => [
-            fmt(t.accommodationType),
-            fmt(t.totalCount),
-            fmt(t.occupiedCount),
-            fmt(t.availableCount),
-            `${t.occupancyPercentage ?? 0}%`
-          ])
-        });
-      }
-
-      // Section: Staff
+      const occTypes = Array.isArray(dashboard?.occupancyByAccommodationType) ? dashboard.occupancyByAccommodationType : [];
       const staff = dashboard?.staffMembers || {};
-      autoTable(doc, {
-        margin: { top: 20 },
-        styles: { fontSize: 10, cellPadding: 6 },
-        headStyles: { fillColor: [156, 39, 176] },
-        head: [['Staff Summary', 'Value']],
-        body: [
-          ['Total', staff.total ?? 0],
-          ['Active', staff.active ?? 0],
-          ['Inactive', staff.inactive ?? 0]
-        ]
-      });
-
       const byPos = staff.byPosition || {};
-      const byPosKeys = Object.keys(byPos);
-      if (byPosKeys.length) {
-        autoTable(doc, {
-          margin: { top: 10 },
-          styles: { fontSize: 9, cellPadding: 5 },
-          headStyles: { fillColor: [156, 39, 176] },
-          head: [['Position', 'Total', 'Active', 'Inactive']],
-          body: byPosKeys.map((k) => [
-            k,
-            fmt(byPos[k]?.total),
-            fmt(byPos[k]?.active),
-            fmt(byPos[k]?.inactive)
-          ])
-        });
-      }
-
-      // Section: Customers
       const cust = dashboard?.totalCustomers || {};
-      autoTable(doc, {
-        margin: { top: 20 },
-        styles: { fontSize: 10, cellPadding: 6 },
-        headStyles: { fillColor: [255, 152, 0] },
-        head: [['Customers Summary', 'Value']],
-        body: [
-          ['Total Customers', cust.total ?? 0],
-          ['New This Month', cust.newThisMonth ?? 0]
-        ]
-      });
-
-      // Section: Financials
       const financials = dashboard?.financialStatistics || {};
       const mr = financials.monthlyRevenue || {};
-      autoTable(doc, {
-        margin: { top: 20 },
-        styles: { fontSize: 10, cellPadding: 6 },
-        headStyles: { fillColor: [3, 169, 244] },
-        head: [['Monthly Revenue', 'Amount (PHP)']],
-        body: [
-          ['Earnings', mr.earnings ?? 0],
-          ['Pending Payments', mr.pendingPayments ?? 0],
-          ['Total Revenue', mr.totalRevenue ?? 0]
-        ]
-      });
-
       const rs = financials.reservationStats || {};
-      autoTable(doc, {
-        margin: { top: 12 },
-        styles: { fontSize: 10, cellPadding: 6 },
-        headStyles: { fillColor: [63, 81, 181] },
-        head: [['Reservation Stats', 'Value']],
-        body: [
-          ['Total Reservations', rs.totalReservations ?? 0],
-          ['Fully Paid', rs.fullyPaidReservations ?? 0],
-          ['Partially Paid', rs.partiallyPaidReservations ?? 0],
-          ['Unpaid', rs.unpaidReservations ?? 0]
-        ]
-      });
-
       const sm = financials.summary || {};
-      autoTable(doc, {
-        margin: { top: 12 },
-        styles: { fontSize: 10, cellPadding: 6 },
-        headStyles: { fillColor: [76, 175, 80] },
-        head: [['Summary', 'Value']],
-        body: [
-          ['Total Earnings This Month', sm.totalEarningsThisMonth ?? 0],
-          ['Average Daily Revenue', sm.averageDailyRevenue ?? 0],
-          ['Average Revenue / Reservation', sm.averageRevenuePerReservation ?? 0],
-          ['Pending Payments', sm.pendingPayments ?? 0],
-          ['Currency', (sm.currency || 'PHP')]
-        ]
+
+      await exportToPDF({
+        fileName: 'dashboard-report.pdf',
+        title: 'Resort Dashboard Report',
+        subtitle: `Period: ${periodLabel}`,
+        sections: [
+          {
+            heading: `Reservations Summary (Total: ${totalReservations})`,
+            table: {
+              head: ['Metric', 'Count'],
+              rows: [
+                ['Confirmed', byStatus.CONFIRMED || 0],
+                ['Completed', byStatus.COMPLETED || 0],
+                ['Walk-in', byType.walkIn || 0],
+                ['Online', byType.online || 0],
+                ['Today', byPeriod.today || 0],
+                ['This Week', byPeriod.thisWeek || 0],
+                ['This Month', byPeriod.thisMonth || 0],
+                ['This Year', byPeriod.thisYear || 0]
+              ]
+            }
+          },
+          {
+            heading: 'Occupancy Overview',
+            keyValues: [
+              ['Current Occupancy', occ.currentOccupancy ?? 0],
+              ['Total Capacity', occ.totalCapacity ?? 0],
+              ['Occupancy %', `${occ.occupancyPercentage ?? 0}%`],
+              ['Occupied Rooms', occ.occupiedRooms ?? 0],
+              ['Available Rooms', occ.availableRooms ?? 0]
+            ]
+          },
+          ...(occTypes.length ? [{
+            heading: 'Occupancy By Accommodation Type',
+            table: {
+              head: ['Type', 'Total', 'Occupied', 'Available', 'Occupancy %'],
+              rows: occTypes.map(t => [
+                t.accommodationType,
+                t.totalCount,
+                t.occupiedCount,
+                t.availableCount,
+                `${t.occupancyPercentage ?? 0}%`
+              ])
+            }
+          }] : []),
+          {
+            heading: 'Staff Summary',
+            keyValues: [
+              ['Total', staff.total ?? 0],
+              ['Active', staff.active ?? 0],
+              ['Inactive', staff.inactive ?? 0]
+            ]
+          },
+          ...(Object.keys(byPos).length ? [{
+            heading: 'Staff By Position',
+            table: {
+              head: ['Position', 'Total', 'Active', 'Inactive'],
+              rows: Object.keys(byPos).map(k => [k, byPos[k]?.total, byPos[k]?.active, byPos[k]?.inactive])
+            }
+          }] : []),
+          {
+            heading: 'Customers Summary',
+            keyValues: [
+              ['Total Customers', cust.total ?? 0],
+              ['New This Month', cust.newThisMonth ?? 0]
+            ]
+          },
+          {
+            heading: 'Monthly Revenue',
+            keyValues: [
+              ['Earnings', mr.earnings ?? 0],
+              ['Pending Payments', mr.pendingPayments ?? 0],
+              ['Total Revenue', mr.totalRevenue ?? 0]
+            ]
+          },
+          {
+            heading: 'Reservation Stats',
+            keyValues: [
+              ['Total Reservations', rs.totalReservations ?? 0],
+              ['Fully Paid', rs.fullyPaidReservations ?? 0],
+              ['Partially Paid', rs.partiallyPaidReservations ?? 0],
+              ['Unpaid', rs.unpaidReservations ?? 0]
+            ]
+          },
+          {
+            heading: 'Summary',
+            keyValues: [
+              ['Total Earnings This Month', sm.totalEarningsThisMonth ?? 0],
+              ['Average Daily Revenue', sm.averageDailyRevenue ?? 0],
+              ['Average Revenue / Reservation', sm.averageRevenuePerReservation ?? 0],
+              ['Pending Payments', sm.pendingPayments ?? 0],
+              ['Currency', sm.currency || 'PHP']
+            ]
+          }
+        ],
+        footerNote: 'Confidential dashboard analytics.',
+        preparedBy: user
       });
-
-      // Footer
-      const pageCount = doc.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        const pageHeight = doc.internal.pageSize.getHeight();
-        doc.setFontSize(9);
-        doc.text('John Cezar Waterfun Resort • dashboard report', 40, pageHeight - 16);
-        doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.getWidth() - 100, pageHeight - 16);
-      }
-
-      doc.save('dashboard-report.pdf');
     } catch (e) {
       console.error('Failed to export dashboard report:', e);
     }
   };
 
   // Export: Financials-only report
-  const exportFinancialsReportToPdf = () => {
+  const exportFinancialsReportToPdf = async () => {
     try {
-      const doc = new jsPDF('p', 'pt');
-
-      const fmt = (v) => (v === undefined || v === null || v === '' ? '-' : String(v));
       const financials = dashboard?.financialStatistics || {};
       const monthName = financials.monthName || monthLabel;
-
-      // Header
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(16);
-      doc.text('Financials Report', 40, 40);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      doc.text(`Period: ${monthName} ${financials.year || selectedYear}`, 40, 58);
-
-      // Monthly Revenue
       const mr = financials.monthlyRevenue || {};
-      autoTable(doc, {
-        startY: 80,
-        styles: { fontSize: 10, cellPadding: 6 },
-        headStyles: { fillColor: [3, 169, 244] },
-        head: [['Monthly Revenue', 'Amount (PHP)']],
-        body: [
-          ['Earnings', fmt(mr.earnings)],
-          ['Pending Payments', fmt(mr.pendingPayments)],
-          ['Total Revenue', fmt(mr.totalRevenue)]
-        ]
-      });
-
-      // Reservation Stats
       const rs = financials.reservationStats || {};
-      autoTable(doc, {
-        margin: { top: 16 },
-        styles: { fontSize: 10, cellPadding: 6 },
-        headStyles: { fillColor: [63, 81, 181] },
-        head: [['Reservation Stats', 'Value']],
-        body: [
-          ['Total Reservations', fmt(rs.totalReservations)],
-          ['Fully Paid', fmt(rs.fullyPaidReservations)],
-          ['Partially Paid', fmt(rs.partiallyPaidReservations)],
-          ['Unpaid', fmt(rs.unpaidReservations)]
-        ]
-      });
-
-      // Summary
       const sm = financials.summary || {};
-      autoTable(doc, {
-        margin: { top: 16 },
-        styles: { fontSize: 10, cellPadding: 6 },
-        headStyles: { fillColor: [76, 175, 80] },
-        head: [['Summary', 'Value']],
-        body: [
-          ['Total Earnings This Month', fmt(sm.totalEarningsThisMonth)],
-          ['Average Daily Revenue', fmt(sm.averageDailyRevenue)],
-          ['Average Revenue / Reservation', fmt(sm.averageRevenuePerReservation)],
-          ['Pending Payments', fmt(sm.pendingPayments)],
-          ['Currency', fmt(sm.currency || 'PHP')]
-        ]
+
+      await exportToPDF({
+        fileName: 'financials-report.pdf',
+        title: 'Financials Report',
+        subtitle: `Period: ${monthName} ${financials.year || selectedYear}`,
+        sections: [
+          {
+            heading: 'Monthly Revenue',
+            keyValues: [
+              ['Earnings', mr.earnings ?? 0],
+              ['Pending Payments', mr.pendingPayments ?? 0],
+              ['Total Revenue', mr.totalRevenue ?? 0]
+            ]
+          },
+          {
+            heading: 'Reservation Stats',
+            keyValues: [
+              ['Total Reservations', rs.totalReservations ?? 0],
+              ['Fully Paid', rs.fullyPaidReservations ?? 0],
+              ['Partially Paid', rs.partiallyPaidReservations ?? 0],
+              ['Unpaid', rs.unpaidReservations ?? 0]
+            ]
+          },
+          {
+            heading: 'Summary',
+            keyValues: [
+              ['Total Earnings This Month', sm.totalEarningsThisMonth ?? 0],
+              ['Average Daily Revenue', sm.averageDailyRevenue ?? 0],
+              ['Average Revenue / Reservation', sm.averageRevenuePerReservation ?? 0],
+              ['Pending Payments', sm.pendingPayments ?? 0],
+              ['Currency', sm.currency || 'PHP']
+            ]
+          }
+        ],
+        footerNote: 'Financial metrics extracted from dashboard analytics.',
+        preparedBy: user
       });
-
-      // Footer
-      const pageCount = doc.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        const pageHeight = doc.internal.pageSize.getHeight();
-        doc.setFontSize(9);
-        doc.text('John Cezar Waterfun Resort • financials report', 40, pageHeight - 16);
-        doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.getWidth() - 100, pageHeight - 16);
-      }
-
-      doc.save('financials-report.pdf');
     } catch (e) {
       console.error('Failed to export financials report:', e);
     }

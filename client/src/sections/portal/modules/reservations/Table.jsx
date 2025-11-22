@@ -51,8 +51,7 @@ import AnimateButton from 'components/@extended/AnimateButton';
 import textFormatter from 'utils/textFormatter';
 import ConfirmationDialog from 'components/ConfirmationDialog';
 import exportReservationToPdf from 'utils/exportReservationPdf';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { exportToPDF } from 'utils/exportToPDF';
 
 const ReservationsTable = () => {
   const theme = useTheme()
@@ -525,107 +524,123 @@ const ReservationsTable = () => {
   }, [isCustomer])
 
   // Bulk export function (table-style; uses one table across pages)
-  const handleBulkExportToPdf = () => {
+  const handleBulkExportToPdf = async () => {
     if (!filteredReservations.length) return;
-    // Use landscape to fit more columns across the page
-    const doc = new jsPDF('l', 'pt'); // use points for better sizing
 
-    const fmt = (v) => (v === undefined || v === null || v === '' ? '-' : String(v));
-    const peso = (value) => {
-      const num = Number(value || 0);
-      try {
-        const formatted = new Intl.NumberFormat('en-PH', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        }).format(num);
-        return `PHP ${formatted}`;
-      } catch (e) {
-        const fixed = (isFinite(num) ? num : 0).toFixed(2);
-        return `PHP ${fixed}`;
-      }
-    };
-    const formatDateTime = (value) => {
-      if (!value) return '-';
-      const d = new Date(value);
-      if (isNaN(d.getTime())) return fmt(value);
-      return d.toLocaleString(undefined, {
-        year: 'numeric', month: 'short', day: '2-digit',
-        hour: '2-digit', minute: '2-digit'
+    try {
+      const peso = (value) => {
+        const num = Number(value || 0);
+        try {
+          const formatted = new Intl.NumberFormat('en-PH', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          }).format(num);
+          return `₱${formatted}`;
+        } catch (e) {
+          const fixed = (isFinite(num) ? num : 0).toFixed(2);
+          return `₱${fixed}`;
+        }
+      };
+
+      const fmt = (v) => (v === undefined || v === null || v === '' ? '-' : String(v));
+
+      const formatDateTime = (value) => {
+        if (!value) return '-';
+        const d = new Date(value);
+        if (isNaN(d.getTime())) return fmt(value);
+        return d.toLocaleString(undefined, {
+          year: 'numeric', month: 'short', day: '2-digit',
+          hour: '2-digit', minute: '2-digit'
+        });
+      };
+
+      // Create summary statistics
+      const totalReservations = filteredReservations.length;
+      const totalRevenue = filteredReservations.reduce((sum, res) => sum + (res?.amount?.total || 0), 0);
+      const totalPaid = filteredReservations.reduce((sum, res) => sum + (res?.amount?.totalPaid || 0), 0);
+      const pendingAmount = totalRevenue - totalPaid;
+
+      const statusCounts = filteredReservations.reduce((acc, res) => {
+        acc[res.status] = (acc[res.status] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Prepare table data
+      const tableRows = filteredReservations.map(reservation => {
+        const customerName = `${fmt(reservation?.userData?.firstName)} ${fmt(reservation?.userData?.lastName)}`.trim();
+        const paymentStatus = (reservation?.amount?.totalPaid || 0) >= (reservation?.amount?.total || 0)
+          ? 'Fully Paid' : ((reservation?.amount?.totalPaid || 0) > 0 ? 'Partially Paid' : 'Unpaid');
+        const isReservation = reservation?.isWalkIn === false;
+        const reservationTypeLabel = isReservation ? 'Via Online' : 'Walk-In';
+
+        return [
+          fmt(reservation?.reservationId),
+          customerName || '-',
+          fmt(reservation?.userData?.emailAddress),
+          fmt(reservation?.accommodationData?.name),
+          fmt(reservation?.guests),
+          formatDateTime(reservation?.startDate),
+          formatDateTime(reservation?.endDate),
+          fmt(reservation?.status),
+          reservationTypeLabel,
+          paymentStatus,
+          peso(reservation?.amount?.total),
+          peso(reservation?.amount?.totalPaid),
+          peso((reservation?.amount?.total || 0) - (reservation?.amount?.totalPaid || 0)),
+          formatDateTime(reservation?.createdAt)
+        ];
       });
-    };
 
-    // Header
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(16);
-    doc.text('Reservations Bulk Export', 40, 40);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.text(`Generated: ${formatDateTime(new Date())}`, 40, 58);
-    doc.setFont('helvetica', 'italic');
-    doc.setTextColor(40, 120, 40);
-    doc.text('Show this to the receptionist upon entry to verify your reservation.', 40, 76);
-    doc.setTextColor(0, 0, 0);
+      await exportToPDF({
+        fileName: 'reservations-bulk-export.pdf',
+        title: 'Reservations Report',
+        subtitle: `Bulk Export - ${totalReservations} reservations`,
+        orientation: 'l', // Landscape for better table viewing
+        preparedBy: user,
+        sections: [
+          {
+            heading: 'Summary Statistics',
+            keyValues: [
+              ['Total Reservations', totalReservations],
+              ['Total Revenue', peso(totalRevenue)],
+              ['Total Paid', peso(totalPaid)],
+              ['Pending Amount', peso(pendingAmount)],
+              ['Confirmed', statusCounts.CONFIRMED || 0],
+              ['Completed', statusCounts.COMPLETED || 0],
+              ['Pending', statusCounts.PENDING || 0],
+              ['Cancelled', statusCounts.CANCELLED || 0]
+            ]
+          },
+          {
+            heading: 'Reservations Details',
+            table: {
+              head: [
+                'ID',
+                'Customer',
+                'Email',
+                'Accommodation',
+                'Guests',
+                'Start Date',
+                'End Date',
+                'Status',
+                'Type',
+                'Payment',
+                'Total',
+                'Paid',
+                'Balance',
+                'Created At'
+              ],
+              rows: tableRows
+            }
+          }
+        ],
+        footerNote: `Export contains ${totalReservations} reservations with current filters applied. Generated for internal use.`
+      });
 
-    // Build table rows
-    const body = filteredReservations.map((r) => {
-      const paymentStatus = (r?.amount?.totalPaid || 0) >= (r?.amount?.total || 0)
-        ? 'Fully Paid' : ((r?.amount?.totalPaid || 0) > 0 ? 'Partially Paid' : 'Unpaid');
-      const balance = (r?.amount?.total || 0) - (r?.amount?.totalPaid || 0);
-      const customer = `${fmt(r?.userData?.firstName)} ${fmt(r?.userData?.lastName)}`.trim();
-      const isReservation = r?.isWalkIn === false; // true if not walk-in
-      const reservationTypeLabel = isReservation ? 'Via Online' : 'Walk-In';
-      return [
-        fmt(r?.reservationId),
-        customer,
-        fmt(r?.userData?.emailAddress),
-        fmt(r?.accommodationData?.name),
-        formatDateTime(r?.startDate),
-        formatDateTime(r?.endDate),
-        fmt(r?.guests),
-        titleCase(fmt(r?.status)),
-        reservationTypeLabel,
-        (r?.rescheduleRequest?.status ? titleCase(r?.rescheduleRequest?.status) : 'None'),
-        paymentStatus,
-        peso(r?.amount?.total),
-        peso(r?.amount?.totalPaid),
-        peso(balance),
-        formatDateTime(r?.createdAt)
-      ];
-    });
-
-    autoTable(doc, {
-      startY: 96,
-      // Let the table auto-fit within page width and wrap as needed
-      margin: { left: 24, right: 24 },
-      tableWidth: 'wrap',
-      styles: { fontSize: 7, cellPadding: 4, overflow: 'linebreak' },
-      headStyles: { fillColor: [63, 81, 181], halign: 'center', valign: 'middle' },
-      bodyStyles: { valign: 'middle' },
-      // Align numeric columns to the right but avoid fixed widths that can push columns off-page
-      columnStyles: {
-        6: { halign: 'right' },   // Guests
-        11: { halign: 'right' },  // Total
-        12: { halign: 'right' },  // Paid
-        13: { halign: 'right' }   // Balance
-      },
-      head: [[
-        'ID', 'Customer', 'Email', 'Accommodation', 'Start', 'End', 'Guests',
-        'Status', 'Reservation Type', 'Resched', 'Payment', 'Total', 'Paid', 'Balance', 'Created At'
-      ]],
-      body
-    });
-
-    // Footer per page
-    const pageCount = doc.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      const pageHeight = doc.internal.pageSize.getHeight();
-      doc.setFontSize(9);
-      doc.text('Generated by John Cezar Waterfun Resort • reservations list', 40, pageHeight - 16);
-      doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.getWidth() - 100, pageHeight - 16);
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Failed to export reservations. Please try again.');
     }
-
-    doc.save('reservations-bulk-export.pdf');
   };
 
   return (
