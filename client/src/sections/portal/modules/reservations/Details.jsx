@@ -56,7 +56,8 @@ const Details = ({ reservationData = {} }) => {
   const [openResched, setOpenResched] = useState(false);
   const [openReject, setOpenReject] = useState(false);
   // Reschedule inputs using MUI pickers
-  const isGuestHouse = accommodationData?.type === 'guest_house';
+  // Determine overnight stay from accommodation tourType
+  const isOvernight = accommodationData?.tourType === 'OVERNIGHT_STAY';
   const initialMode = useMemo(() => {
     if (!endDate) return 'day';
     const endHour = new Date(endDate).getHours();
@@ -106,7 +107,7 @@ const Details = ({ reservationData = {} }) => {
     try {
       setSubmitting(true);
       let s, e;
-      if (isGuestHouse) {
+      if (isOvernight) {
         if (!reschedDateTime) throw new Error('Please select a new start date and time.');
         s = new Date(reschedDateTime);
         e = addHours(s, accommodationData?.maxStayDuration || 10);
@@ -465,7 +466,7 @@ const Details = ({ reservationData = {} }) => {
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
-              {isGuestHouse ? (
+              {isOvernight ? (
                 <DateTimePicker
                   value={reschedDateTime}
                   onChange={(val) => setReschedDateTime(val)}

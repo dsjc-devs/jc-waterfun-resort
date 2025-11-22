@@ -40,6 +40,9 @@ const validationSchema = Yup.object().shape({
       then: (schema) => schema.required("Status is required"),
       otherwise: (schema) => schema.notRequired(),
     }),
+  tourType: Yup.string()
+    .oneOf(["DAY_NIGHT_TOUR", "OVERNIGHT_STAY"], "Invalid tour type")
+    .required("Tour type is required"),
   name: Yup.string()
     .required("Name is required")
     .min(3, "Name must be at least 3 characters long"),
@@ -87,6 +90,7 @@ const AccommodationForm = ({ data = {}, _type = '', isLoading = false, isEditMod
       name: data?.name || '',
       notes: data?.notes || '',
       type: (_type && _type) || data?.type || '',
+      tourType: data?.tourType || '',
       description: data?.description || '',
       dayPrice: data?.price?.day || '',
       nightPrice: data?.price?.night || '',
@@ -125,6 +129,7 @@ const AccommodationForm = ({ data = {}, _type = '', isLoading = false, isEditMod
 
         formData.append('name', values.name);
         formData.append('type', values.type);
+        formData.append('tourType', values.tourType);
         formData.append('description', values.description);
         formData.append('price.day', values.dayPrice);
         formData.append('price.night', values.nightPrice);
@@ -334,6 +339,24 @@ const AccommodationForm = ({ data = {}, _type = '', isLoading = false, isEditMod
                       </MenuItem>
                     ))}
                   </Select>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <Typography variant='body1'>Tour Type (Required)</Typography>
+                  <Select
+                    fullWidth
+                    name='tourType'
+                    value={formik.values.tourType || ''}
+                    onChange={formik.handleChange}
+                  >
+                    <MenuItem value='DAY_NIGHT_TOUR'>Day/Night Use</MenuItem>
+                    <MenuItem value='OVERNIGHT_STAY'>Overnight Stay</MenuItem>
+                  </Select>
+                  {formik.touched.tourType && formik.errors.tourType && (
+                    <FormHelperText error id='helper-text-tourType'>
+                      {formik.errors.tourType}
+                    </FormHelperText>
+                  )}
                 </Grid>
 
                 <Grid item xs={12}>

@@ -88,7 +88,8 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
   const transformedPictures = pictures?.map((pic) => pic?.image) || [];
   const _pictures = [thumbnail, ...transformedPictures];
 
-  const isGuestHouse = type === "guest_house"
+  // Overnight accommodations use custom time selection similar to previous guest house logic
+  const isOvernight = data?.tourType === 'OVERNIGHT_STAY';
 
   const [loading, setLoading] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -199,7 +200,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
     const computedEnd = addHours(startDate, maxStayDuration);
     setEndDate(computedEnd);
 
-    if (!manualMode && isGuestHouse) {
+    if (!manualMode && isOvernight) {
       setMode(isNightStay(computedEnd) ? "night" : "day");
     }
   }, [startDate, maxStayDuration, type, manualMode]);
@@ -528,7 +529,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                 </Typography>
 
                 <Box sx={{ background: '#f5f5f5', borderRadius: "12px", p: 2 }}>
-                  {!isGuestHouse && (
+                  {!isOvernight && (
                     <Box marginBlockEnd={2}>
                       <Typography variant='body1' color='secondary' gutterBottom> Time of Day </Typography>
 
@@ -579,7 +580,7 @@ const AccommodationPage = ({ data, isLoading, isOnPortal = true }) => {
                     </Typography>
 
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
-                      {isGuestHouse ? (
+                      {isOvernight ? (
                         <DateTimePicker
                           value={startDate}
                           onChange={(newValue) => {

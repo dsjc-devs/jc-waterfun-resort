@@ -74,7 +74,7 @@ const accommodationsSchema = new mongoose.Schema(
     tourType: {
       type: String,
       required: true,
-      enum: ["OVERNIGHT", "DAYUSE"],
+      enum: ["DAY_NIGHT_TOUR", "OVERNIGHT_STAY"],
     },
     type: {
       type: String,

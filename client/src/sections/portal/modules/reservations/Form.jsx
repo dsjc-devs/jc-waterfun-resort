@@ -68,7 +68,8 @@ const ReservationForm = () => {
   const totalQuantity = entrances.adult + entrances.child + entrances.pwdSenior;
   const hasNoQuantities = totalQuantity === 0;
 
-  const isGuestHouse = selectedAccommodation?.type === 'guest_house';
+  // Overnight stay logic now driven by tourType
+  const isOvernight = selectedAccommodation?.tourType === 'OVERNIGHT_STAY';
 
   const { resortRates } = useGetResortRates();
 
@@ -450,7 +451,7 @@ const ReservationForm = () => {
                 {formik.values.accommodationId && (
                   <Grid item xs={12}>
                     <Typography variant="body1"> Select Dates </Typography>
-                    {!isGuestHouse && (
+                    {!isOvernight && (
                       <Box marginBlockEnd={2}>
                         <Typography variant="body1" color="secondary" gutterBottom>
                           Time of Day
@@ -492,7 +493,7 @@ const ReservationForm = () => {
                       </Typography>
 
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        {isGuestHouse ? (
+                        {isOvernight ? (
                           <DateTimePicker
                             value={startDate}
                             onChange={(newValue) => {
