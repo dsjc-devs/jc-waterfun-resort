@@ -12,6 +12,7 @@ import Policies from "../models/policiesModels.js";
 import FAQs from "../models/faqsModels.js";
 import rescheduleRequestTemplate from "../templates/reschedule-request.js";
 import rescheduleDecisionTemplate from "../templates/reschedule-decision.js";
+import activityServices from "./activityServices.js";
 
 // Standard footer for all outbound SMS messages
 const SMS_FOOTER = "\n(Automated message. Do not reply.)";
@@ -93,6 +94,33 @@ const createReservation = async (reservationData) => {
       paymentStatus,
       ...reservationData,
     });
+
+    // Record activity: reservation created
+    try {
+      const firstName = reservationData?.userData?.firstName || "Unknown";
+      const lastName = reservationData?.userData?.lastName || "";
+      const when = formatDateInTimeZone(reservation.createdAt, { includeTime: true });
+      await activityServices.createActivity({
+        reservationId,
+        type: "RESERVATION_CREATED",
+        createdAt: reservation.createdAt,
+        description: `${firstName} ${lastName} of the customer booked a reservation on ${when}`.trim(),
+      });
+
+      // If already fully paid at creation, log it explicitly
+      const totalPaid = reservationData?.amount?.totalPaid ?? 0;
+      const total = reservationData?.amount?.total ?? 0;
+      if (total && totalPaid >= total) {
+        await activityServices.createActivity({
+          reservationId,
+          type: "PAYMENT_FULLY_PAID",
+          createdAt: reservation.createdAt,
+          description: `Reservation is now FULLY PAID (${totalPaid}/${total}) on ${when}`,
+        });
+      }
+    } catch (e) {
+      console.error("Failed to record reservation created activity:", e?.message);
+    }
 
     const hasEmailAddress = reservationData?.userData?.emailAddress;
     const phoneNumber = reservationData?.userData?.phoneNumber;
@@ -212,11 +240,160 @@ const updateReservationById = async (reservationId, updateData) => {
       throw new Error("Reservation not found");
     }
 
+    const before = {
+      startDate: currentReservation.startDate,
+      endDate: currentReservation.endDate,
+      status: currentReservation.status,
+      amount: currentReservation.amount,
+      guests: currentReservation.guests,
+      entrances: currentReservation.entrances,
+      accommodationId: currentReservation.accommodationId,
+      userData: currentReservation.userData,
+      isWalkIn: currentReservation.isWalkIn,
+      firstName: currentReservation?.userData?.firstName || "Unknown",
+      lastName: currentReservation?.userData?.lastName || "",
+    };
+
     Object.keys(updateData).forEach(key => {
       currentReservation[key] = updateData[key];
     });
 
     const updatedReservation = await currentReservation.save();
+
+    // Record activity summarizing the update
+    try {
+      const nowWhen = formatDateInTimeZone(updatedReservation.updatedAt || new Date(), { includeTime: true });
+      const events = [];
+
+      const oldStart = before.startDate ? formatDateInTimeZone(before.startDate, { includeTime: true }) : "";
+      const oldEnd = before.endDate ? formatDateInTimeZone(before.endDate, { includeTime: true }) : "";
+      const newStart = updatedReservation.startDate ? formatDateInTimeZone(updatedReservation.startDate, { includeTime: true }) : "";
+      const newEnd = updatedReservation.endDate ? formatDateInTimeZone(updatedReservation.endDate, { includeTime: true }) : "";
+
+      const datesChanged = (before.startDate?.getTime?.() || 0) !== (updatedReservation.startDate?.getTime?.() || 0)
+        || (before.endDate?.getTime?.() || 0) !== (updatedReservation.endDate?.getTime?.() || 0);
+      const statusChanged = before.status !== updatedReservation.status && updatedReservation.status;
+
+      // Payment change / fully paid detection
+      const beforePaid = before?.amount?.totalPaid ?? 0;
+      const beforeTotal = before?.amount?.total ?? 0;
+      const afterPaid = updatedReservation?.amount?.totalPaid ?? beforePaid;
+      const afterTotal = updatedReservation?.amount?.total ?? beforeTotal;
+      const paymentChanged = afterPaid !== beforePaid || afterTotal !== beforeTotal;
+      const becameFullyPaid = afterTotal > 0 && afterPaid >= afterTotal && !(beforeTotal > 0 && beforePaid >= beforeTotal);
+
+      if (datesChanged) {
+        events.push({
+          type: "SCHEDULE_UPDATED",
+          description: `Reservation schedule updated from ${oldStart}–${oldEnd} to ${newStart}–${newEnd} on ${nowWhen}`.trim(),
+        });
+      }
+      if (statusChanged) {
+        const from = before.status ? String(before.status).toUpperCase() : 'UNKNOWN';
+        const to = String(updatedReservation.status).toUpperCase();
+        events.push({
+          type: "STATUS_UPDATED",
+          description: `Reservation status updated from ${from} to ${to} on ${nowWhen}`,
+        });
+      }
+      if (becameFullyPaid) {
+        events.push({
+          type: "PAYMENT_FULLY_PAID",
+          description: `Reservation is now FULLY PAID (${afterPaid}/${afterTotal}) on ${nowWhen}`,
+        });
+      } else if (paymentChanged) {
+        events.push({
+          type: "PAYMENT_UPDATED",
+          description: `Payment updated: ${afterPaid}/${afterTotal} on ${nowWhen}`,
+        });
+      }
+
+      // Guests count changed
+      if (typeof before.guests === 'number' && typeof updatedReservation.guests === 'number' && before.guests !== updatedReservation.guests) {
+        events.push({
+          type: "GUESTS_UPDATED",
+          description: `Guests updated from ${before.guests} to ${updatedReservation.guests} on ${nowWhen}`,
+        });
+      }
+
+      // Entrances changed per category
+      const entranceFields = ["adult", "child", "pwdSenior"];
+      const entranceChanges = [];
+      for (const k of entranceFields) {
+        const prev = before?.entrances?.[k] ?? 0;
+        const next = updatedReservation?.entrances?.[k] ?? prev;
+        if (prev !== next) entranceChanges.push(`${k} ${prev}->${next}`);
+      }
+      if (entranceChanges.length) {
+        events.push({
+          type: "ENTRANCES_UPDATED",
+          description: `Entrances updated (${entranceChanges.join(', ')}) on ${nowWhen}`,
+        });
+      }
+
+      // Accommodation changed
+      const beforeAccId = String(before.accommodationId || '') || '';
+      const afterAccId = String(updatedReservation.accommodationId || '') || '';
+      if (beforeAccId && afterAccId && beforeAccId !== afterAccId) {
+        try {
+          const [oldAcc, newAcc] = await Promise.all([
+            Accommodations.findById(before.accommodationId).select('name').lean(),
+            Accommodations.findById(updatedReservation.accommodationId).select('name').lean(),
+          ]);
+          const oldName = oldAcc?.name || 'Previous accommodation';
+          const newName = newAcc?.name || 'New accommodation';
+          events.push({
+            type: "ACCOMMODATION_CHANGED",
+            description: `Accommodation changed from ${oldName} to ${newName} on ${nowWhen}`,
+          });
+        } catch (e) {
+          // If fetch fails, still record change without names
+          events.push({
+            type: "ACCOMMODATION_CHANGED",
+            description: `Accommodation changed on ${nowWhen}`,
+          });
+        }
+      }
+
+      // User details updated
+      const prevUser = before.userData || {};
+      const nextUser = updatedReservation.userData || {};
+      const userChanges = [];
+      if ((prevUser.firstName || '') !== (nextUser.firstName || '')) userChanges.push(`first name "${prevUser.firstName || ''}"->"${nextUser.firstName || ''}"`);
+      if ((prevUser.lastName || '') !== (nextUser.lastName || '')) userChanges.push(`last name "${prevUser.lastName || ''}"->"${nextUser.lastName || ''}"`);
+      if ((prevUser.emailAddress || '') !== (nextUser.emailAddress || '')) userChanges.push(`email ${prevUser.emailAddress || ''}->${nextUser.emailAddress || ''}`);
+      if ((prevUser.phoneNumber || '') !== (nextUser.phoneNumber || '')) userChanges.push(`phone ${prevUser.phoneNumber || ''}->${nextUser.phoneNumber || ''}`);
+      if (userChanges.length) {
+        events.push({
+          type: "USER_UPDATED",
+          description: `Guest details updated (${userChanges.join(', ')}) on ${nowWhen}`,
+        });
+      }
+
+      // Walk-in flag changed
+      const prevWalk = !!before.isWalkIn;
+      const nextWalk = !!updatedReservation.isWalkIn;
+      if (prevWalk !== nextWalk) {
+        events.push({
+          type: "WALKIN_UPDATED",
+          description: `Walk-in set to ${nextWalk ? 'TRUE' : 'FALSE'} on ${nowWhen}`,
+        });
+      }
+      if (!events.length) {
+        events.push({ type: "ACTIVITY", description: `Reservation updated on ${nowWhen}` });
+      }
+
+      for (const ev of events) {
+        await activityServices.createActivity({
+          reservationId,
+          type: ev.type,
+          createdAt: updatedReservation.updatedAt,
+          description: ev.description,
+        });
+      }
+    } catch (e) {
+      console.error("Failed to record reservation update activity:", e?.message);
+    }
     return updatedReservation;
   } catch (error) {
     console.error("Error updating reservation:", error.message);
@@ -388,6 +565,27 @@ const requestRescheduleById = async (reservationId, { newStartDate, newEndDate, 
 
     await reservation.save();
 
+    // Record activity: reschedule requested
+    try {
+      const { userData } = reservation.toObject();
+      const rr = reservation.rescheduleRequest;
+      const requestedWhen = formatDateInTimeZone(rr.requestedAt, { includeTime: true });
+      const firstName = userData?.firstName || "Unknown";
+      const lastName = userData?.lastName || "";
+      const oldStart = rr.oldStartDate ? formatDateInTimeZone(rr.oldStartDate, { includeTime: true }) : "";
+      const oldEnd = rr.oldEndDate ? formatDateInTimeZone(rr.oldEndDate, { includeTime: true }) : "";
+      const newStartStr = rr.newStartDate ? formatDateInTimeZone(rr.newStartDate, { includeTime: true }) : "";
+      const newEndStr = rr.newEndDate ? formatDateInTimeZone(rr.newEndDate, { includeTime: true }) : "";
+      await activityServices.createActivity({
+        reservationId,
+        type: "RESCHEDULE_REQUESTED",
+        createdAt: rr.requestedAt,
+        description: `${firstName} ${lastName} requested to reschedule from ${oldStart}–${oldEnd} to ${newStartStr}–${newEndStr} on ${requestedWhen}`.trim(),
+      });
+    } catch (e) {
+      console.error("Failed to record reschedule request activity:", e?.message);
+    }
+
     // Notify customer: subject for confirmation
     const { userData, accommodationId: accommodationData } = reservation.toObject();
     const emailAddress = userData?.emailAddress;
@@ -473,6 +671,20 @@ const decideRescheduleById = async (reservationId, { action, reason, decidedBy }
     }
 
     await reservation.save();
+
+    // Record activity: reschedule decision
+    try {
+      const rr = reservation.rescheduleRequest;
+      const decidedWhen = formatDateInTimeZone(rr.decidedAt, { includeTime: true });
+      await activityServices.createActivity({
+        reservationId,
+        type: "RESCHEDULE_DECIDED",
+        createdAt: rr.decidedAt,
+        description: `Reschedule request ${String(rr.status).toUpperCase()} on ${decidedWhen}`,
+      });
+    } catch (e) {
+      console.error("Failed to record reschedule decision activity:", e?.message);
+    }
 
     // Notify customer of decision
     const { userData, accommodationId: accommodationData } = reservation.toObject();

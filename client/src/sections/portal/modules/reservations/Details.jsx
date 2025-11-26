@@ -9,7 +9,7 @@ import {
   PhoneOutlined,
   EditOutlined,
 } from "@ant-design/icons";
-import { Grid, Chip, Stack, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, ToggleButtonGroup, ToggleButton, Alert } from "@mui/material";
+import { Grid, Chip, Stack, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, ToggleButtonGroup, ToggleButton, Alert, Typography, Divider, Box } from "@mui/material";
 import { toast } from 'react-toastify';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -29,6 +29,7 @@ import ConvertDate from "components/ConvertDate";
 import textFormatter from "utils/textFormatter";
 import AnimateButton from "components/@extended/AnimateButton";
 import reservationsApi, { useGetSingleReservation } from "api/reservations";
+import { useGetActivities } from "api/activities";
 
 
 const Details = ({ reservationData = {} }) => {
@@ -51,6 +52,9 @@ const Details = ({ reservationData = {} }) => {
 
   const paymentsStatus = amount?.totalPaid >= amount?.total;
   const paymentsStatusLabel = paymentsStatus ? 'FULLY_PAID' : (amount?.totalPaid > 0 ? 'PARTIALLY_PAID' : 'UNPAID');
+
+  // Activities timeline
+  const { data: activities = [], isLoading: loadingActivities } = useGetActivities(reservationId);
 
   // Reschedule UI state
   const [openResched, setOpenResched] = useState(false);
@@ -81,7 +85,7 @@ const Details = ({ reservationData = {} }) => {
   };
 
   const hasPendingResched = rescheduleRequest?.status === 'PENDING';
-  const canRequestReschedule = isCustomer && status === 'CONFIRMED' && isAtLeast2DaysBefore(startDate) && !hasPendingResched;
+  const canRequestReschedule = isCustomer && isAtLeast2DaysBefore(startDate) && !hasPendingResched;
 
   // Helpers similar to Reservation Form
   const applyModeStartTime = (dateLike, mode) => {
@@ -471,6 +475,97 @@ const Details = ({ reservationData = {} }) => {
                 />
               </Grid>
             </Grid>
+          </MainCard>
+
+          <MainCard title="Activity Timeline" sx={{ maxHeight: 600, overflowY: 'auto' }}>
+            {loadingActivities ? (
+              <Box sx={{ textAlign: 'center', py: 3 }}>
+                <Typography variant="body2" color="text.secondary">Loading activities…</Typography>
+              </Box>
+            ) : !activities || activities.length === 0 ? (
+              <Box sx={{ textAlign: 'center', py: 3 }}>
+                <Typography variant="body2" color="text.secondary">No activities yet.</Typography>
+              </Box>
+            ) : (
+              <Box sx={{ position: 'relative', pl: 2 }}>
+                {/* Timeline vertical line */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    left: 16,
+                    top: 0,
+                    bottom: 0,
+                    width: 2,
+                    bgcolor: 'divider',
+                    zIndex: 1
+                  }}
+                />
+
+                {activities.map((item, idx) => {
+                  const chipColor = 'primary';
+                  const label = textFormatter.fromSlug(item.type || 'ACTIVITY');
+
+                  return (
+                    <Box key={`${item._id || item.createdAt}-${idx}`} sx={{ position: 'relative', pb: 3 }}>
+                      {/* Timeline dot */}
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          left: -8,
+                          top: 8,
+                          width: 16,
+                          height: 16,
+                          borderRadius: '50%',
+                          bgcolor: chipColor === 'default' ? 'grey.400' : `${chipColor}.main`,
+                          border: 3,
+                          borderColor: 'background.paper',
+                          zIndex: 2,
+                          boxShadow: 1
+                        }}
+                      />
+
+                      {/* Content */}
+                      <Box sx={{ ml: 3 }}>
+                        <Stack spacing={1}>
+                          <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
+                            <Chip
+                              size="small"
+                              label={label}
+                              color={chipColor}
+                              sx={{ fontWeight: 500 }}
+                            />
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{
+                                fontWeight: 500,
+                                px: 1,
+                                py: 0.25,
+                                bgcolor: 'grey.100',
+                                borderRadius: 1
+                              }}
+                            >
+                              <ConvertDate dateString={item.createdAt} time />
+                            </Typography>
+                          </Stack>
+
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: 'text.primary',
+                              lineHeight: 1.5,
+                              pr: 1
+                            }}
+                          >
+                            {item.description}
+                          </Typography>
+                        </Stack>
+                      </Box>
+                    </Box>
+                  );
+                })}
+              </Box>
+            )}
           </MainCard>
         </Grid>
       </Grid>
