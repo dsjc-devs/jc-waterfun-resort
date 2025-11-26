@@ -90,11 +90,23 @@ const createReservation = async (reservationData) => {
 
     const paymentStatus = totalPaid === total ? "FULLY_PAID" : "PARTIALLY_PAID";
 
+    // Do not persist client-provided amenities directly; they lack required name/price
+    const { amenitiesItems, amenities: clientAmenities, ...restData } = reservationData || {};
     const reservation = await Reservation.create({
       reservationId,
       paymentStatus,
-      ...reservationData,
+      ...restData,
+      amenities: [],
     });
+
+    // If amenities are provided, enrich and update line items + totals
+    if (Array.isArray(amenitiesItems) && amenitiesItems.length) {
+      try {
+        await updateReservationAmenitiesById(reservationId, { items: amenitiesItems });
+      } catch (e) {
+        console.error("Failed to attach amenities on create:", e?.message || e);
+      }
+    }
 
     // Record activity: reservation created
     try {

@@ -67,6 +67,7 @@ const handlePaymentSuccess = async (paymentIntent) => {
       guests: tempBooking.guests,
       entrances: tempBooking.entrances,
       amount: tempBooking.amount,
+      amenitiesItems: Array.isArray(tempBooking.amenitiesItems) ? tempBooking.amenitiesItems : [],
       paymentIntentId: paymentIntentId
     };
 

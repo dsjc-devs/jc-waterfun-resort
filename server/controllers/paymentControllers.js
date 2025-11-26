@@ -187,6 +187,7 @@ const checkPaymentStatus = expressAsync(async (req, res) => {
               guests: pendingBooking.guests,
               entrances: pendingBooking.entrances,
               amount: pendingBooking.amount,
+              amenitiesItems: Array.isArray(pendingBooking.amenitiesItems) ? pendingBooking.amenitiesItems : [],
               paymentIntentId
             };
 

@@ -40,6 +40,7 @@ const tempBookingSchema = new mongoose.Schema(
       extraPersonFee: { type: Number, default: 0 },
       accommodationTotal: { type: Number, required: true },
       entranceTotal: { type: Number, default: 0 },
+      amenitiesTotal: { type: Number, default: 0 },
       total: { type: Number, required: true },
       minimumPayable: { type: Number, required: true },
       totalPaid: { type: Number, required: true },
@@ -47,6 +48,15 @@ const tempBookingSchema = new mongoose.Schema(
       child: { type: Number, default: 0 },
       pwdSenior: { type: Number, default: 0 },
     },
+    amenitiesItems: [
+      new mongoose.Schema(
+        {
+          amenityId: { type: mongoose.Schema.Types.ObjectId, ref: "Amenities", required: true },
+          quantity: { type: Number, default: 0 },
+        },
+        { _id: false }
+      )
+    ],
     paymentMethod: {
       type: String,
       required: true,

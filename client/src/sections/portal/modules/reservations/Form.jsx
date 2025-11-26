@@ -135,6 +135,7 @@ const ReservationForm = () => {
             accommodationTotal: price,
             entranceTotal: entranceTotal,
             extraPersonFee: getExtraPersonFee(),
+            amenitiesTotal: amenitiesTotal,
             total: total,
             totalPaid: values.amount.totalPaid,
             adult: entranceAmounts.adult,
@@ -143,7 +144,7 @@ const ReservationForm = () => {
           }
         };
         if (isEditMode && reservationId) {
-          payload.isWalkIn = true;
+          // Do not override existing isWalkIn flag on edit; preserve original value
           await agent.Reservations.editReservation(reservationId, payload);
           // Persist amenities via dedicated endpoint
           try {
@@ -813,7 +814,7 @@ const ReservationForm = () => {
                       <AmenitySelector
                         amenitiesQuantities={amenitiesQuantities}
                         onAmenitiesChange={setAmenitiesQuantities}
-                        variant="enhance"
+                        variant="simple"
                       />
                     </Grid>
                   </Grid>

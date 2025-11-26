@@ -174,6 +174,7 @@ const BookReservation = () => {
           child: bookingData.entrances.child,
           pwdSenior: bookingData.entrances.pwdSenior
         },
+        // Provide amenities via items for server enrichment
         amenitiesItems: Object.entries(bookingData?.amenitiesQuantities || {})
           .map(([amenityId, quantity]) => ({ amenityId, quantity: Number(quantity || 0) }))
           .filter((it) => it.quantity > 0),

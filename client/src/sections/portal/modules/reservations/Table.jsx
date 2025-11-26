@@ -361,6 +361,19 @@ const ReservationsTable = () => {
           paymentsStatusLabel = 'UNPAID';
         }
 
+        // Derive grand total including amenities & extra person fee if amount.total is missing or legacy
+        const accom = Number(row?.amount?.accommodationTotal || 0);
+        const entrance = Number(row?.amount?.entranceTotal || 0);
+        const amenities = Number(row?.amount?.amenitiesTotal || 0);
+        const extraFee = Number(row?.amount?.extraPersonFee || 0);
+        // If backend already computed total including amenities use it; else fallback
+        const computedGrandTotal = accom + entrance + amenities + extraFee;
+        const displayedTotal = typeof row?.amount?.total === 'number' && row?.amount?.total > 0
+          ? row?.amount?.total
+          : computedGrandTotal;
+        const paid = Number(row?.amount?.totalPaid || 0);
+        const balance = Math.max(displayedTotal - paid, 0);
+
         return (
           <Stack textAlign='left'>
             <Chip
@@ -374,13 +387,19 @@ const ReservationsTable = () => {
             />
             <Typography variant="body2">Accommodation Total: {formatPeso(row?.amount?.accommodationTotal)}</Typography>
             <Typography variant="body2">Entrance Total: {formatPeso(row?.amount?.entranceTotal)}</Typography>
+            {amenities > 0 && (
+              <Typography variant="body2">Amenities Total: {formatPeso(amenities)}</Typography>
+            )}
+            {extraFee > 0 && (
+              <Typography variant="body2">Extra Person Fee: {formatPeso(extraFee)}</Typography>
+            )}
             <Typography variant="body2">Minimum Payable: {formatPeso(row?.amount?.minimumPayable)}</Typography>
-            <Typography variant="body2">Total: {formatPeso(row?.amount?.total)}</Typography>
+            <Typography variant="body2">Total: {formatPeso(displayedTotal)}</Typography>
             <Divider sx={{ mb: 1 }} />
-            <Typography variant="body2" color="success.dark">Paid: {formatPeso(row?.amount?.totalPaid)}</Typography>
+            <Typography variant="body2" color="success.dark">Paid: {formatPeso(paid)}</Typography>
             <Divider sx={{ mb: 1 }} />
             <Typography variant="body2" color="error">
-              Balance: {formatPeso(row?.amount?.total - row?.amount?.totalPaid)}
+              Balance: {formatPeso(balance)}
             </Typography>
           </Stack>
         )
