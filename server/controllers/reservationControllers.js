@@ -154,3 +154,25 @@ export {
   requestReschedule,
   decideReschedule,
 };
+
+// ============ AMENITIES CONTROLLERS ============ //
+
+const updateReservationAmenitiesById = expressAsync(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { items } = req.body || {};
+
+    const reservation = await reservationServices.updateReservationAmenitiesById(id, { items });
+
+    res.status(200).json({
+      success: true,
+      message: "Reservation amenities updated successfully",
+      reservation,
+    });
+  } catch (error) {
+    console.error("Error in updateReservationAmenitiesById controller:", error);
+    throw new Error(error);
+  }
+});
+
+export { updateReservationAmenitiesById };

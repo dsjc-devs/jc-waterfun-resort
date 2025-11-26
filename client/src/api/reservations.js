@@ -64,6 +64,14 @@ const Reservations = {
       throw new Error(error?.response?.data?.message);
     }
   },
+  updateAmenities: async (reservationId, items) => {
+    try {
+      const response = await axiosServices.patch(`/${endpoints.key}/${reservationId}/amenities`, { items });
+      return response;
+    } catch (error) {
+      throw new Error(error?.response?.data?.message);
+    }
+  },
   editReservation: async (reservationId, payload) => {
     try {
       const response = await axiosServices.patch(`/${endpoints.key}/${reservationId}`, payload)

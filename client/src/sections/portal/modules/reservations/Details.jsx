@@ -9,7 +9,7 @@ import {
   PhoneOutlined,
   EditOutlined,
 } from "@ant-design/icons";
-import { Grid, Chip, Stack, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, ToggleButtonGroup, ToggleButton, Alert, Typography, Divider, Box } from "@mui/material";
+import { Grid, Chip, Stack, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, ToggleButtonGroup, ToggleButton, Alert, Typography, Divider, Box, List, ListItem } from "@mui/material";
 import { toast } from 'react-toastify';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -30,6 +30,7 @@ import textFormatter from "utils/textFormatter";
 import AnimateButton from "components/@extended/AnimateButton";
 import reservationsApi, { useGetSingleReservation } from "api/reservations";
 import { useGetActivities } from "api/activities";
+import { useGetAmenities } from "api/amenities";
 
 
 const Details = ({ reservationData = {} }) => {
@@ -49,6 +50,28 @@ const Details = ({ reservationData = {} }) => {
   const amount = reservationData?.amount;
   const guests = reservationData?.guests;
   const rescheduleRequest = reservationData?.rescheduleRequest;
+
+  // Amenities - prefer reservation data, fallback to quantities map + catalog
+  const { data: amenitiesData = {} } = useGetAmenities({ status: 'POSTED' });
+  const amenitiesCatalog = Array.isArray(amenitiesData?.amenities) ? amenitiesData.amenities : [];
+  const selectedAmenities = useMemo(() => {
+    if (Array.isArray(reservationData?.amenities) && reservationData.amenities.length > 0) {
+      return reservationData.amenities.map((it) => ({
+        name: it.name,
+        price: Number(it.price || 0),
+        quantity: Number(it.quantity || 1),
+        total: Number(typeof it.total === 'number' ? it.total : (Number(it.price || 0) * Number(it.quantity || 1)))
+      }));
+    }
+    const qmap = reservationData?.amenitiesQuantities || {};
+    if (amenitiesCatalog.length && qmap && typeof qmap === 'object') {
+      return amenitiesCatalog
+        .filter((a) => a?.hasPrice && Number(qmap[a._id] || 0) > 0)
+        .map((a) => ({ name: a.name, price: Number(a.price || 0), quantity: 1, total: Number(a.price || 0) }));
+    }
+    return [];
+  }, [reservationData, amenitiesCatalog]);
+  const amenitiesTotal = useMemo(() => selectedAmenities.reduce((s, it) => s + Number(it.total || 0), 0), [selectedAmenities]);
 
   const paymentsStatus = amount?.totalPaid >= amount?.total;
   const paymentsStatusLabel = paymentsStatus ? 'FULLY_PAID' : (amount?.totalPaid > 0 ? 'PARTIALLY_PAID' : 'UNPAID');
@@ -334,6 +357,41 @@ const Details = ({ reservationData = {} }) => {
               </Grid>
             </MainCard>
 
+            <MainCard title="Amenities Information" sx={{ marginBottom: 2 }}>
+              <Grid container spacing={2}>
+                {selectedAmenities.length === 0 ? (
+                  <Grid item xs={12}>
+                    <LabeledValue
+                      title="No Amenities availed"
+                      subTitle={"-"}
+                      icon={<UserOutlined />}
+                    />
+                  </Grid>
+                ) : (
+                  <>
+                    {selectedAmenities.map((item, idx) => (
+                      <Grid item xs={12} key={`${item.name}-${idx}`}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                          <Typography variant="body1" fontWeight={600}>{item.name}</Typography>
+                          <Stack direction="row" spacing={2} alignItems="center">
+                            <Typography variant="body2" color="text.secondary">x{item.quantity}</Typography>
+                            <Typography variant="body1">{formatPeso(item.total || 0)}</Typography>
+                          </Stack>
+                        </Stack>
+                      </Grid>
+                    ))}
+                    <Grid item xs={12}>
+                      <Divider sx={{ my: 1 }} />
+                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Typography variant="subtitle1" fontWeight={700}>Amenities Subtotal</Typography>
+                        <Typography variant="subtitle1" fontWeight={700}>{formatPeso(amenitiesTotal)}</Typography>
+                      </Stack>
+                    </Grid>
+                  </>
+                )}
+              </Grid>
+            </MainCard>
+
             {rescheduleRequest && (
               <MainCard title="Reschedule Information" sx={{ marginBottom: 2 }}>
                 <Grid container spacing={2}>
@@ -436,6 +494,13 @@ const Details = ({ reservationData = {} }) => {
                 <LabeledValue
                   title="Entrance Total"
                   subTitle={formatPeso(amount?.entranceTotal)}
+                  icon={PESO_SIGN}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <LabeledValue
+                  title="Amenities Total"
+                  subTitle={formatPeso(typeof amount?.amenitiesTotal === 'number' ? amount?.amenitiesTotal : amenitiesTotal)}
                   icon={PESO_SIGN}
                 />
               </Grid>

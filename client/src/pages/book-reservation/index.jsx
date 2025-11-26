@@ -54,11 +54,13 @@ const BookReservation = () => {
     guests: 0,
     entrances: { adult: 0, child: 0, pwdSenior: 0 },
     includeEntranceFee: false,
+    amenitiesQuantities: {},
   });
 
   const [amount, setAmount] = useState({
     accommodationTotal: 0,
     entranceTotal: 0,
+    amenitiesTotal: 0,
     adult: 0,
     child: 0,
     pwdSenior: 0,
@@ -89,7 +91,7 @@ const BookReservation = () => {
   const recaptchaTheme = muiTheme?.palette?.mode === 'dark' ? 'dark' : 'light';
   const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
 
-  const calculatedTotal = (amount.accommodationTotal || 0) + (amount.entranceTotal || 0) + (amount.extraPersonFee || 0);
+  const calculatedTotal = (amount.accommodationTotal || 0) + (amount.entranceTotal || 0) + (amount.amenitiesTotal || 0) + (amount.extraPersonFee || 0);
 
   useEffect(() => {
     setBookingData((prev) => ({
@@ -172,11 +174,15 @@ const BookReservation = () => {
           child: bookingData.entrances.child,
           pwdSenior: bookingData.entrances.pwdSenior
         },
+        amenitiesItems: Object.entries(bookingData?.amenitiesQuantities || {})
+          .map(([amenityId, quantity]) => ({ amenityId, quantity: Number(quantity || 0) }))
+          .filter((it) => it.quantity > 0),
         amount: {
           extraPersonFee: bookingData?.amount?.extraPersonFee || 0,
           accommodationTotal: bookingData?.amount?.accommodationTotal,
           entranceTotal: bookingData?.amount?.entranceTotal,
-          total: (bookingData?.amount?.total || 0) + (bookingData?.amount?.extraPersonFee || 0),
+          amenitiesTotal: bookingData?.amount?.amenitiesTotal || 0,
+          total: calculatedTotal,
           minimumPayable: bookingData?.amount?.minimumPayable,
           totalPaid,
           adult: bookingData?.amount?.adult,
@@ -312,6 +318,8 @@ const BookReservation = () => {
                     onSetAmount={setAmount}
                     guests={bookingData.guests}
                     onGuestsChange={handleGuestsChange}
+                    amenitiesQuantities={bookingData.amenitiesQuantities}
+                    onAmenitiesChange={(next) => saveBookingData({ ...bookingData, amenitiesQuantities: next })}
                   />
                 )}
 
@@ -350,6 +358,7 @@ const BookReservation = () => {
                     includeEntrance: bookingData?.includeEntranceFee || bookingData?.accommodationData?.hasPoolAccess,
                     entrances: bookingData?.entrances,
                     entranceTotal: amount?.entranceTotal,
+                    amenitiesTotal: amount?.amenitiesTotal,
                     total: calculatedTotal,
                     minimumPayable: amount?.minimumPayable,
                     prices: {

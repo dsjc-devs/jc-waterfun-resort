@@ -30,6 +30,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { addHours } from 'date-fns';
 import { useGetResortRates } from 'api/resort-rates';
 import { useGetSingleReservation } from 'api/reservations';
+import { useGetAmenities } from 'api/amenities';
 
 import agent from 'api';
 import AnimateButton from 'components/@extended/AnimateButton';
@@ -39,6 +40,7 @@ import RoomCard from 'components/accommodations/RoomCard';
 import PaymentSummaryCard from 'components/accommodations/PaymentSummaryCard';
 import UserFinder from 'components/users/UserFinder';
 import ConfirmationDialog from 'components/ConfirmationDialog';
+import AmenitySelector from 'components/AmenitySelector';
 import formatPeso from 'utils/formatPrice';
 
 const ReservationForm = () => {
@@ -64,6 +66,7 @@ const ReservationForm = () => {
 
   const [showEntranceSection, setShowEntranceSection] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState(false);
+  const [amenitiesQuantities, setAmenitiesQuantities] = useState({});
 
   const totalQuantity = entrances.adult + entrances.child + entrances.pwdSenior;
   const hasNoQuantities = totalQuantity === 0;
@@ -108,6 +111,7 @@ const ReservationForm = () => {
   const { data: singleReservation } = useGetSingleReservation(reservationId);
 
   const { data: _blockedDates = [] } = useGetBlockedDates();
+  const { data: amenitiesData = {} } = useGetAmenities({ status: 'POSTED' });
 
   const formik = useFormik({
     initialValues,
@@ -115,6 +119,9 @@ const ReservationForm = () => {
     onSubmit: async (values, { setSubmitting }) => {
       setSubmitting(true);
       try {
+        const amenityItems = Object.entries(amenitiesQuantities || {})
+          .map(([amenityId, quantity]) => ({ amenityId, quantity: Number(quantity || 0) }))
+          .filter((it) => it.quantity > 0);
         const payload = {
           userId: values.userData?.userId,
           userData: values.userData,
@@ -138,9 +145,25 @@ const ReservationForm = () => {
         if (isEditMode && reservationId) {
           payload.isWalkIn = true;
           await agent.Reservations.editReservation(reservationId, payload);
+          // Persist amenities via dedicated endpoint
+          try {
+            await agent.Reservations.updateAmenities(reservationId, amenityItems);
+          } catch (e) {
+            console.error('Failed to update amenities:', e);
+          }
           toast.success('Reservation updated successfully!');
         } else {
-          await agent.Reservations.createReservation({ ...payload, isWalkIn: true });
+          const res = await agent.Reservations.createReservation({ ...payload, isWalkIn: true });
+          const data = res?.data || res;
+          const created = data?.reservation || data;
+          const newReservationId = created?.reservationId;
+          if (newReservationId && amenityItems.length) {
+            try {
+              await agent.Reservations.updateAmenities(newReservationId, amenityItems);
+            } catch (e) {
+              console.error('Failed to set amenities for new reservation:', e);
+            }
+          }
           toast.success('Reservation created successfully!');
           formik.resetForm();
           setSelectedAccommodation({});
@@ -149,6 +172,7 @@ const ReservationForm = () => {
           setMode('day');
           setManualMode(false);
           setEntrances({ adult: 0, child: 0, pwdSenior: 0 });
+          setAmenitiesQuantities({});
         }
 
         navigate('/portal/reservations')
@@ -237,6 +261,14 @@ const ReservationForm = () => {
       }
       setManualMode(false);
       setEntrances(r.entrances || initialValues.entrances);
+      // Preload amenities quantities if present on reservation
+      if (Array.isArray(r.amenities)) {
+        const init = {};
+        for (const a of r.amenities) {
+          if (a?.amenityId) init[a.amenityId] = a.quantity || 0;
+        }
+        setAmenitiesQuantities(init);
+      }
     }
   }, [isEditMode, singleReservation, accommodations]);
 
@@ -370,10 +402,19 @@ const ReservationForm = () => {
 
   const entranceTotal = entranceAmounts.adult + entranceAmounts.child + entranceAmounts.pwdSenior;
 
+  const amenitiesList = Array.isArray(amenitiesData?.amenities) ? amenitiesData.amenities : [];
+  const amenitiesTotal = useMemo(() => {
+    return amenitiesList.reduce((sum, a) => {
+      const q = Number(amenitiesQuantities[a._id] || 0);
+      const price = Number(a?.price || 0);
+      return sum + price * q;
+    }, 0);
+  }, [amenitiesList, amenitiesQuantities]);
+
   const minimumPayable = (price) * 0.5;
 
   const extraPersonFee = getExtraPersonFee();
-  const total = price + entranceTotal + extraPersonFee;
+  const total = price + entranceTotal + extraPersonFee + amenitiesTotal;
 
   const name = selectedAccommodation?.name || '';
 
@@ -382,6 +423,22 @@ const ReservationForm = () => {
     setConfirmDialog(false);
     setTimeout(() => formik.handleSubmit(), 100);
   };
+
+  const handleAmenityIncrease = (amenityId) => {
+    setAmenitiesQuantities(prev => ({ ...prev, [amenityId]: Math.min(1, Number(prev[amenityId] || 0) + 1) }));
+  };
+  const handleAmenityDecrease = (amenityId) => {
+    setAmenitiesQuantities(prev => {
+      const next = Math.max(0, Number(prev[amenityId] || 0) - 1);
+      return { ...prev, [amenityId]: next };
+    });
+  };
+  const handleAmenityChange = (amenityId, value) => {
+    const parsed = parseInt(value, 10);
+    const clamped = !isNaN(parsed) && parsed >= 0 ? Math.min(1, parsed) : 0;
+    setAmenitiesQuantities(prev => ({ ...prev, [amenityId]: clamped }));
+  };
+  const clearAmenities = () => setAmenitiesQuantities({});
   return (
     <React.Fragment>
       <Grid container spacing={2}>
@@ -747,6 +804,18 @@ const ReservationForm = () => {
                         </Grid>
                       </Box>
                     </Grid>
+
+                    {/* Amenities Selection */}
+                    <Grid item xs={12} sx={{ mt: 2 }}>
+                      <Typography variant="body1" gutterBottom>
+                        Amenities (optional)
+                      </Typography>
+                      <AmenitySelector
+                        amenitiesQuantities={amenitiesQuantities}
+                        onAmenitiesChange={setAmenitiesQuantities}
+                        variant="enhance"
+                      />
+                    </Grid>
                   </Grid>
                 )}
               </Grid>
@@ -764,6 +833,8 @@ const ReservationForm = () => {
                 includeEntrance: selectedAccommodation?.hasPoolAccess || showEntranceSection,
                 entrances,
                 entranceTotal,
+                amenities: amenitiesList.filter(a => (amenitiesQuantities[a._id] || 0) > 0).map(a => ({ name: a.name, price: a.price || 0, total: a.price || 0, amenityId: a._id, quantity: 1 })),
+                amenitiesTotal,
                 minimumPayable,
                 total,
                 extraPersonFee,

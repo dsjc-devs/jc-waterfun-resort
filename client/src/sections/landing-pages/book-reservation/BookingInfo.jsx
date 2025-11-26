@@ -6,6 +6,8 @@ import {
   Stack,
   TextField,
   Alert,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useGetResortRates } from "api/resort-rates";
@@ -16,6 +18,8 @@ import formatPeso from "utils/formatPrice";
 import IconButton from "components/@extended/IconButton";
 import LongAccommodationCard from "components/accommodations/LongAccommodationCard";
 import PaymentSummaryCard from "components/accommodations/PaymentSummaryCard";
+import AmenitySelector from "components/AmenitySelector";
+import { useGetAmenities } from "api/amenities";
 
 const BookingInfo = ({
   data,
@@ -30,7 +34,9 @@ const BookingInfo = ({
   onIncludeEntranceChange,
   onSetAmount,
   guests,
-  onGuestsChange
+  onGuestsChange,
+  amenitiesQuantities = {},
+  onAmenitiesChange,
 }) => {
   const { resortRates } = useGetResortRates();
 
@@ -64,10 +70,6 @@ const BookingInfo = ({
     );
   }, [entrances, resortRates, mode, includeEntrance]);
 
-  const total = useMemo(() => {
-    return price + entranceTotal;
-  }, [price, entranceTotal]);
-
   const minimumPayable = useMemo(() => {
     const accomDownPayment = price * 0.5;
     return accomDownPayment;
@@ -81,6 +83,23 @@ const BookingInfo = ({
   const extraPersonFee = (extraPersonFeeValue > 0 && usedGuests > capacity)
     ? (usedGuests - capacity) * extraPersonFeeValue
     : 0;
+
+  // Import the amenities data for calculations
+  const { data: amenitiesData = {} } = useGetAmenities({ status: 'POSTED' });
+  const amenitiesList = Array.isArray(amenitiesData?.amenities) ? amenitiesData.amenities : [];
+
+  const amenitiesTotal = useMemo(() => {
+    return amenitiesList.reduce((sum, a) => {
+      if (!a?.hasPrice) return sum;
+      const q = Number(amenitiesQuantities?.[a._id] || 0);
+      const price = Number(a?.price || 0);
+      return sum + q * price;
+    }, 0);
+  }, [amenitiesList, amenitiesQuantities]);
+
+  const total = useMemo(() => {
+    return price + entranceTotal + amenitiesTotal + (extraPersonFee || 0);
+  }, [price, entranceTotal, amenitiesTotal, extraPersonFee]);
 
   const handleClearAll = () => {
     onQuantitiesChange({ adult: 0, child: 0, pwdSenior: 0 });
@@ -120,6 +139,7 @@ const BookingInfo = ({
     onSetAmount({
       accommodationTotal: price || 0,
       entranceTotal,
+      amenitiesTotal,
       total,
       minimumPayable,
       adult: entranceAmounts.adult,
@@ -127,7 +147,7 @@ const BookingInfo = ({
       pwdSenior: entranceAmounts.pwdSenior,
       extraPersonFee
     });
-  }, [price, entranceTotal, total, minimumPayable, extraPersonFee, onSetAmount]);
+  }, [price, entranceTotal, amenitiesTotal, total, minimumPayable, extraPersonFee, onSetAmount]);
 
   return (
     <Box sx={{ bgcolor: "#fff", borderRadius: 3, mt: 4 }}>
@@ -354,6 +374,13 @@ const BookingInfo = ({
           </MainCard>
         </Box>
       )}
+
+      {/* Amenities Selection */}
+      <AmenitySelector
+        amenitiesQuantities={amenitiesQuantities}
+        onAmenitiesChange={onAmenitiesChange}
+        variant="enhanced"
+      />
     </Box>
   );
 };

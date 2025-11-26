@@ -13,6 +13,7 @@ const amountSchema = new mongoose.Schema(
   {
     accommodationTotal: { type: Number, required: true },
     entranceTotal: { type: Number, required: true },
+    amenitiesTotal: { type: Number, default: 0 },
     total: { type: Number, required: true },
     totalPaid: { type: Number, required: true },
     adult: { type: Number, default: 0 },
@@ -85,6 +86,18 @@ const reservationSchema = new mongoose.Schema(
       default: false
     },
     entrances: entrancesSchema,
+    amenities: [
+      new mongoose.Schema(
+        {
+          amenityId: { type: mongoose.Schema.Types.ObjectId, ref: "Amenities", required: true },
+          name: { type: String, required: true },
+          price: { type: Number, default: 0 },
+          quantity: { type: Number, default: 0 },
+          total: { type: Number, default: 0 },
+        },
+        { _id: false }
+      )
+    ],
     amount: amountSchema,
     guests: {
       type: Number,

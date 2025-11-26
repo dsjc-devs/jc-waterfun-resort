@@ -8,6 +8,7 @@ import reservationDetails from "../templates/reservation-details.js";
 import sendEmail from "../utils/sendNodeMail.js";
 import emailTemplate from "../templates/defaults/index.js";
 import Accommodations from "../models/accommodationsModels.js";
+import Amenities from "../models/amenitiesModels.js";
 import Policies from "../models/policiesModels.js";
 import FAQs from "../models/faqsModels.js";
 import rescheduleRequestTemplate from "../templates/reschedule-request.js";
@@ -736,12 +737,118 @@ const decideRescheduleById = async (reservationId, { action, reason, decidedBy }
   }
 };
 
+// ============ AMENITIES MANAGEMENT ============ //
+
+const updateReservationAmenitiesById = async (reservationId, { items }) => {
+  try {
+    if (!Array.isArray(items)) {
+      throw new Error("'items' must be an array of { amenityId, quantity }");
+    }
+
+    const reservation = await Reservation.findOne({ reservationId });
+    if (!reservation) throw new Error("Reservation not found");
+
+    const qtyMap = new Map();
+    const amenityIds = [];
+    for (const it of items) {
+      if (!it || !it.amenityId) continue;
+      // Clamp to max 1 per amenity for resort add-ons
+      const q = Math.min(1, Number(it.quantity || 0));
+      if (q <= 0) continue; // skip zero or negative
+      const id = String(it.amenityId);
+      qtyMap.set(id, q);
+      amenityIds.push(id);
+    }
+
+    const docs = amenityIds.length
+      ? await Amenities.find({ _id: { $in: amenityIds } }).lean()
+      : [];
+
+    // Build line items with current pricing and names
+    const lineItems = docs.map((a) => {
+      const q = qtyMap.get(String(a._id)) || 0;
+      const price = Number(a.price || 0);
+      const total = price * q;
+      return {
+        amenityId: a._id,
+        name: a.name,
+        price,
+        quantity: q,
+        total,
+      };
+    });
+
+    const amenitiesTotal = lineItems.reduce((sum, li) => sum + (li.total || 0), 0);
+
+    // Update reservation amounts
+    const beforeAmount = reservation.amount || {};
+    const beforeTotal = Number(beforeAmount.total || 0);
+    const beforePaid = Number(beforeAmount.totalPaid || 0);
+
+    reservation.amenities = lineItems;
+
+    const nextAmount = {
+      ...beforeAmount,
+      amenitiesTotal,
+    };
+    const accommodationTotal = Number(nextAmount.accommodationTotal || 0);
+    const entranceTotal = Number(nextAmount.entranceTotal || 0);
+    const extraPersonFee = Number(nextAmount.extraPersonFee || 0);
+    nextAmount.total = accommodationTotal + entranceTotal + amenitiesTotal + extraPersonFee;
+    reservation.amount = nextAmount;
+
+    const saved = await reservation.save();
+
+    // Record activity for amenities change
+    try {
+      const when = formatDateInTimeZone(new Date(), { includeTime: true });
+      const summary = lineItems.length
+        ? lineItems.map((li) => `${li.name} x${li.quantity}${li.price ? ` (₱${li.price})` : ''}`).join(', ')
+        : 'none';
+      await activityServices.createActivity({
+        reservationId,
+        type: "ACTIVITY",
+        description: `Amenities updated: ${summary} on ${when}`,
+        createdAt: new Date(),
+      });
+
+      // Detect fully paid crossing due to total change
+      const afterTotal = Number(saved.amount?.total || 0);
+      const wasFullyPaid = beforeTotal > 0 && beforePaid >= beforeTotal;
+      const isNowFullyPaid = afterTotal > 0 && beforePaid >= afterTotal;
+      if (!wasFullyPaid && isNowFullyPaid) {
+        await activityServices.createActivity({
+          reservationId,
+          type: "PAYMENT_FULLY_PAID",
+          description: `Reservation is now FULLY PAID (${beforePaid}/${afterTotal}) on ${when}`,
+          createdAt: new Date(),
+        });
+      } else if (beforeTotal !== afterTotal) {
+        await activityServices.createActivity({
+          reservationId,
+          type: "PAYMENT_UPDATED",
+          description: `Payment updated: ${beforePaid}/${afterTotal} on ${when}`,
+          createdAt: new Date(),
+        });
+      }
+    } catch (e) {
+      console.error("Failed to record amenities update activity:", e?.message);
+    }
+
+    return saved;
+  } catch (error) {
+    console.error("Error updating reservation amenities:", error);
+    throw new Error(error.message || "Failed to update amenities for reservation");
+  }
+};
+
 export default {
   hasDateConflict,
   createReservation,
   getReservationsByQuery,
   getSingleReservationById,
   updateReservationById,
+  updateReservationAmenitiesById,
   deleteReservationById,
   checkAndUpdateReservationStatus,
   sendUpcomingReservationReminders,

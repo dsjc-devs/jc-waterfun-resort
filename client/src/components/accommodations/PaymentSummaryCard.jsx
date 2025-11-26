@@ -1,3 +1,4 @@
+
 import { Box, Typography, Stack, Alert } from "@mui/material";
 import React from "react";
 import MainCard from "components/MainCard";
@@ -10,6 +11,8 @@ const PaymentSummaryCard = ({ data, isDisplayBalance = false }) => {
     includeEntrance,
     entrances = {},
     entranceTotal,
+    amenities = [],
+    amenitiesTotal = 0,
     total,
     minimumPayable,
     prices = {},
@@ -89,6 +92,32 @@ const PaymentSummaryCard = ({ data, isDisplayBalance = false }) => {
             </Typography>
             <Typography variant="h5" fontWeight={600}>
               {formatPeso(entranceTotal)}
+            </Typography>
+          </Stack>
+        </React.Fragment>
+      )}
+
+      {/* Amenities breakdown */}
+      {!!amenitiesTotal && (
+        <React.Fragment>
+          {/* Individual amenity items */}
+          {Array.isArray(amenities) && amenities.map((a) => (
+            <Stack key={`${a.amenityId || a.name}`} direction="row" justifyContent="space-between" mb={1}>
+              <Typography variant="body1" color="textSecondary">
+                {a.name || 'Amenity'} {a.quantity ? `x ${a.quantity}` : ''}
+              </Typography>
+              <Typography variant="body1">
+                {formatPeso(a.total ?? a.price ?? 0)}
+              </Typography>
+            </Stack>
+          ))}
+
+          <Stack direction="row" justifyContent="space-between" mb={1}>
+            <Typography variant="h5" fontWeight={600}>
+              Amenities Subtotal
+            </Typography>
+            <Typography variant="h5" fontWeight={600}>
+              {formatPeso(amenitiesTotal)}
             </Typography>
           </Stack>
         </React.Fragment>
