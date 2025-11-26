@@ -814,7 +814,7 @@ const ReservationForm = () => {
                       <AmenitySelector
                         amenitiesQuantities={amenitiesQuantities}
                         onAmenitiesChange={setAmenitiesQuantities}
-                        variant="simple"
+                        variant="enhanced"
                       />
                     </Grid>
                   </Grid>
