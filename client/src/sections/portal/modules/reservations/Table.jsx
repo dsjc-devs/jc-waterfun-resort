@@ -366,11 +366,9 @@ const ReservationsTable = () => {
         const entrance = Number(row?.amount?.entranceTotal || 0);
         const amenities = Number(row?.amount?.amenitiesTotal || 0);
         const extraFee = Number(row?.amount?.extraPersonFee || 0);
-        // If backend already computed total including amenities use it; else fallback
+        // Always compute grand total as sum of components
         const computedGrandTotal = accom + entrance + amenities + extraFee;
-        const displayedTotal = typeof row?.amount?.total === 'number' && row?.amount?.total > 0
-          ? row?.amount?.total
-          : computedGrandTotal;
+        const displayedTotal = computedGrandTotal;
         const paid = Number(row?.amount?.totalPaid || 0);
         const balance = Math.max(displayedTotal - paid, 0);
 
@@ -575,7 +573,14 @@ const ReservationsTable = () => {
 
       // Create summary statistics
       const totalReservations = filteredReservations.length;
-      const totalRevenue = filteredReservations.reduce((sum, res) => sum + (res?.amount?.total || 0), 0);
+      const totalRevenue = filteredReservations.reduce((sum, res) => {
+        const accom = Number(res?.amount?.accommodationTotal || 0);
+        const entrance = Number(res?.amount?.entranceTotal || 0);
+        const amenities = Number(res?.amount?.amenitiesTotal || 0);
+        const extraFee = Number(res?.amount?.extraPersonFee || 0);
+        const computedTotal = accom + entrance + amenities + extraFee;
+        return sum + computedTotal;
+      }, 0);
       const totalPaid = filteredReservations.reduce((sum, res) => sum + (res?.amount?.totalPaid || 0), 0);
       const pendingAmount = totalRevenue - totalPaid;
 
@@ -587,7 +592,12 @@ const ReservationsTable = () => {
       // Prepare table data
       const tableRows = filteredReservations.map(reservation => {
         const customerName = `${fmt(reservation?.userData?.firstName)} ${fmt(reservation?.userData?.lastName)}`.trim();
-        const paymentStatus = (reservation?.amount?.totalPaid || 0) >= (reservation?.amount?.total || 0)
+        const accom = Number(reservation?.amount?.accommodationTotal || 0);
+        const entrance = Number(reservation?.amount?.entranceTotal || 0);
+        const amenities = Number(reservation?.amount?.amenitiesTotal || 0);
+        const extraFee = Number(reservation?.amount?.extraPersonFee || 0);
+        const computedTotal = accom + entrance + amenities + extraFee;
+        const paymentStatus = (reservation?.amount?.totalPaid || 0) >= computedTotal
           ? 'Fully Paid' : ((reservation?.amount?.totalPaid || 0) > 0 ? 'Partially Paid' : 'Unpaid');
         const isReservation = reservation?.isWalkIn === false;
         const reservationTypeLabel = isReservation ? 'Via Online' : 'Walk-In';
@@ -603,9 +613,9 @@ const ReservationsTable = () => {
           fmt(reservation?.status),
           reservationTypeLabel,
           paymentStatus,
-          peso(reservation?.amount?.total),
+          peso(computedTotal),
           peso(reservation?.amount?.totalPaid),
-          peso((reservation?.amount?.total || 0) - (reservation?.amount?.totalPaid || 0)),
+          peso(computedTotal - (reservation?.amount?.totalPaid || 0)),
           formatDateTime(reservation?.createdAt)
         ];
       });

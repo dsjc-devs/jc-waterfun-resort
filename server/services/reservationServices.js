@@ -271,6 +271,33 @@ const updateReservationById = async (reservationId, updateData) => {
       currentReservation[key] = updateData[key];
     });
 
+    // Recompute amount.total (and related derived fields) if any amount components changed
+    const amt = currentReservation.amount || {};
+    const accomTotal = Number(amt.accommodationTotal || 0);
+    const entranceTotal = Number(amt.entranceTotal || 0);
+    const amenitiesTotal = Number(amt.amenitiesTotal || 0);
+    const extraPersonFee = Number(amt.extraPersonFee || 0);
+    const recomputedTotal = accomTotal + entranceTotal + amenitiesTotal + extraPersonFee;
+
+    // If total differs or components provided in updateData, set the recomputed total
+    const componentsTouched = (
+      updateData?.amount?.hasOwnProperty('accommodationTotal') ||
+      updateData?.amount?.hasOwnProperty('entranceTotal') ||
+      updateData?.amount?.hasOwnProperty('amenitiesTotal') ||
+      updateData?.amount?.hasOwnProperty('extraPersonFee')
+    );
+    if (componentsTouched || Number(amt.total || 0) !== recomputedTotal) {
+      currentReservation.amount = {
+        ...amt,
+        total: recomputedTotal,
+        // Keep minimumPayable derived from accommodationTotal for consistency in getters
+      };
+
+      // Also update paymentStatus based on totalPaid vs total
+      const totalPaid = Number(currentReservation.amount.totalPaid || 0);
+      currentReservation.paymentStatus = totalPaid >= recomputedTotal ? 'FULLY_PAID' : 'PARTIALLY_PAID';
+    }
+
     const updatedReservation = await currentReservation.save();
 
     // Record activity summarizing the update
