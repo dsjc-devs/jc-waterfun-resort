@@ -6,6 +6,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useGetTestimonials } from 'api/testimonials';
 import EmptyUserCard from 'components/cards/skeleton/EmptyUserCard';
 import TitleTag from 'components/TitleTag2';
+import ConvertDate from 'components/ConvertDate';
 
 const NextArrow = ({ onClick }) => (
   <IconButton
@@ -83,10 +84,10 @@ const Testimonials = ({ isHomepage = true }) => {
     speed: 500,
     slidesToShow: showDesktop,
     slidesToScroll: 1,
-    autoplay: total > 3, 
+    autoplay: total > 3,
     autoplaySpeed: 5000,
     pauseOnHover: true,
-    arrows: total > 3, 
+    arrows: total > 3,
     nextArrow: total > 3 ? <NextArrow /> : null,
     prevArrow: total > 3 ? <PrevArrow /> : null,
     responsive: [
@@ -95,7 +96,7 @@ const Testimonials = ({ isHomepage = true }) => {
         settings: {
           slidesToShow: showTablet,
           slidesToScroll: 1,
-          arrows: total > 2, 
+          arrows: total > 2,
         }
       },
       {
@@ -146,6 +147,7 @@ const Testimonials = ({ isHomepage = true }) => {
                 {testimonials.map((testimonial, idx) => {
                   const fullName = `${testimonial.firstName} ${testimonial.lastName}`;
                   const initials = `${testimonial.firstName?.[0] || ''}${testimonial.lastName?.[0] || ''}`;
+                  const reservationDate = testimonial.reservationCreatedAt ? new Date(testimonial.reservationCreatedAt) : null;
 
                   return (
                     <Box key={`${testimonial.testimonialId}-${idx}`} px={{ xs: 1.5, md: 2 }} sx={{ height: '100%' }}>
@@ -270,6 +272,14 @@ const Testimonials = ({ isHomepage = true }) => {
                               >
                                 {testimonial.emailAddress}
                               </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                fontFamily="Poppins"
+                                sx={{ display: 'block', mt: 0.5 }}
+                              >
+                                Booked a reservation on: <ConvertDate dateString={testimonial.reservationCreatedAt} />
+                              </Typography>
                             </Box>
                           </Stack>
                         </CardContent>
@@ -302,6 +312,7 @@ const Testimonials = ({ isHomepage = true }) => {
                 {testimonials.map((testimonial) => {
                   const fullName = `${testimonial.firstName} ${testimonial.lastName}`;
                   const initials = `${testimonial.firstName?.[0] || ''}${testimonial.lastName?.[0] || ''}`;
+                  const reservationDate = testimonial.reservationCreatedAt ? new Date(testimonial.reservationCreatedAt) : null;
 
                   return (
                     <Grid item xs={12} sm={6} md={4} key={testimonial.testimonialId}>
@@ -426,6 +437,14 @@ const Testimonials = ({ isHomepage = true }) => {
                                 sx={{ fontSize: '0.875rem' }}
                               >
                                 {testimonial.emailAddress}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                fontFamily="Poppins"
+                                sx={{ display: 'block', mt: 0.5 }}
+                              >
+                                Booked a reservation on: <ConvertDate dateString={testimonial.reservationCreatedAt} />
                               </Typography>
                             </Box>
                           </Stack>
@@ -587,6 +606,14 @@ const Testimonials = ({ isHomepage = true }) => {
                               sx={{ fontSize: '0.875rem' }}
                             >
                               {testimonial.emailAddress}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              fontFamily="Poppins"
+                              sx={{ display: 'block', mt: 0.5 }}
+                            >
+                              Booked a reservation on: <ConvertDate dateString={testimonial.reservationCreatedAt} />
                             </Typography>
                           </Box>
                         </Stack>

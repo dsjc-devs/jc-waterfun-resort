@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -22,6 +22,7 @@ import {
 } from '@mui/material';
 import { Add as AddIcon, FormatQuote } from '@mui/icons-material';
 import { useGetTestimonials } from 'api/testimonials';
+import { useGetReservations } from 'api/reservations';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 
@@ -51,6 +52,13 @@ const TestimonialsDetails = () => {
     page,
     limit
   });
+
+  // Fetch the user's most recent reservation for auto-filling reservationId
+  const { data: reservationsData } = useGetReservations({ userId, page: 1, limit: 5 });
+  const latestReservationId = useMemo(() => {
+    const list = reservationsData?.reservations || [];
+    return list.length ? list[0]?.reservationId : '';
+  }, [reservationsData]);
 
   const testimonials = useMemo(() => {
     const userTestimonials = userTestimonialsData?.testimonials || [];
@@ -203,6 +211,7 @@ const TestimonialsDetails = () => {
           <Formik
             initialValues={{
               userId: user?.userId || user?._id || user?.id || '',
+              reservationId: '',
               firstName: user?.firstName || '',
               lastName: user?.lastName || '',
               emailAddress: user?.emailAddress || '',
@@ -238,6 +247,29 @@ const TestimonialsDetails = () => {
                     <Grid item xs={12}>
                       <InputLabel sx={{ mb: 0.5 }}>Email</InputLabel>
                       <TextField fullWidth name="emailAddress" value={values.emailAddress} disabled />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <InputLabel sx={{ mb: 0.5 }}>Reservation ID (optional)</InputLabel>
+                      <TextField
+                        fullWidth
+                        name="reservationId"
+                        value={values.reservationId}
+                        onChange={handleChange}
+                        placeholder="Enter your reservation ID"
+                        helperText="Link your review to a reservation for verification"
+                      />
+                      {/* Auto-fill from latest reservation when opening */}
+                      {latestReservationId && !values.reservationId && (
+                        <Box sx={{ mt: 1 }}>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={() => setFieldValue('reservationId', latestReservationId)}
+                          >
+                            Use Latest Reservation ({latestReservationId})
+                          </Button>
+                        </Box>
+                      )}
                     </Grid>
                     <Grid item xs={12}>
                       <InputLabel sx={{ mb: 0.5 }}>Rating *</InputLabel>

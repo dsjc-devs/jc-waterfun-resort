@@ -3,7 +3,7 @@ import Reservation from "../models/reservationsModels.js";
 import { v4 as uuidv4 } from "uuid";
 
 const createTestimonial = async (testimonialData) => {
-  const { userId, firstName, lastName, emailAddress, remarks, rating } =
+  const { userId, reservationId, firstName, lastName, emailAddress, remarks, rating } =
     testimonialData || {};
 
   const testimonialId = uuidv4();
@@ -14,7 +14,13 @@ const createTestimonial = async (testimonialData) => {
       err.statusCode = 400;
       throw err;
     }
-    const hasReservation = await Reservation.exists({ userId });
+    // Require a matching reservation (by id preferred; fallback to userId)
+    let hasReservation = null;
+    if (reservationId) {
+      hasReservation = await Reservation.exists({ reservationId });
+    } else {
+      hasReservation = await Reservation.exists({ userId });
+    }
     if (!hasReservation) {
       const err = new Error("Not eligible to post a testimonial. A completed or existing reservation is required.");
       err.statusCode = 400;
@@ -24,6 +30,7 @@ const createTestimonial = async (testimonialData) => {
     const testimonial = await Testimonials.create({
       testimonialId,
       userId,
+      reservationId,
       firstName,
       lastName,
       emailAddress,
@@ -53,12 +60,28 @@ const getTestimonials = async (queryObject) => {
     const testimonials = await Testimonials.find(filters)
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
+
+    // Attach reservationCreatedAt via lookup
+    const reservationIds = testimonials
+      .map(t => t.reservationId)
+      .filter(Boolean);
+    const reservations = reservationIds.length
+      ? await Reservation.find({ reservationId: { $in: reservationIds } })
+        .select('reservationId createdAt')
+        .lean()
+      : [];
+    const map = new Map(reservations.map(r => [r.reservationId, r.createdAt]));
+    const enriched = testimonials.map(t => ({
+      ...t,
+      reservationCreatedAt: map.get(t.reservationId) || null,
+    }));
 
     const totalCount = await Testimonials.countDocuments(filters);
 
     return {
-      testimonials,
+      testimonials: enriched,
       totalPages: Math.ceil(totalCount / limit),
       currentPage: page,
       totalTestimonials: totalCount,

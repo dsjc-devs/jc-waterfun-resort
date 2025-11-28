@@ -1,46 +1,50 @@
 import mongoose from "mongoose";
 
 const testimonialSchema = new mongoose.Schema(
-    {   
+    {
         testimonialId: {
-        type: String,
-        required: true,
-        unique: true
+            type: String,
+            required: true,
+            unique: true
+        },
+        reservationId: {
+            type: String,
+            required: true
         },
         firstName: {
-        type: String,
-        required: true
+            type: String,
+            required: true
         },
         lastName: {
-        type: String,
-        required: true
+            type: String,
+            required: true
         },
-    userId: {
-    type: String,
-    required: false
-    },
-    emailAddress: {
-        type: String,
-        required: true
+        userId: {
+            type: String,
+            required: false
+        },
+        emailAddress: {
+            type: String,
+            required: true
         },
         remarks: {
-        type: String,
-        required: true,
+            type: String,
+            required: true,
         },
         rating: {
-        type: Number,
-        required: true,
-        min: 1,
-        max: 5
+            type: Number,
+            required: true,
+            min: 1,
+            max: 5
         },
         isPosted: {
-        type: Boolean,
-        default: false
+            type: Boolean,
+            default: false
         }
     },
     {
         timestamps: true
     }
-    );
+);
 
-    export default mongoose.model("Testimonials", testimonialSchema);
+export default mongoose.model("Testimonials", testimonialSchema);
