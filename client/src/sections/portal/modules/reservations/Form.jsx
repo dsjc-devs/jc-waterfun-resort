@@ -719,41 +719,16 @@ const ReservationForm = () => {
                       </Grid>
                     )}
 
+                    {/* Amenities Selection */}
                     <Grid item xs={12} sx={{ mt: 2 }}>
                       <Typography variant="body1" gutterBottom>
-                        Total Paid
+                        Amenities (optional)
                       </Typography>
-
-                      <Grid container spacing={2} alignItems='center'>
-                        <Grid item xs={9}>
-                          <TextField
-                            type="number"
-                            value={formik.values.amount.totalPaid === 0 ? '' : formik.values.amount.totalPaid}
-                            placeholder='Enter amount paid'
-                            onChange={e => {
-                              const val = e.target.value;
-                              formik.setFieldValue('amount.totalPaid', val === '' ? 0 : Number(val));
-                            }}
-                            fullWidth
-                            InputLabelProps={{ shrink: true }}
-                          />
-                        </Grid>
-
-                        <Grid item xs={3}>
-                          <Button
-                            variant="outlined"
-                            startIcon={<CheckOutlined />}
-                            color='success'
-                            fullWidth
-                            disabled={formik.values.amount.totalPaid >= total}
-                            onClick={() => {
-                              formik.setFieldValue('amount.totalPaid', total);
-                            }}
-                          >
-                            Mark as Fully Paid
-                          </Button>
-                        </Grid>
-                      </Grid>
+                      <AmenitySelector
+                        amenitiesQuantities={amenitiesQuantities}
+                        onAmenitiesChange={setAmenitiesQuantities}
+                        variant="enhanced"
+                      />
                     </Grid>
 
                     <Grid item xs={12} sx={{ mt: 2 }}>
@@ -806,16 +781,41 @@ const ReservationForm = () => {
                       </Box>
                     </Grid>
 
-                    {/* Amenities Selection */}
                     <Grid item xs={12} sx={{ mt: 2 }}>
                       <Typography variant="body1" gutterBottom>
-                        Amenities (optional)
+                        Total Paid
                       </Typography>
-                      <AmenitySelector
-                        amenitiesQuantities={amenitiesQuantities}
-                        onAmenitiesChange={setAmenitiesQuantities}
-                        variant="enhanced"
-                      />
+
+                      <Grid container spacing={2} alignItems='center'>
+                        <Grid item xs={9}>
+                          <TextField
+                            type="number"
+                            value={formik.values.amount.totalPaid === 0 ? '' : formik.values.amount.totalPaid}
+                            placeholder='Enter amount paid'
+                            onChange={e => {
+                              const val = e.target.value;
+                              formik.setFieldValue('amount.totalPaid', val === '' ? 0 : Number(val));
+                            }}
+                            fullWidth
+                            InputLabelProps={{ shrink: true }}
+                          />
+                        </Grid>
+
+                        <Grid item xs={3}>
+                          <Button
+                            variant="outlined"
+                            startIcon={<CheckOutlined />}
+                            color='success'
+                            fullWidth
+                            disabled={formik.values.amount.totalPaid >= total}
+                            onClick={() => {
+                              formik.setFieldValue('amount.totalPaid', total);
+                            }}
+                          >
+                            Mark as Fully Paid
+                          </Button>
+                        </Grid>
+                      </Grid>
                     </Grid>
                   </Grid>
                 )}
