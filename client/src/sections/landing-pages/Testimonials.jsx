@@ -444,7 +444,7 @@ const Testimonials = ({ isHomepage = true }) => {
                                 fontFamily="Poppins"
                                 sx={{ display: 'block', mt: 0.5 }}
                               >
-                                Booked a reservation on: <ConvertDate dateString={testimonial.reservationCreatedAt} />
+                                Booked a reservation on: <ConvertDate dateString={reservationDate} />
                               </Typography>
                             </Box>
                           </Stack>
