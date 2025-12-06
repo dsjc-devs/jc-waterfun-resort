@@ -88,13 +88,10 @@ const createReservation = async (reservationData) => {
     }
     const reservationId = generateRandomString(6)
 
-    const paymentStatus = totalPaid === total ? "FULLY_PAID" : "PARTIALLY_PAID";
-
     // Do not persist client-provided amenities directly; they lack required name/price
     const { amenitiesItems, amenities: clientAmenities, ...restData } = reservationData || {};
     const reservation = await Reservation.create({
       reservationId,
-      paymentStatus,
       ...restData,
       amenities: [],
     });
@@ -292,10 +289,6 @@ const updateReservationById = async (reservationId, updateData) => {
         total: recomputedTotal,
         // Keep minimumPayable derived from accommodationTotal for consistency in getters
       };
-
-      // Also update paymentStatus based on totalPaid vs total
-      const totalPaid = Number(currentReservation.amount.totalPaid || 0);
-      currentReservation.paymentStatus = totalPaid >= recomputedTotal ? 'FULLY_PAID' : 'PARTIALLY_PAID';
     }
 
     const updatedReservation = await currentReservation.save();
