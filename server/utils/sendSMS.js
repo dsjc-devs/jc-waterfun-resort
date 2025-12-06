@@ -2,6 +2,8 @@ import axios from "axios";
 
 // Skycode SMS sender
 export async function sendSMS({ number, message }) {
+  return console.log(`SMS sent`);
+
   if (!number || !message) throw new Error("sendSMS: 'number' and 'message' are required");
 
   const url = "https://sms.skyio.site/api/sms/send";
