@@ -21,6 +21,7 @@ const PaymentResult = () => {
   const [reservationId, setReservationId] = useState(null);
   const pollTimerRef = useRef(null);
   const [countdown, setCountdown] = useState(null);
+  const [autoRedirectEnabled, setAutoRedirectEnabled] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -136,7 +137,7 @@ const PaymentResult = () => {
   // Auto-redirect to reservation details when successful (with a short countdown)
   useEffect(() => {
     let intervalId = null;
-    if (status === 'success' && reservationId && countdown === null) {
+    if (status === 'success' && reservationId && countdown === null && autoRedirectEnabled) {
       setCountdown(5);
     }
 
@@ -157,7 +158,7 @@ const PaymentResult = () => {
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [status, reservationId, countdown, navigate]);
+  }, [status, reservationId, countdown, autoRedirectEnabled, navigate]);
 
   const renderContent = () => {
     switch (status) {
@@ -201,7 +202,13 @@ const PaymentResult = () => {
                 {reservationId ? 'View Reservation' : 'View My Reservations'}
               </Button>
               {countdown !== null && (
-                <Button variant="text" onClick={() => setCountdown(null)}>
+                <Button
+                  variant="text"
+                  onClick={() => {
+                    setAutoRedirectEnabled(false);
+                    setCountdown(null);
+                  }}
+                >
                   Stay on this page
                 </Button>
               )}
