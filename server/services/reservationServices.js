@@ -29,6 +29,23 @@ const hasDateConflict = async (accommodationId, newStartDate, newEndDate) => {
   return !!conflict;
 };
 
+// Helper to find an existing reservation for same accommodation and dates
+const getExistingReservationByRange = async (accommodationId, startDate, endDate) => {
+  try {
+    if (!accommodationId || !startDate || !endDate) return null;
+    const existing = await Reservation.findOne({
+      accommodationId,
+      status: { $ne: "CANCELLED" },
+      startDate: { $lt: new Date(endDate) },
+      endDate: { $gt: new Date(startDate) },
+    }).lean();
+    return existing;
+  } catch (e) {
+    console.error("Error checking existing reservation range:", e?.message);
+    return null;
+  }
+}
+
 const hasDateConflictExcludingReservation = async (accommodationId, newStartDate, newEndDate, reservationId) => {
   const conflict = await Reservation.findOne({
     accommodationId,
@@ -876,6 +893,7 @@ const updateReservationAmenitiesById = async (reservationId, { items }) => {
 
 export default {
   hasDateConflict,
+  getExistingReservationByRange,
   createReservation,
   getReservationsByQuery,
   getSingleReservationById,

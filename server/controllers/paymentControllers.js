@@ -191,10 +191,19 @@ const checkPaymentStatus = expressAsync(async (req, res) => {
               paymentIntentId
             };
 
-            const reservation = await reservationServices.createReservation(reservationPayload);
+            // Idempotency: if a reservation already exists for same accommodation and dates, reuse it
+            const existingReservation = await reservationServices.getExistingReservationByRange(
+              pendingBooking.accommodationId,
+              pendingBooking.startDate,
+              pendingBooking.endDate
+            );
+
+            const reservation = existingReservation
+              ? existingReservation
+              : await reservationServices.createReservation(reservationPayload);
 
             await paymentServices.createPaymentDB({
-              reservationId: reservation.reservationId,
+              reservationId: reservation.reservationId || reservation.reservationId,
               amount: intent.attributes.amount,
               currency: intent.attributes.currency,
               paymentIntentId,
