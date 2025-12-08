@@ -867,7 +867,6 @@ const decideRescheduleById = async (reservationId, { action, reason, decidedBy }
 // ============ AMENITIES MANAGEMENT ============ //
 
 const updateReservationAmenitiesById = async (reservationId, { items }) => {
-  console.log(`trig`);
 
   try {
     if (!Array.isArray(items)) {

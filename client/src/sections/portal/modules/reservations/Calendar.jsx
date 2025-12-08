@@ -93,14 +93,11 @@ const Calendar = ({ events = [], title = '', subtitle = '' }) => {
 
   const handleDateClick = (info) => {
     const clickedDate = info.dateStr;
-    console.log('Date clicked:', clickedDate);
   };
 
   const handleEventMouseEnter = (info) => {
     const event = info.event;
     const rect = info.el.getBoundingClientRect();
-
-    console.log('Event mouse enter:', event);
 
     const tooltipContent = (
       <div>
