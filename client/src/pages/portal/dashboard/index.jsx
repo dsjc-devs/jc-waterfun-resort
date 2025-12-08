@@ -113,20 +113,12 @@ const Dashboard = () => {
       label: 'Average Revenue / Reservation',
       value: formatCurrency(stats.financial.summary.averageRevenuePerReservation)
     },
-    {
-      label: 'Pending Payments',
-      value: formatCurrency(stats.financial.summary.pendingPayments)
-    }
   ];
 
   const chartData = [
     {
       name: 'Earnings',
       amount: stats.financial.monthlyRevenue.earnings
-    },
-    {
-      name: 'Pending Payments',
-      amount: stats.financial.monthlyRevenue.pendingPayments
     },
     {
       name: 'Total Revenue',
@@ -263,7 +255,6 @@ const Dashboard = () => {
             heading: 'Monthly Revenue',
             keyValues: [
               ['Earnings', mr.earnings ?? 0],
-              ['Pending Payments', mr.pendingPayments ?? 0],
               ['Total Revenue', mr.totalRevenue ?? 0]
             ]
           },
@@ -282,7 +273,6 @@ const Dashboard = () => {
               ['Total Earnings This Month', sm.totalEarningsThisMonth ?? 0],
               ['Average Daily Revenue', sm.averageDailyRevenue ?? 0],
               ['Average Revenue / Reservation', sm.averageRevenuePerReservation ?? 0],
-              ['Pending Payments', sm.pendingPayments ?? 0],
               ['Currency', sm.currency || 'PHP']
             ]
           }
@@ -313,7 +303,6 @@ const Dashboard = () => {
             heading: 'Monthly Revenue',
             keyValues: [
               ['Earnings', mr.earnings ?? 0],
-              ['Pending Payments', mr.pendingPayments ?? 0],
               ['Total Revenue', mr.totalRevenue ?? 0]
             ]
           },
@@ -332,7 +321,6 @@ const Dashboard = () => {
               ['Total Earnings This Month', sm.totalEarningsThisMonth ?? 0],
               ['Average Daily Revenue', sm.averageDailyRevenue ?? 0],
               ['Average Revenue / Reservation', sm.averageRevenuePerReservation ?? 0],
-              ['Pending Payments', sm.pendingPayments ?? 0],
               ['Currency', sm.currency || 'PHP']
             ]
           }

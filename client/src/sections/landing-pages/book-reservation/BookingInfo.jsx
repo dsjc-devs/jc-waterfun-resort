@@ -376,11 +376,11 @@ const BookingInfo = ({
       )}
 
       {/* Amenities Selection */}
-      <AmenitySelector
+      {/* <AmenitySelector
         amenitiesQuantities={amenitiesQuantities}
         onAmenitiesChange={onAmenitiesChange}
         variant="enhanced"
-      />
+      /> */}
     </Box>
   );
 };
