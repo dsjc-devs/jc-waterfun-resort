@@ -18,6 +18,66 @@ import activityServices from "./activityServices.js";
 // Standard footer for all outbound SMS messages
 const SMS_FOOTER = "\n(Automated message. Do not reply.)";
 
+// ============ TOTALS UTILITY ============ //
+// Centralized helper to compute aggregate total from amount components.
+// When base components are missing (common in non–walk-in flows),
+// optionally preserve a previous aggregate to avoid collapsing to amenities-only.
+const recomputeTotal = ({ amount, nextAmenitiesTotal, preserveWhenBaseMissing = true }) => {
+  const amt = amount || {};
+  const accommodationTotal = Number(amt.accommodationTotal || 0);
+  const entranceTotal = Number(amt.entranceTotal || 0);
+  const extraPersonFee = Number(amt.extraPersonFee || 0);
+  const prevAmenitiesTotal = Number(amt.amenitiesTotal || 0);
+  const beforeTotal = Number(amt.total || 0);
+  const amenitiesTotal = Number(
+    typeof nextAmenitiesTotal === 'number' ? nextAmenitiesTotal : prevAmenitiesTotal
+  );
+
+  const baseAggregateIsZero = (accommodationTotal + entranceTotal + extraPersonFee) === 0; // Check if base totals are missing
+
+  if (preserveWhenBaseMissing && baseAggregateIsZero) {
+    // Preserve previously computed aggregate when we don't have base components.
+    // If none exist, fall back to 0 to avoid equating total with amenities-only.
+    return beforeTotal > 0 ? beforeTotal : 0;
+  }
+
+  return accommodationTotal + entranceTotal + amenitiesTotal + extraPersonFee;
+};
+
+// Compute base totals server-side when missing.
+// - accommodationTotal: derived from accommodation price * nights (at least 1)
+// - entranceTotal: preserved from provided amount if any; otherwise 0
+// - extraPersonFee: preserved from provided amount if any; otherwise 0
+const computeBaseTotals = async ({ accommodationId, startDate, endDate, amount, mode, isDayMode }) => {
+  const amt = amount || {};
+  let accommodationTotal = Number(amt.accommodationTotal || 0);
+  let entranceTotal = Number(amt.entranceTotal || 0);
+  let extraPersonFee = Number(amt.extraPersonFee || 0);
+
+  const baseMissing = (accommodationTotal + entranceTotal + extraPersonFee) === 0;
+  if (!baseMissing) {
+    return { accommodationTotal, entranceTotal, extraPersonFee };
+  }
+
+  try {
+    const acc = await Accommodations.findById(accommodationId).lean();
+    // Prefer day/night differentiated pricing when available
+    const useDay = typeof isDayMode === 'boolean' ? isDayMode : (String(mode || '').toLowerCase() === 'day');
+    const priceCandidate = useDay ? (acc?.price?.day ?? acc?.price) : (acc?.price?.night ?? acc?.price);
+    const price = Number(priceCandidate || 0);
+    // Align with Form.jsx: use the per-mode price directly (no nights multiplication)
+    // Form.jsx computes total as: price + entranceTotal + extraPersonFee + amenitiesTotal
+    // and minimumPayable = price * 0.5
+    accommodationTotal = price;
+  } catch (e) {
+    // If we fail fetching accommodation, keep accommodationTotal as 0
+    console.error("Failed to compute accommodationTotal:", e?.message);
+  }
+
+  // Keep entrance and extra fees as provided (or 0 if absent)
+  return { accommodationTotal, entranceTotal, extraPersonFee };
+};
+
 const hasDateConflict = async (accommodationId, newStartDate, newEndDate) => {
   const conflict = await Reservation.findOne({
     accommodationId,
@@ -107,19 +167,37 @@ const createReservation = async (reservationData) => {
 
     // Do not persist client-provided amenities directly; they lack required name/price
     const { amenitiesItems, amenities: clientAmenities, ...restData } = reservationData || {};
-    const reservation = await Reservation.create({
+
+    // Normalize amount so totals are consistent even when not walk-in
+    // Compute server-side base totals if missing
+    const base = await computeBaseTotals({ accommodationId, startDate, endDate, amount, mode: reservationData?.mode, isDayMode: reservationData?.isDayMode });
+    const accomTotal = Number(base.accommodationTotal || 0);
+    const entranceTotal = Number(base.entranceTotal || 0);
+    const amenitiesTotal = Number(amount?.amenitiesTotal || 0);
+    const extraPersonFee = Number(base.extraPersonFee || 0);
+    // Deterministically recompute total from components; do not preserve when base is missing
+    const computedTotal = recomputeTotal({ amount: { ...amount, accommodationTotal: accomTotal, entranceTotal, extraPersonFee, amenitiesTotal }, nextAmenitiesTotal: amenitiesTotal, preserveWhenBaseMissing: false });
+    const normalizedAmount = {
+      ...amount,
+      accommodationTotal: accomTotal,
+      entranceTotal,
+      amenitiesTotal,
+      extraPersonFee,
+      total: computedTotal,
+    };
+    let reservation = await Reservation.create({
       reservationId,
       ...restData,
+      amount: normalizedAmount,
       amenities: [],
     });
 
-    // If amenities are provided, enrich and update line items + totals
-    if (Array.isArray(amenitiesItems) && amenitiesItems.length) {
-      try {
-        await updateReservationAmenitiesById(reservationId, { items: amenitiesItems });
-      } catch (e) {
-        console.error("Failed to attach amenities on create:", e?.message || e);
-      }
+    // Always trigger amenities update (even with empty list) to normalize totals consistently
+    try {
+      const items = Array.isArray(amenitiesItems) ? amenitiesItems : [];
+      reservation = await updateReservationAmenitiesById(reservationId, { items });
+    } catch (e) {
+      console.error("Failed to update amenities on create:", e?.message || e);
     }
 
     // Record activity: reservation created
@@ -291,7 +369,7 @@ const updateReservationById = async (reservationId, updateData) => {
     const entranceTotal = Number(amt.entranceTotal || 0);
     const amenitiesTotal = Number(amt.amenitiesTotal || 0);
     const extraPersonFee = Number(amt.extraPersonFee || 0);
-    const recomputedTotal = accomTotal + entranceTotal + amenitiesTotal + extraPersonFee;
+    const recomputedTotal = recomputeTotal({ amount: amt, preserveWhenBaseMissing: false });
 
     // If total differs or components provided in updateData, set the recomputed total
     const componentsTouched = (
@@ -789,6 +867,8 @@ const decideRescheduleById = async (reservationId, { action, reason, decidedBy }
 // ============ AMENITIES MANAGEMENT ============ //
 
 const updateReservationAmenitiesById = async (reservationId, { items }) => {
+  console.log(`trig`);
+
   try {
     if (!Array.isArray(items)) {
       throw new Error("'items' must be an array of { amenityId, quantity }");
@@ -836,15 +916,47 @@ const updateReservationAmenitiesById = async (reservationId, { items }) => {
 
     reservation.amenities = lineItems;
 
-    const nextAmount = {
+    // Update amenitiesTotal and recompute amount.total.
+    // If base components are missing (non-walk-in flows often don't send them),
+    // preserve the previously computed aggregate total by adjusting only the amenities delta.
+    const accommodationTotal = Number(beforeAmount.accommodationTotal || 0);
+    const entranceTotal = Number(beforeAmount.entranceTotal || 0);
+    const extraPersonFee = Number(beforeAmount.extraPersonFee || 0);
+    const prevAmenitiesTotal = Number(beforeAmount.amenitiesTotal || 0);
+    const baseAggregateIsZero = (accommodationTotal + entranceTotal + extraPersonFee) === 0;
+    const hasExistingAggregate = Number.isFinite(beforeTotal) && beforeTotal > 0;
+    let recomputedTotal;
+    const baseMissing = (Number(beforeAmount.accommodationTotal || 0) + Number(beforeAmount.entranceTotal || 0) + Number(beforeAmount.extraPersonFee || 0)) === 0;
+    if (baseMissing) {
+      try {
+        const base = await computeBaseTotals({
+          accommodationId: reservation.accommodationId,
+          startDate: reservation.startDate,
+          endDate: reservation.endDate,
+          amount: beforeAmount,
+          mode: reservation.mode,
+          isDayMode: reservation.isDayMode,
+        });
+        const mergedAmount = {
+          ...beforeAmount,
+          accommodationTotal: Number(base.accommodationTotal || 0),
+          entranceTotal: Number(base.entranceTotal || 0),
+          extraPersonFee: Number(base.extraPersonFee || 0),
+        };
+        recomputedTotal = recomputeTotal({ amount: mergedAmount, nextAmenitiesTotal: amenitiesTotal, preserveWhenBaseMissing: false });
+      } catch (e) {
+        // Fallback to preservation logic if computing base fails
+        recomputedTotal = recomputeTotal({ amount: beforeAmount, nextAmenitiesTotal: amenitiesTotal, preserveWhenBaseMissing: true });
+      }
+    } else {
+      recomputedTotal = recomputeTotal({ amount: beforeAmount, nextAmenitiesTotal: amenitiesTotal, preserveWhenBaseMissing: false });
+    }
+
+    reservation.amount = {
       ...beforeAmount,
       amenitiesTotal,
+      total: recomputedTotal,
     };
-    const accommodationTotal = Number(nextAmount.accommodationTotal || 0);
-    const entranceTotal = Number(nextAmount.entranceTotal || 0);
-    const extraPersonFee = Number(nextAmount.extraPersonFee || 0);
-    nextAmount.total = accommodationTotal + entranceTotal + amenitiesTotal + extraPersonFee;
-    reservation.amount = nextAmount;
 
     const saved = await reservation.save();
 
