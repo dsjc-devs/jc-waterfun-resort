@@ -18,9 +18,6 @@ const ImportantInfoSection = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <Typography variant="body1" color="#634131" mb={1}>
-                • Children under 2 years old enter for FREE
-              </Typography>
-              <Typography variant="body1" color="#634131" mb={1}>
                 • No cancellation or refund
               </Typography>
               <Typography variant="body1" color="#634131" mb={1}>
